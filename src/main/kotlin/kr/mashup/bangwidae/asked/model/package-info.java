@@ -1,0 +1,1 @@
+package kr.mashup.bangwidae.asked.model;
