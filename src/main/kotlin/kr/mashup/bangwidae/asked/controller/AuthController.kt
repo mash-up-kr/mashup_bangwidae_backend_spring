@@ -18,4 +18,5 @@ class AuthController {
     ): LoginResponse {
         return LoginResponse(token = "example")
     }
+
 }
