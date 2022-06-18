@@ -13,11 +13,6 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(
 	private val userService: UserService
 ) {
-	@GetMapping("/name/{name}")
-	fun findUsersByName(@PathVariable name: String): List<User> {
-		return userService.findAllByName(name)
-	}
-
 	@GetMapping("/{id}")
 	fun findUser(@PathVariable id: ObjectId): User {
 		return userService.findById(id)
