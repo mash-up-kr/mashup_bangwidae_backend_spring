@@ -2,6 +2,11 @@ spring:
   data:
     mongodb:
       uri: ${MONGO_URI}
+  main:
+    allow-bean-definition-overriding: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 
 server:
   error:
