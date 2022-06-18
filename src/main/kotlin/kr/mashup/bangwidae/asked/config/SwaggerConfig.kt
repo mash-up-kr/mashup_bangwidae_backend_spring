@@ -9,6 +9,7 @@ import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spring.web.plugins.Docket
 import springfox.documentation.spring.web.plugins.WebMvcRequestHandlerProvider
 import springfox.documentation.spring.web.readers.operation.HandlerMethodResolver
+import springfox.documentation.swagger2.annotations.EnableSwagger2
 import java.util.*
 import javax.servlet.ServletContext
 import kotlin.streams.toList
