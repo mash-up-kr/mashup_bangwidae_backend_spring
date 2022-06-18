@@ -5,10 +5,12 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.mongodb.MongoDatabaseFactory
+import org.springframework.data.mongodb.config.EnableMongoAuditing
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory
 
 @Configuration
+@EnableMongoAuditing
 class MongoConfig {
 	@Bean
 	@ConfigurationProperties("spring.data.mongodb")

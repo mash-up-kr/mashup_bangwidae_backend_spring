@@ -10,10 +10,6 @@ import org.springframework.stereotype.Service
 class UserService(
 	private val userRepository: UserRepository
 ) {
-	fun findAllByName(name: String): List<User> {
-		return userRepository.findAllByName(name)
-	}
-
 	fun findById(id: ObjectId): User {
 		return userRepository.findByIdOrNull(id) ?: throw RuntimeException("User {id: $id} Not Found")
 	}
