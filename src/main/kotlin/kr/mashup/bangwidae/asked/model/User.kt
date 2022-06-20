@@ -17,9 +17,9 @@ data class User(
 	val tags: List<String> = emptyList(),
 
 	@CreatedDate // TODO: KST 변환방법 알아보기 JAVA TIME Module
-	val createdAt: LocalDateTime = LocalDateTime.MIN, // TODO: modified, created 되는지 테스트해보기
+	val createdAt: LocalDateTime = LocalDateTime.now(), // TODO: modified, created 되는지 테스트해보기
 	@LastModifiedDate
-	val updatedAt: LocalDateTime = LocalDateTime.MIN,
+	val updatedAt: LocalDateTime = LocalDateTime.now(),
 )
 
 enum class LoginType {

@@ -14,7 +14,7 @@ data class Post(
 	val location: GeoJsonPoint,
 
 	@CreatedDate
-	val createdAt: LocalDateTime = LocalDateTime.MIN,
+	val createdAt: LocalDateTime = LocalDateTime.now(),
 	@LastModifiedDate
-	val updatedAt: LocalDateTime = LocalDateTime.MIN
+	val updatedAt: LocalDateTime = LocalDateTime.now()
 )
