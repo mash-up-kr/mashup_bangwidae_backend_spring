@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface PostRepository : MongoRepository<Post, ObjectId> {
-	fun findAByLocationNear(location: GeoJsonPoint, distance: Distance): List<Post>
+	fun findByLocationNear(location: GeoJsonPoint, distance: Distance): List<Post>
 }
