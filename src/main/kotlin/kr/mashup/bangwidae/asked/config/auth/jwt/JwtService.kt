@@ -17,16 +17,18 @@ class JwtService(
     private val algorithm: Algorithm = Algorithm.HMAC256(tokenSigningKey)
     private val jwtVerifier: JWTVerifier = JWT.require(algorithm).build()
 
-    fun encode(userId: String): String {
+    // TODO : expired 결정, refresh 할건지? 등등
+    fun createAccessToken(userId: String): String {
         return JWT.create()
             .withIssuer(tokenIssuer)
             .withClaim("userId", userId)
             .sign(algorithm)
     }
 
-    fun decode(token: String?): Long? {
+    fun decodeToken(token: String?): String? {
         return try {
-            jwtVerifier.verify(token).let { it.claims["userId"]?.asLong() }
+            // claim 에 string 을 처음 넣어봤는데 string 에 " 가 붙는 기이한 현상 발생해서 replace 하는 야매 사용 ;;
+            jwtVerifier.verify(token).let { it.claims["userId"]?.toString()?.replace("\"", "") }
         } catch (ex: JWTVerificationException) {
             null
         }

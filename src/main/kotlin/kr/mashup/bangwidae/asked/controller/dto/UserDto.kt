@@ -18,3 +18,12 @@ data class UserDto(
         }
     }
 }
+
+data class JoinUserRequest(
+    val loginId: String,
+    val password: String
+)
+
+data class JoinUserResponse(
+    val accessToken: String
+)

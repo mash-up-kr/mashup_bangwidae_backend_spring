@@ -2,6 +2,7 @@ package kr.mashup.bangwidae.asked.config.auth.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import kr.mashup.bangwidae.asked.config.auth.jwt.JwtService
+import kr.mashup.bangwidae.asked.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -25,11 +26,15 @@ class SecurityConfig {
     @Autowired
     lateinit var jwtService: JwtService
 
+    @Autowired
+    lateinit var userService: UserService
+
     @Bean
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http.antMatcher("/api/v1/**")
             .authorizeRequests()
             .antMatchers("actuator/health").permitAll()
+            .antMatchers("/api/v1/user/join").permitAll()
             .antMatchers("/api/**").hasAuthority("ROLE")
         http.csrf().disable()
             .logout().disable()
@@ -70,7 +75,8 @@ class SecurityConfig {
     @Bean
     fun preAuthTokenProvider(): PreAuthTokenProvider {
         return PreAuthTokenProvider(
-            jwtService
+            jwtService,
+            userService
         )
     }
 }

@@ -6,9 +6,9 @@ import kr.mashup.bangwidae.asked.controller.dto.LoginRequest
 import kr.mashup.bangwidae.asked.controller.dto.LoginResponse
 import org.springframework.web.bind.annotation.*
 
+@Api(tags = ["인증 컨트롤러 (로그인)"])
 @RestController
 @RequestMapping("/api/v1/auth")
-@Api(tags = ["인증 컨트롤러 (로그인)"])
 class AuthController {
 
     @ApiOperation("로그인")
