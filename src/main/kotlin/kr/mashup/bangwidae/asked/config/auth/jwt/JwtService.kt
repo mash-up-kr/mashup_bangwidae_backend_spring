@@ -21,16 +21,20 @@ class JwtService(
     fun createAccessToken(userId: String): String {
         return JWT.create()
             .withIssuer(tokenIssuer)
-            .withClaim("userId", userId)
+            .withClaim(CLAIM_NAME, userId)
             .sign(algorithm)
     }
 
     fun decodeToken(token: String?): String? {
         return try {
             // claim 에 string 을 처음 넣어봤는데 string 에 " 가 붙는 기이한 현상 발생해서 replace 하는 야매 사용 ;;
-            jwtVerifier.verify(token).let { it.claims["userId"]?.toString()?.replace("\"", "") }
+            jwtVerifier.verify(token).let { it.claims[CLAIM_NAME]?.toString()?.replace("\"", "") }
         } catch (ex: JWTVerificationException) {
             null
         }
+    }
+
+    companion object {
+        private const val CLAIM_NAME = "userId"
     }
 }

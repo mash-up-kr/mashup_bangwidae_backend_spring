@@ -17,6 +17,7 @@ class UserService(
 ) {
 
 	fun jointUser(joinUserRequest: JoinUserRequest): String {
+		// TODO 비밀번호 암호화
 		val user = userRepository.save(
 			User.createBasicUser(
 				loginId = joinUserRequest.loginId,
@@ -29,5 +30,10 @@ class UserService(
 	@Transactional(readOnly = true)
 	fun findById(id: ObjectId): User {
 		return userRepository.findByIdOrNull(id) ?: throw RuntimeException("User {id: $id} Not Found")
+	}
+
+	@Transactional(readOnly = true)
+	fun findByLoginId(loginId: String): User? {
+		return userRepository.findByLoginId(loginId)
 	}
 }
