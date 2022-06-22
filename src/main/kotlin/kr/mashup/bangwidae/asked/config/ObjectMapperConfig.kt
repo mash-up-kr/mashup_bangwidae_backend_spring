@@ -11,13 +11,13 @@ import org.springframework.context.annotation.Primary
 
 @Configuration
 class ObjectMapperConfig {
-	@Bean
-	@Primary
-	fun objectMapper(): ObjectMapper {
-		val objectIdModule = SimpleModule().apply { addSerializer(ObjectId::class.java, ToStringSerializer()) }
-		return ObjectMapper().registerModules(
-			objectIdModule,
-			JavaTimeModule()
-		)
-	}
+//	@Bean
+//	@Primary
+//	fun objectMapper(): ObjectMapper {
+//		val objectIdModule = SimpleModule().apply { addSerializer(ObjectId::class.java, ToStringSerializer()) }
+//		return ObjectMapper().registerModules(
+//			objectIdModule,
+//			JavaTimeModule()
+//		)
+//	}
 }

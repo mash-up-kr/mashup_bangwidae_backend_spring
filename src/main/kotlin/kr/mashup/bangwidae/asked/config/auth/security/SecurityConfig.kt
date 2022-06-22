@@ -33,8 +33,11 @@ class SecurityConfig {
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http.antMatcher("/api/v1/**")
             .authorizeRequests()
-            .antMatchers("actuator/health").permitAll()
-            .antMatchers("/api/v1/user/join").permitAll()
+            .antMatchers(
+                "actuator/health",
+                "/api/v1/user/join",
+                "/api/v1/auth/login"
+            ).permitAll()
             .antMatchers("/api/**").hasAuthority("ROLE")
         http.csrf().disable()
             .logout().disable()

@@ -7,7 +7,7 @@ import java.lang.RuntimeException
 class DoriDoriException(
     val httpStatus: HttpStatus,
     val code: String,
-    override val message: String?,
+    override val message: String? = null,
 ) : RuntimeException() {
     companion object {
         fun of(type: DoriDoriExceptionType): DoriDoriException {

@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
 import kr.mashup.bangwidae.asked.controller.dto.LoginRequest
 import kr.mashup.bangwidae.asked.controller.dto.LoginResponse
-import kr.mashup.bangwidae.asked.service.AuthService
+import kr.mashup.bangwidae.asked.service.auth.AuthService
 import org.springframework.web.bind.annotation.*
 
 @Api(tags = ["인증 컨트롤러 (로그인)"])
