@@ -37,12 +37,12 @@ enum class DoriDoriExceptionType(
     ),
     INVALID_PASSWORD_REGEX(
         httpStatus = HttpStatus.BAD_REQUEST,
-        code = Code.INVALID_PASSWORD,
+        code = Code.INVALID_PASSWORD_REGEX,
         message = "비밀번호는 숫자, 영어, 특수문자로 이루어져야 해요"
     ),
     INVALID_PASSWORD_LENGTH(
         httpStatus = HttpStatus.BAD_REQUEST,
-        code = Code.INVALID_PASSWORD,
+        code = Code.INVALID_PASSWORD_LENGTH,
         message = "비밀번호는 8자리 이상이어야 해요"
     );
 
