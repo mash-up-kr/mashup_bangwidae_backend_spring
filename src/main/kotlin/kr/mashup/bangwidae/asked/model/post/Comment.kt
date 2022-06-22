@@ -13,7 +13,7 @@ data class Comment (
 	val content: String,
 
 	@CreatedDate
-	val createdAt: LocalDateTime = LocalDateTime.MIN,
+	val createdAt: LocalDateTime = LocalDateTime.now(),
 	@LastModifiedDate
-	val updatedAt: LocalDateTime = LocalDateTime.MIN
+	val updatedAt: LocalDateTime = LocalDateTime.now()
 )

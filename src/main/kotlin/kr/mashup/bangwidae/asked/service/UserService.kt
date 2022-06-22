@@ -2,6 +2,7 @@ package kr.mashup.bangwidae.asked.service
 
 import kr.mashup.bangwidae.asked.config.auth.jwt.JwtService
 import kr.mashup.bangwidae.asked.controller.dto.JoinUserRequest
+import kr.mashup.bangwidae.asked.controller.dto.JoinUserResponse
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import org.bson.types.ObjectId
@@ -16,7 +17,7 @@ class UserService(
 	private val userRepository: UserRepository
 ) {
 
-	fun jointUser(joinUserRequest: JoinUserRequest): String {
+	fun jointUser(joinUserRequest: JoinUserRequest): JoinUserResponse {
 		// TODO 비밀번호 암호화
 		val user = userRepository.save(
 			User.createBasicUser(
@@ -24,7 +25,7 @@ class UserService(
 				password = joinUserRequest.password
 			)
 		)
-		return jwtService.createAccessToken(user.id!!.toHexString())
+		return JoinUserResponse(jwtService.createAccessToken(user.id!!.toHexString()))
 	}
 
 	@Transactional(readOnly = true)
