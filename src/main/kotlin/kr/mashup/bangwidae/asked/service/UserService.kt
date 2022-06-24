@@ -9,9 +9,7 @@ import kr.mashup.bangwidae.asked.repository.UserRepository
 import org.bson.types.ObjectId
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
-@Transactional
 @Service
 class UserService(
 	private val jwtService: JwtService,
@@ -32,12 +30,10 @@ class UserService(
 		return JoinUserResponse(jwtService.createAccessToken(user.id!!.toHexString()))
 	}
 
-	@Transactional(readOnly = true)
 	fun findById(id: ObjectId): User {
 		return userRepository.findByIdOrNull(id) ?: throw RuntimeException("User {id: $id} Not Found")
 	}
 
-	@Transactional(readOnly = true)
 	fun findByLoginId(loginId: String): User? {
 		return userRepository.findByLoginId(loginId)
 	}
