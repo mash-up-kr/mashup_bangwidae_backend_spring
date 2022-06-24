@@ -19,7 +19,7 @@ class UserService(
 	private val passwordService: PasswordService
 ) {
 
-	fun jointUser(joinUserRequest: JoinUserRequest): JoinUserResponse {
+	fun joinUser(joinUserRequest: JoinUserRequest): JoinUserResponse {
 		passwordService.validatePassword(joinUserRequest.password)
 
 		val encodedPassword = passwordService.encodePassword(joinUserRequest.password)
