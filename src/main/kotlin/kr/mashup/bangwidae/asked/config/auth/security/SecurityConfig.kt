@@ -37,7 +37,8 @@ class SecurityConfig {
                 "actuator/health",
                 "/api/v1/user/join",
                 "/api/v1/auth/login",
-                "/api/v1/auth/mail/send"
+                "/api/v1/auth/mail/send",
+                "/api/v1/auth/mail/cert"
             ).permitAll()
             .antMatchers("/api/**").hasAuthority("ROLE")
         http.csrf().disable()

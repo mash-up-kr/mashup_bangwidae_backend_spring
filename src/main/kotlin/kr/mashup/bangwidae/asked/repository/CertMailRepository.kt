@@ -7,5 +7,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface CertMailRepository: MongoRepository<CertMail, ObjectId> {
-    fun findFirstByEmailAndOrderByMailSendTsDesc(email: String): CertMail?
+    fun findFirstByEmailOrderByMailSendTsDesc(email: String): CertMail?
 }

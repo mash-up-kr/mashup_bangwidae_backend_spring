@@ -6,7 +6,6 @@ import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.external.mail.GmailSender
-import kr.mashup.bangwidae.asked.model.CertMail
 import kr.mashup.bangwidae.asked.model.LoginType
 import kr.mashup.bangwidae.asked.model.MailTemplate
 import kr.mashup.bangwidae.asked.model.User
@@ -30,15 +29,15 @@ class AuthService(
     private val authProviderFactory: AuthProviderFactory,
 ) {
     fun login(loginRequest: LoginRequest): LoginResponse {
-        val user = (userService.findByLoginId(loginRequest.loginId)
+        val user = (userService.findByEmail(loginRequest.email)
             ?: throw IllegalArgumentException("유저가 없어용"))
 
         runCatching {
             loginWithType(user, loginRequest)
         }.onSuccess {
-            logger.info { "$LOG_PREFIX ${user.loginId} ${user.loginType} 인증 성공" }
+            logger.info { "$LOG_PREFIX ${user.email} ${user.loginType} 인증 성공" }
         }.onFailure {
-            logger.info { "$LOG_PREFIX ${user.loginId} ${user.loginType} 인증 실패" }
+            logger.info { "$LOG_PREFIX ${user.email} ${user.loginType} 인증 실패" }
             throw DoriDoriException.of(DoriDoriExceptionType.LOGIN_FAILED)
         }
 
@@ -57,6 +56,8 @@ class AuthService(
     }
 
     fun sendCertMail(certMailSendRequest: CertMailSendRequest) {
+        userService.checkDuplicatedUser(certMailSendRequest.email)
+
         val certificationNumber = createCertificationNumber()
         certMailService.create(certMailSendRequest.email, certificationNumber)
         gmailSender.send(

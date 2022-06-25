@@ -17,7 +17,7 @@ class CertMailService(
     }
 
     fun certificate(email: String, certificationNumber: String) {
-        val certMail = (certMailRepository.findFirstByEmailAndOrderByMailSendTsDesc(email)
+        val certMail = (certMailRepository.findFirstByEmailOrderByMailSendTsDesc(email)
             ?: throw DoriDoriException.of(DoriDoriExceptionType.COMMON_ERROR))
 
         if (!certMail.isCertifiedBy(certificationNumber)) {
@@ -25,6 +25,12 @@ class CertMailService(
         }
 
         certMail.certificationTs = LocalDateTime.now()
+        certMail.isCertificated = true
         certMailRepository.save(certMail)
+    }
+
+    fun findByEmail(email: String): CertMail {
+        return certMailRepository.findFirstByEmailOrderByMailSendTsDesc(email)
+            ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
     }
 }

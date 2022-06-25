@@ -10,7 +10,7 @@ import java.time.LocalDateTime
 data class User(
 	val id: ObjectId? = null,
 	val nickname: String = "noname",
-	val loginId: String,
+	val email: String,
 	val password: String? = null,
 	val providerId: String? = null,
 	val loginType: LoginType,
@@ -22,9 +22,9 @@ data class User(
 	val updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
 	companion object {
-		fun createBasicUser(loginId: String, password: String): User {
+		fun createBasicUser(email: String, password: String): User {
 			return User(
-				loginId = loginId,
+				email = email,
 				password = password,
 				loginType = LoginType.BASIC
 			)

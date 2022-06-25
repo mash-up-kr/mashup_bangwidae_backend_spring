@@ -39,7 +39,7 @@ class MongoDbSpringIntegrationTest(
 
 		// then
 		assertTrue(savedUser.id == foundUser.id)
-		assertTrue(savedUser.loginId == foundUser.loginId)
+		assertTrue(savedUser.email == foundUser.email)
 		assertTrue(savedUser.nickname == foundUser.nickname)
 		assertTrue(savedUser.password == foundUser.password)
 		assertTrue(savedUser.tags == foundUser.tags)

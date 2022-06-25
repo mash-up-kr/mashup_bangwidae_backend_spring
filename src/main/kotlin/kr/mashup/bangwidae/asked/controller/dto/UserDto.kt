@@ -20,8 +20,8 @@ data class UserDto(
 }
 
 data class JoinUserRequest(
-    @ApiModelProperty(value = "로그인 ID", example = "gardenlee")
-    val loginId: String,
+    @ApiModelProperty(value = "이메일", example = "doridori@gmail.com")
+    val email: String,
     @ApiModelProperty(value = "로그인 비밀번호", example = "12345")
     val password: String
 )

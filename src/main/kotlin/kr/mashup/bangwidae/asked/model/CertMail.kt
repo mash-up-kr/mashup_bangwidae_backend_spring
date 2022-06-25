@@ -9,6 +9,7 @@ data class CertMail(
     val id: ObjectId? = null,
     val email: String,
     val certificationNumber: String,
+    var isCertificated: Boolean = false,
     var certificationTs: LocalDateTime? = null,
     val mailSendTs: LocalDateTime = LocalDateTime.now(),
     val expiredTs: LocalDateTime // 유효기간 검사 필요할 때 develop
