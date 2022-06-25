@@ -14,3 +14,7 @@ server:
     include-message: always
     include-exception: true
     include-stacktrace: never
+
+jwt:
+  token-issuer: bangwidae
+  secret-key: secret-key # 나중에 바꿉시당
