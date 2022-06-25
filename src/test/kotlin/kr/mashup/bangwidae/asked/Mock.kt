@@ -21,7 +21,8 @@ fun mockSinnonhyeonPost(): Post {
 	return Post(
 		id = null,
 		content = "신논현 교보문고 입니다.",
-		location = GeoJsonPoint(127.024099, 37.504030)
+		location = GeoJsonPoint(127.024099, 37.504030),
+		representativeAddress = "신논현"
 	)
 }
 
@@ -29,7 +30,8 @@ fun mockGangnamPost(): Post {
 	return Post(
 		id = null,
 		content = "강남역 입니다.",
-		location = GeoJsonPoint(127.027926, 37.497175)
+		location = GeoJsonPoint(127.027926, 37.497175),
+		representativeAddress = "강남"
 	)
 }
 
@@ -37,6 +39,7 @@ fun mockNonhyeonPost(): Post {
 	return Post(
 		id = null,
 		content = "논현역 입니다.",
-		location = GeoJsonPoint(127.02158470345, 37.511130469556)
+		location = GeoJsonPoint(127.02158470345, 37.511130469556),
+		representativeAddress = "논현"
 	)
 }

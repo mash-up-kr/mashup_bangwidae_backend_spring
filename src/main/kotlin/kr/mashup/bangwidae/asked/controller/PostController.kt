@@ -22,7 +22,7 @@ class PostController {
 	fun writePost(
 		@ApiIgnore @AuthenticationPrincipal user: User,
 		@RequestBody postRequest: PostRequest
-	): ApiResponse<PostDto> {
+	): ApiResponse<Any> {
 		return ApiResponse.success(true)
 	}
 }
