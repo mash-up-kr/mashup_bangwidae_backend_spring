@@ -12,9 +12,10 @@ import java.time.LocalDateTime
 @Document("post")
 data class Post(
 	val id: ObjectId? = null,
-	val content: String,
+	val content: String = "",
 	@GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
 	val location: GeoJsonPoint,
+	val representativeAddress: String?,
 
 	@CreatedDate
 	val createdAt: LocalDateTime = LocalDateTime.now(),
