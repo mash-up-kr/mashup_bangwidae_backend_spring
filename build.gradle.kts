@@ -20,6 +20,7 @@ val javaJwtVersion: String by project
 val kotlinLoggingVersion: String by project
 val jacksonKotlinModuleVersion: String by project
 val embeddedMongoVersion: String by project
+val jasyptVersion: String by project
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
@@ -28,6 +29,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
 
 	implementation("com.auth0:java-jwt:$javaJwtVersion")
+	implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:${jasyptVersion}")
 	implementation("io.github.microutils:kotlin-logging-jvm:${kotlinLoggingVersion}")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
