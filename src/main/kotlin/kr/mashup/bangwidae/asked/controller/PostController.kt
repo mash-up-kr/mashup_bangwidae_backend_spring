@@ -31,7 +31,7 @@ class PostController(
 
 	@ApiOperation("거리 반경 포스트 글 페이징")
 	@GetMapping("/near")
-	fun getNearPost(
+	fun getNearPosts(
 		@RequestParam longitude: Double,
 		@RequestParam latitude: Double,
 		@RequestParam meterDistance: Double,
