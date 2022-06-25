@@ -17,3 +17,8 @@ data class LoginResponse(
     @ApiModelProperty(value = "access token", example = "eherhljerghjlejrgligjl")
     val accessToken: String
 )
+
+data class MailAuthRequest(
+    @ApiModelProperty(value = "access token", example = "eherhljerghjlejrgligjl")
+    val email: String
+)
