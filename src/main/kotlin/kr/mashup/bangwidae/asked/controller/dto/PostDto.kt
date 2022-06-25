@@ -42,7 +42,7 @@ data class PostDto(
 	}
 }
 
-data class PostRequest(
+data class PostWriteRequest(
 	@ApiModelProperty(value = "post content", example = "질문 post 샘플")
 	val content: String,
 	@ApiModelProperty(value = "경도", example = "127.4")

@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
 import kr.mashup.bangwidae.asked.controller.dto.CursorResult
 import kr.mashup.bangwidae.asked.controller.dto.PostDto
-import kr.mashup.bangwidae.asked.controller.dto.PostRequest
+import kr.mashup.bangwidae.asked.controller.dto.PostWriteRequest
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.PostService
 import org.bson.types.ObjectId
@@ -23,9 +23,9 @@ class PostController(
 	@PostMapping
 	fun writePost(
 		@ApiIgnore @AuthenticationPrincipal user: User,
-		@RequestBody postRequest: PostRequest
+		@RequestBody postWriteRequest: PostWriteRequest
 	): ApiResponse<PostDto> {
-		val savedPost = postService.upsert(postRequest.toEntity(user.id!!))
+		val savedPost = postService.upsert(postWriteRequest.toEntity(user.id!!))
 		return ApiResponse.success(PostDto.from(savedPost))
 	}
 
