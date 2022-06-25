@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.mongodb.MongoDatabaseFactory
+import org.springframework.data.mongodb.MongoTransactionManager
 import org.springframework.data.mongodb.config.EnableMongoAuditing
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory
@@ -26,5 +27,10 @@ class MongoConfig {
 	@Bean
 	fun mongoTemplate(mongoFactory: MongoDatabaseFactory): MongoTemplate {
 		return MongoTemplate(mongoFactory)
+	}
+
+	@Bean
+	fun transactionManager(mongoFactory: MongoDatabaseFactory): MongoTransactionManager {
+		return MongoTransactionManager(mongoFactory)
 	}
 }
