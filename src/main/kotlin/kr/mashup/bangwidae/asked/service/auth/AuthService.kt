@@ -2,12 +2,11 @@ package kr.mashup.bangwidae.asked.service.auth
 
 import kr.mashup.bangwidae.asked.config.auth.jwt.JwtService
 import kr.mashup.bangwidae.asked.config.auth.password.PasswordService
-import kr.mashup.bangwidae.asked.controller.dto.LoginRequest
-import kr.mashup.bangwidae.asked.controller.dto.LoginResponse
-import kr.mashup.bangwidae.asked.controller.dto.MailAuthRequest
+import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.external.mail.GmailSender
+import kr.mashup.bangwidae.asked.model.CertMail
 import kr.mashup.bangwidae.asked.model.LoginType
 import kr.mashup.bangwidae.asked.model.MailTemplate
 import kr.mashup.bangwidae.asked.model.User
@@ -57,11 +56,11 @@ class AuthService(
         }
     }
 
-    fun sendCertMail(mailAuthRequest: MailAuthRequest) {
+    fun sendCertMail(certMailSendRequest: CertMailSendRequest) {
         val certificationNumber = createCertificationNumber()
-        certMailService.create(mailAuthRequest.email, certificationNumber)
+        certMailService.create(certMailSendRequest.email, certificationNumber)
         gmailSender.send(
-            email = mailAuthRequest.email,
+            email = certMailSendRequest.email,
             title = "도리도리 인증번호가 발급되었습니다.",
             text = MailTemplate.createCertTemplate(certificationNumber)
         )
@@ -69,6 +68,10 @@ class AuthService(
 
     private fun createCertificationNumber(): String {
         return RandomStringUtils.randomNumeric(6)
+    }
+
+    fun certMail(certMailRequest: CertMailRequest) {
+        certMailService.certificate(certMailRequest.email, certMailRequest.certificationNumber)
     }
 
     companion object {

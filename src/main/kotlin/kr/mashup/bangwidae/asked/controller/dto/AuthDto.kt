@@ -18,7 +18,14 @@ data class LoginResponse(
     val accessToken: String
 )
 
-data class MailAuthRequest(
-    @ApiModelProperty(value = "access token", example = "eherhljerghjlejrgligjl")
+data class CertMailSendRequest(
+    @ApiModelProperty(value = "이메일", example = "doridori@gmail.com")
     val email: String
+)
+
+data class CertMailRequest(
+    @ApiModelProperty(value = "이메일", example = "doridori@gmail.com")
+    val email: String,
+    @ApiModelProperty(value = "인증 번호 (6자리 숫자)", example = "000000")
+    val certificationNumber: String,
 )

@@ -2,10 +2,7 @@ package kr.mashup.bangwidae.asked.controller
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
-import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
-import kr.mashup.bangwidae.asked.controller.dto.LoginRequest
-import kr.mashup.bangwidae.asked.controller.dto.LoginResponse
-import kr.mashup.bangwidae.asked.controller.dto.MailAuthRequest
+import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.service.auth.AuthService
 import org.springframework.web.bind.annotation.*
 
@@ -27,9 +24,18 @@ class AuthController(
     @ApiOperation("인증메일 발송")
     @PostMapping("/mail/send")
     fun sendCertMail(
-        @RequestBody mailAuthRequest: MailAuthRequest
+        @RequestBody certMailSendRequest: CertMailSendRequest
     ): ApiResponse<Boolean> {
-        authService.sendCertMail(mailAuthRequest)
+        authService.sendCertMail(certMailSendRequest)
+        return ApiResponse.success(true)
+    }
+
+    @ApiOperation("메일 인증")
+    @PostMapping("/mail/cert")
+    fun sendCertMail(
+        @RequestBody certMailRequest: CertMailRequest
+    ): ApiResponse<Boolean> {
+        authService.certMail(certMailRequest)
         return ApiResponse.success(true)
     }
 
