@@ -7,6 +7,17 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  mail:
+    username: ENC(DEK7lxRAJr3TRo4qNqoW0dIfDt2jpiEdU9Rtxa9khvE63KOPcPsbAkGZsRQQJFNiPbkpKid31MVe+6YcdH9Qrg==)
+    password: ENC(5ijBROKTSKxmY1qsM/baCn828AInwh62gpKapzFSntltF7JzNv399MWTboVUTE1Q/07zXD5wTcI0aFZs+JMXrw==)
+    host: smtp.gmail.com
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 server:
   error:

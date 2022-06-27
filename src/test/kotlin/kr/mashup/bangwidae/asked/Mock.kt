@@ -9,7 +9,7 @@ fun mockUser(): User {
 	return User(
 		id = null,
 		nickname = "mock user nickname",
-		loginId = "mock user loginId",
+		email = "mock user loginId",
 		password = "mock user password",
 		providerId = "mock user providerId",
 		loginType = LoginType.BASIC,
