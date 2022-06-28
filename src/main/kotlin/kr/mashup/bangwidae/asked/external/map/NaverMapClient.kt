@@ -1,0 +1,73 @@
+package kr.mashup.bangwidae.asked.external.map
+
+import org.springframework.stereotype.Component
+
+@Component
+class NaverMapClient(
+    private val naverMapFeignClient: NaverMapFeignClient,
+    private val naverMapProperties: NaverMapProperties,
+) {
+    fun reverseGeocode(longitude: Double, latitude: Double): List<NaverReverseGeocodeResult> {
+        val response = naverMapFeignClient.reverseGeocode(
+            clientId = naverMapProperties.authorization.clientId,
+            clientSecret = naverMapProperties.authorization.clientSecret,
+            coordinates = "${longitude},${latitude}",
+            responseType = "json"
+        )
+
+        return response.results
+    }
+}
+
+data class NaverReverseGeocodeResponse(
+    val status: NaverReverseGeocodeStatus,
+    val results: List<NaverReverseGeocodeResult>,
+)
+
+data class NaverReverseGeocodeStatus(
+    val code: Int,
+    val name: String,
+    val message: String,
+)
+
+data class NaverReverseGeocodeResult(
+    val name: String?,
+    val code: NaverReverseGeocodeCode?,
+    val region: NaverReverseGeocodeRegion?,
+)
+
+data class NaverReverseGeocodeCode(
+    val id: String?,
+    val type: String?,
+    val mappingId: String?,
+)
+
+data class NaverReverseGeocodeRegion(
+    // 국가 코드 최상위 도메인 두 자리 (KR)
+    val area0: NaverReverseGeocodeRegionArea?,
+    // 행정안전부에서 공시된 시/도 명칭
+    val area1: NaverReverseGeocodeRegionArea?,
+    // 행정안전부에서 공시된 시/군/구 명칭
+    val area2: NaverReverseGeocodeRegionArea?,
+    // 행정안전부에서 공시된 읍/면/동 명칭
+    val area3: NaverReverseGeocodeRegionArea?,
+    // 행정안전부에서 공시된 리 명칭
+    val area4: NaverReverseGeocodeRegionArea?,
+)
+
+data class NaverReverseGeocodeRegionArea(
+    val name: String?,
+    val coords: NaverReverseGeocodeCoords?,
+    val alias: String?,
+)
+
+data class NaverReverseGeocodeCoords(
+    val center: NaverReverseGeocodeCenter?,
+)
+
+data class NaverReverseGeocodeCenter(
+    val crs: String?,
+    val x: Double?,
+    val y: Double?,
+)
+
