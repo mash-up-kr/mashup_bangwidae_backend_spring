@@ -1,6 +1,7 @@
 package kr.mashup.bangwidae.asked.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.SerializationFeature
 import com.fasterxml.jackson.databind.module.SimpleModule
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
@@ -17,5 +18,6 @@ class ObjectMapperConfig {
 	fun objectMapper(): ObjectMapper {
 		val objectIdModule = SimpleModule().apply { addSerializer(ObjectId::class.java, ToStringSerializer()) }
 		return ObjectMapper().registerModules(objectIdModule, JavaTimeModule(), KotlinModule())
+			.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
 	}
 }
