@@ -13,24 +13,24 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory
 @Configuration
 @EnableMongoAuditing
 class MongoConfig {
-	@Bean
-	@ConfigurationProperties("spring.data.mongodb")
-	fun properties(): MongoProperties {
-		return MongoProperties()
-	}
+    @Bean
+    @ConfigurationProperties("spring.data.mongodb")
+    fun properties(): MongoProperties {
+        return MongoProperties()
+    }
 
-	@Bean
-	fun mongoFactory(properties: MongoProperties): MongoDatabaseFactory {
-		return SimpleMongoClientDatabaseFactory(properties.uri)
-	}
+    @Bean
+    fun mongoFactory(properties: MongoProperties): MongoDatabaseFactory {
+        return SimpleMongoClientDatabaseFactory(properties.uri)
+    }
 
-	@Bean
-	fun mongoTemplate(mongoFactory: MongoDatabaseFactory): MongoTemplate {
-		return MongoTemplate(mongoFactory)
-	}
+    @Bean
+    fun mongoTemplate(mongoFactory: MongoDatabaseFactory): MongoTemplate {
+        return MongoTemplate(mongoFactory)
+    }
 
-	@Bean
-	fun transactionManager(mongoFactory: MongoDatabaseFactory): MongoTransactionManager {
-		return MongoTransactionManager(mongoFactory)
-	}
+    @Bean
+    fun transactionManager(mongoFactory: MongoDatabaseFactory): MongoTransactionManager {
+        return MongoTransactionManager(mongoFactory)
+    }
 }

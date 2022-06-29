@@ -9,5 +9,5 @@ import org.springframework.cloud.openfeign.EnableFeignClients
 class AskedApplication
 
 fun main(args: Array<String>) {
-	runApplication<AskedApplication>(*args)
+    runApplication<AskedApplication>(*args)
 }

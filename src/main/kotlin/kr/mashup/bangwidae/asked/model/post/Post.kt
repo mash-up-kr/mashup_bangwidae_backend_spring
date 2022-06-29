@@ -11,16 +11,16 @@ import java.time.LocalDateTime
 
 @Document("post")
 data class Post(
-	val id: ObjectId? = null,
-	val userId: ObjectId,
-	val content: String = "",
-	@GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
-	val location: GeoJsonPoint,
-	val representativeAddress: String?,
-	val fullAddress: String?,
+    val id: ObjectId? = null,
+    val userId: ObjectId,
+    val content: String = "",
+    @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
+    val location: GeoJsonPoint,
+    val representativeAddress: String?,
+    val fullAddress: String?,
 
-	@CreatedDate
-	val createdAt: LocalDateTime = LocalDateTime.now(),
-	@LastModifiedDate
-	val updatedAt: LocalDateTime = LocalDateTime.now()
+    @CreatedDate
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    @LastModifiedDate
+    val updatedAt: LocalDateTime = LocalDateTime.now()
 )

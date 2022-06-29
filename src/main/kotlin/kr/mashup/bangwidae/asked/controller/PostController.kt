@@ -17,27 +17,27 @@ import springfox.documentation.annotations.ApiIgnore
 @RestController
 @RequestMapping("/api/v1/posts")
 class PostController(
-	private val postService: PostService
+    private val postService: PostService
 ) {
-	@ApiOperation("포스트 글 작성")
-	@PostMapping
-	fun writePost(
-		@ApiIgnore @AuthenticationPrincipal user: User,
-		@RequestBody postWriteRequest: PostWriteRequest
-	): ApiResponse<PostDto> {
-		val savedPost = postService.upsert(postWriteRequest.toEntity(user.id!!))
-		return ApiResponse.success(PostDto.from(savedPost))
-	}
+    @ApiOperation("포스트 글 작성")
+    @PostMapping
+    fun writePost(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @RequestBody postWriteRequest: PostWriteRequest
+    ): ApiResponse<PostDto> {
+        val savedPost = postService.upsert(postWriteRequest.toEntity(user.id!!))
+        return ApiResponse.success(PostDto.from(savedPost))
+    }
 
-	@ApiOperation("거리 반경 포스트 글 페이징")
-	@GetMapping("/near")
-	fun getNearPosts(
-		@RequestParam longitude: Double,
-		@RequestParam latitude: Double,
-		@RequestParam meterDistance: Double,
-		@RequestParam size: Int,
-		@RequestParam lastId: ObjectId?
-	): ApiResponse<CursorResult<PostDto>> {
-		return ApiResponse.success(postService.getNearPost(longitude, latitude, meterDistance, lastId, size))
-	}
+    @ApiOperation("거리 반경 포스트 글 페이징")
+    @GetMapping("/near")
+    fun getNearPosts(
+        @RequestParam longitude: Double,
+        @RequestParam latitude: Double,
+        @RequestParam meterDistance: Double,
+        @RequestParam size: Int,
+        @RequestParam lastId: ObjectId?
+    ): ApiResponse<CursorResult<PostDto>> {
+        return ApiResponse.success(postService.getNearPost(longitude, latitude, meterDistance, lastId, size))
+    }
 }

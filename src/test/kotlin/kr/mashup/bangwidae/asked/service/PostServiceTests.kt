@@ -19,48 +19,48 @@ import org.springframework.data.mongodb.core.indexOps
 
 @DataMongoTest
 class PostServiceTests(
-	@Autowired
-	private val mongoTemplate: MongoTemplate,
-	@Autowired
-	private val postRepository: PostRepository,
+    @Autowired
+    private val mongoTemplate: MongoTemplate,
+    @Autowired
+    private val postRepository: PostRepository,
 ) {
-	private val postService = PostService(postRepository)
+    private val postService = PostService(postRepository)
 
-	@Test
-	@DisplayName("커서 테스트")
-	fun findNearLocationCursorTest() {
-		//given
-		val gangnamPost = mockGangnamPost()
-		val sinnonhyeonPost = mockSinnonhyeonPost()
+    @Test
+    @DisplayName("커서 테스트")
+    fun findNearLocationCursorTest() {
+        //given
+        val gangnamPost = mockGangnamPost()
+        val sinnonhyeonPost = mockSinnonhyeonPost()
 
-		//when
-		mongoTemplate.indexOps<Post>().ensureIndex(GeospatialIndex("location").typed(GeoSpatialIndexType.GEO_2DSPHERE))
-		for (i in 0 until 100) {
-			postRepository.save(sinnonhyeonPost.copy(content = i.toString()))
-		}
+        //when
+        mongoTemplate.indexOps<Post>().ensureIndex(GeospatialIndex("location").typed(GeoSpatialIndexType.GEO_2DSPHERE))
+        for (i in 0 until 100) {
+            postRepository.save(sinnonhyeonPost.copy(content = i.toString()))
+        }
 
-		val nearPostsPage1 = postService.getNearPost(
-			gangnamPost.location.getLongitude(),
-			gangnamPost.location.getLatitude(),
-			1000.0,
-			null,
-			30
-		)
-		val lastId = nearPostsPage1.values.last().id
-		val nearPostsPage2 = postService.getNearPost(
-			gangnamPost.location.getLongitude(),
-			gangnamPost.location.getLatitude(),
-			1000.0,
-			ObjectId(lastId),
-			30
-		)
-		val contentContrastPage1List = (99 downTo 70).map { it.toString() }
-		val postContentPage1List = nearPostsPage1.values.map { it.content }
-		val contentContrastPage2List = (69 downTo 40).map { it.toString() }
-		val postContentPage2List = nearPostsPage2.values.map { it.content }
+        val nearPostsPage1 = postService.getNearPost(
+            gangnamPost.location.getLongitude(),
+            gangnamPost.location.getLatitude(),
+            1000.0,
+            null,
+            30
+        )
+        val lastId = nearPostsPage1.values.last().id
+        val nearPostsPage2 = postService.getNearPost(
+            gangnamPost.location.getLongitude(),
+            gangnamPost.location.getLatitude(),
+            1000.0,
+            ObjectId(lastId),
+            30
+        )
+        val contentContrastPage1List = (99 downTo 70).map { it.toString() }
+        val postContentPage1List = nearPostsPage1.values.map { it.content }
+        val contentContrastPage2List = (69 downTo 40).map { it.toString() }
+        val postContentPage2List = nearPostsPage2.values.map { it.content }
 
-		//then
-		assertThat(postContentPage1List).isEqualTo(contentContrastPage1List)
-		assertThat(postContentPage2List).isEqualTo(contentContrastPage2List)
-	}
+        //then
+        assertThat(postContentPage1List).isEqualTo(contentContrastPage1List)
+        assertThat(postContentPage2List).isEqualTo(contentContrastPage2List)
+    }
 }
