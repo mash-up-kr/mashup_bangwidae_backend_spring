@@ -1,0 +1,29 @@
+### 강남역
+GET {{doridori}}/api/v1/place/reverse/geocode?latitude=37.504030&longitude=127.024099
+
+### 용인시 수지구
+GET {{doridori}}/api/v1/place/reverse/geocode?latitude=37.342296446704&longitude=127.10195655337
+
+### 일반 읍면동
+GET {{doridori}}/api/v1/place/reverse/geocode?latitude=37.5666936&longitude=126.9913201
+
+### 일반 읍면동
+GET {{doridori}}/api/v1/place/reverse/geocode?latitude=35.2982640&longitude=129.1133567
+
+### 일반 리
+GET {{doridori}}/api/v1/place/reverse/geocode?latitude=36.4938906&longitude=128.2439084
+
+### 분당구 정자동 (법정동=행정동)
+GET {{doridori}}/api/v1/place/reverse/geocode?latitude=37.3614463&longitude=127.1114893
+
+### 세종시 도담동 (법정동=행정동)
+GET {{doridori}}/api/v1/place/reverse/geocode?latitude=36.5008113&longitude=127.2654387
+
+### 세종시 조치원읍 (법정)
+GET {{doridori}}/api/v1/place/reverse/geocode?latitude=36.5929071&longitude=127.2923750
+
+### 바다 위
+GET {{doridori}}/api/v1/place/reverse/geocode?latitude=37.5666936&longitude=125.9913201
+
+### 도쿄
+GET {{doridori}}/api/v1/place/reverse/geocode?latitude=35.6894875&longitude=139.6917064

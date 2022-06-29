@@ -59,7 +59,20 @@ enum class DoriDoriExceptionType(
         httpStatus = HttpStatus.BAD_REQUEST,
         code = Code.INVALID_PASSWORD_LENGTH,
         message = "비밀번호는 8자리 이상이어야 해요"
-    );
+    ),
+
+    // PLACE
+    INVALID_COUNTRY(
+        httpStatus = HttpStatus.BAD_REQUEST,
+        code = Code.INVALID_COUNTRY,
+        message = "한국에서만 위치 기능을 사용할 수 있어요"
+    ),
+    PLACE_FETCH_FAIL(
+        httpStatus = HttpStatus.INTERNAL_SERVER_ERROR,
+        code = Code.PLACE_FETCH_FAIL,
+        message = "위치 정보를 받아오지 못했어요"
+    ),
+    ;
 
     object Code {
         const val COMMON_ERROR = "COMMON_ERROR"
@@ -72,5 +85,8 @@ enum class DoriDoriExceptionType(
         const val INVALID_PASSWORD = "INVALID_PASSWORD"
         const val INVALID_PASSWORD_REGEX = "INVALID_PASSWORD_REGEX"
         const val INVALID_PASSWORD_LENGTH = "INVALID_PASSWORD_LENGTH"
+
+        const val INVALID_COUNTRY = "INVALID_COUNTRY"
+        const val PLACE_FETCH_FAIL = "PLACE_FETCH_FAIL"
     }
 }

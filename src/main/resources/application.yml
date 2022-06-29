@@ -29,3 +29,10 @@ server:
 jwt:
   token-issuer: bangwidae
   secret-key: secret-key # 나중에 바꿉시당
+
+map:
+  naver:
+    authorization:
+      client-id: ENC(U1ooxWX24YYjijvwLYvZxHvQ0G00KArWb4BHsPZDYE+m0WtlOVwBKtp0ik0KVKmi)
+      client-secret: ENC(ivUwyuZ35N+Du6QSg4/FMxAKdF24PavN75isNr5B696kDTA0sIKf+J0jmaSRRFvp56K42BhunyUNfDqv7iSsjsIC2CgqSGgVSPCbeKxKSlY=)
+    host: https://naveropenapi.apigw.ntruss.com
