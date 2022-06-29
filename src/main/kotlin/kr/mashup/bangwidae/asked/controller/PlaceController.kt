@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*
 class PlaceController(
     private val placeService: PlaceService,
 ) {
-    @ApiOperation("위경도를 주소로 변환합니다")
+    @ApiOperation("위경도를 주소로 변환")
     @GetMapping("/reverse/geocode")
     fun reverseGeocode(
         @RequestParam latitude: Double,

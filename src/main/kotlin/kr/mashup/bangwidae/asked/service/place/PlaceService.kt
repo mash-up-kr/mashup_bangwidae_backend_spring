@@ -14,10 +14,16 @@ class PlaceService(
             latitude = latitude,
         )
 
-        if (region.국가 != "kr") {
+        if (region.국가 === Nationality.UNSUPPORTED) {
             throw DoriDoriException.of(DoriDoriExceptionType.INVALID_COUNTRY)
         }
 
         return region
     }
+}
+
+enum class Nationality {
+    KR,
+    UNSUPPORTED,
+    ;
 }

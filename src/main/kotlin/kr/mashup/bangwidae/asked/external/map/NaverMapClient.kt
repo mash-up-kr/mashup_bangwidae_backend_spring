@@ -15,19 +15,28 @@ class NaverMapClient(
             responseType = "json"
         )
 
-        return response.results
+        // TODO FeignException 을 DoriDoriException 으로
+
+        return response.results!!
     }
 }
 
 data class NaverReverseGeocodeResponse(
-    val status: NaverReverseGeocodeStatus,
-    val results: List<NaverReverseGeocodeResult>,
+    val status: NaverReverseGeocodeStatus?,
+    val results: List<NaverReverseGeocodeResult>?,
+    val error: NaverReverseGeocodeError?,
 )
 
 data class NaverReverseGeocodeStatus(
     val code: Int,
-    val name: String,
-    val message: String,
+    val name: String?,
+    val message: String?,
+)
+
+data class NaverReverseGeocodeError(
+    val errorCode: String,
+    val message: String?,
+    val details: String?,
 )
 
 data class NaverReverseGeocodeResult(
