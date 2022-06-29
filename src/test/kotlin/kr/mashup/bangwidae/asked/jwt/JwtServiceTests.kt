@@ -10,20 +10,20 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 class JwtServiceTests(
-	@Autowired
-	val jwtService: JwtService
+    @Autowired
+    val jwtService: JwtService
 ) {
-	@Test
-	@DisplayName("jwt encode & decode test")
-	fun jwtEncodeDecodeTest() {
-		//given
-		val oid = ObjectId().toHexString()
+    @Test
+    @DisplayName("jwt encode & decode test")
+    fun jwtEncodeDecodeTest() {
+        //given
+        val oid = ObjectId().toHexString()
 
-		//when
-		val token = jwtService.createAccessToken(oid)
-		val decodedOid = jwtService.decodeToken(token)
+        //when
+        val token = jwtService.createAccessToken(oid)
+        val decodedOid = jwtService.decodeToken(token)
 
-		//then
-		assertThat(oid).isEqualTo(decodedOid)
-	}
+        //then
+        assertThat(oid).isEqualTo(decodedOid)
+    }
 }

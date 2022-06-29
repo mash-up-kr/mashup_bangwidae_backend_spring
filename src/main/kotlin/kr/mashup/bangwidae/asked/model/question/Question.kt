@@ -8,11 +8,11 @@ import java.time.LocalDateTime
 
 @Document("question")
 data class Question (
-	val id: ObjectId? = null,
-	val content: String,
+    val id: ObjectId? = null,
+    val content: String,
 
-	@CreatedDate
-	val createdAt: LocalDateTime = LocalDateTime.MIN,
-	@LastModifiedDate
-	val updatedAt: LocalDateTime = LocalDateTime.MIN
+    @CreatedDate
+    val createdAt: LocalDateTime = LocalDateTime.MIN,
+    @LastModifiedDate
+    val updatedAt: LocalDateTime = LocalDateTime.MIN
 )

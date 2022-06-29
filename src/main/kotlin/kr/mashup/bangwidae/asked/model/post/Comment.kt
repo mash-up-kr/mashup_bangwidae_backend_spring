@@ -8,12 +8,12 @@ import java.time.LocalDateTime
 
 @Document("comment")
 data class Comment (
-	val id: ObjectId? = null,
-	val userId: ObjectId,
-	val content: String,
+    val id: ObjectId? = null,
+    val userId: ObjectId,
+    val content: String,
 
-	@CreatedDate
-	val createdAt: LocalDateTime = LocalDateTime.now(),
-	@LastModifiedDate
-	val updatedAt: LocalDateTime = LocalDateTime.now()
+    @CreatedDate
+    val createdAt: LocalDateTime = LocalDateTime.now(),
+    @LastModifiedDate
+    val updatedAt: LocalDateTime = LocalDateTime.now()
 )
