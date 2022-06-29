@@ -32,8 +32,8 @@ data class PostDto(
 				id = post.id!!.toHexString(),
 				userId= post.userId.toHexString(),
 				content = post.content,
-				longitude = post.location.getLongitude(),
-				latitude = post.location.getLatitude(),
+				longitude = post.coordinates.getLongitude(),
+				latitude = post.coordinates.getLatitude(),
 				representativeAddress = post.representativeAddress,
 				createdAt = post.createdAt,
 				updatedAt = post.updatedAt,
@@ -54,7 +54,7 @@ data class PostWriteRequest(
 		return Post(
 			content = content,
 			userId = userId,
-			location = GeoUtils.geoJsonPoint(longitude, latitude),
+			coordinates = GeoUtils.geoJsonPoint(longitude, latitude),
 			representativeAddress = null,
 			fullAddress = null
 		)

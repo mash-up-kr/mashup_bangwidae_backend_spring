@@ -23,7 +23,7 @@ fun mockSinnonhyeonPost(): Post {
 		id = null,
 		userId = ObjectId(),
 		content = "신논현 교보문고 입니다.",
-		location = GeoUtils.geoJsonPoint(127.024099, 37.504030),
+		coordinates = GeoUtils.geoJsonPoint(127.024099, 37.504030),
 		representativeAddress = "신논현",
 		fullAddress = "서울특별시 강남구 봉은사로 지하102"
 	)
@@ -34,7 +34,7 @@ fun mockGangnamPost(): Post {
 		id = null,
 		userId = ObjectId(),
 		content = "강남역 입니다.",
-		location = GeoUtils.geoJsonPoint(127.027926, 37.497175),
+		coordinates = GeoUtils.geoJsonPoint(127.027926, 37.497175),
 		representativeAddress = "강남",
 		fullAddress = "서울특별시 강남구 강남대로66길 14"
 	)
@@ -45,7 +45,7 @@ fun mockNonhyeonPost(): Post {
 		id = null,
 		userId = ObjectId(),
 		content = "논현역 입니다.",
-		location = GeoUtils.geoJsonPoint(127.02158470345, 37.511130469556),
+		coordinates = GeoUtils.geoJsonPoint(127.02158470345, 37.511130469556),
 		representativeAddress = "논현",
 		fullAddress = "서울특별시 논현구 논현로77 14"
 	)

@@ -15,7 +15,7 @@ data class Post(
 	val userId: ObjectId,
 	val content: String = "",
 	@GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
-	val location: GeoJsonPoint,
+	val coordinates: GeoJsonPoint,
 	val representativeAddress: String?,
 	val fullAddress: String?,
 
