@@ -22,6 +22,8 @@ val jacksonKotlinModuleVersion: String by project
 val embeddedMongoVersion: String by project
 val jasyptVersion: String by project
 val apacheCommonsVersion: String by project
+val kotestVersion: String by project
+val mockkVersion: String by project
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
@@ -42,7 +44,12 @@ dependencies {
 	implementation("org.apache.commons:commons-lang3:${apacheCommonsVersion}")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
 	testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:${embeddedMongoVersion}")
+	testImplementation("io.kotest:kotest-runner-junit5:${kotestVersion}")
+	testImplementation("io.kotest:kotest-assertions-core:${kotestVersion}")
+	testImplementation("io.mockk:mockk:${mockkVersion}")
+	testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.4.2")
 }
 
 tasks.withType<KotlinCompile> {
