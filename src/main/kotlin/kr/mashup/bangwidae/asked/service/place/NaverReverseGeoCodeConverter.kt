@@ -44,8 +44,8 @@ class NaverReverseGeocodeConverter(
             시 = 시도?.takeIf { it.endsWith("시") }
                 ?: 시군구?.split(" ")?.firstOrNull { it.endsWith("시") },
             군구 = 시군구?.split(" ")?.firstOrNull { it.endsWith("군") || it.endsWith("구") },
-            읍면동 = 읍면동,
-            리 = 리,
+            읍면동 = 읍면동?.takeIf { it.isNotBlank() },
+            리 = 리?.takeIf { it.isNotBlank() },
         )
     }
 }

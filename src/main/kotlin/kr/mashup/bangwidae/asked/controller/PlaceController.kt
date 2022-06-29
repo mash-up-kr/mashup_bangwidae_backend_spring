@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*
 class PlaceController(
     private val placeService: PlaceService,
 ) {
+    // TODO 필요한 응답 포맷 확인 후 DTO 반환하도록 수정
     @ApiOperation("위경도를 주소로 변환")
     @GetMapping("/reverse/geocode")
     fun reverseGeocode(
