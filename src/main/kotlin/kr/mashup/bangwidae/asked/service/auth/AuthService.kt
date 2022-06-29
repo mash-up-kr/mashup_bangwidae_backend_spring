@@ -14,7 +14,6 @@ import kr.mashup.bangwidae.asked.service.UserService
 import mu.KotlinLogging
 import org.apache.commons.lang3.RandomStringUtils
 import org.springframework.stereotype.Service
-import java.lang.IllegalArgumentException
 
 private val logger = KotlinLogging.logger {}
 
@@ -29,8 +28,8 @@ class AuthService(
     private val authProviderFactory: AuthProviderFactory,
 ) {
     fun login(loginRequest: LoginRequest): LoginResponse {
-        val user = (userService.findByEmail(loginRequest.email)
-            ?: throw IllegalArgumentException("유저가 없어용"))
+        val user = userService.findByEmail(loginRequest.email)
+            ?: throw DoriDoriException.of(DoriDoriExceptionType.LOGIN_FAILED)
 
         runCatching {
             loginWithType(user, loginRequest)
