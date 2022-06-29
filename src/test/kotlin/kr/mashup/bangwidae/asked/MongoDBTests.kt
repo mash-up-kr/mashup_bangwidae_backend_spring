@@ -39,7 +39,7 @@ class MongoDbSpringIntegrationTest(
 
 		// then
 		assertTrue(savedUser.id == foundUser.id)
-		assertTrue(savedUser.loginId == foundUser.loginId)
+		assertTrue(savedUser.email == foundUser.email)
 		assertTrue(savedUser.nickname == foundUser.nickname)
 		assertTrue(savedUser.password == foundUser.password)
 		assertTrue(savedUser.tags == foundUser.tags)
@@ -61,7 +61,7 @@ class MongoDbSpringIntegrationTest(
 		val savedNonhyeonPost = postRepository.save(nonhyeonPost)
 		val nearGangnamPostIdList =
 			postRepository.findByLocationNear(
-				gangnamPost.location,
+				gangnamPost.coordinates,
 				Distance(1.0, Metrics.KILOMETERS)
 			).map { it.id }
 

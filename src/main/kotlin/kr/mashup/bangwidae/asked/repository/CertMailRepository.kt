@@ -1,11 +1,11 @@
 package kr.mashup.bangwidae.asked.repository
 
-import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.CertMail
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface UserRepository : MongoRepository<User, ObjectId> {
-    fun findByEmail(email: String): User?
+interface CertMailRepository: MongoRepository<CertMail, ObjectId> {
+    fun findFirstByEmailOrderByMailSendTsDesc(email: String): CertMail?
 }
