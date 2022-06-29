@@ -60,8 +60,8 @@ class MongoDbSpringIntegrationTest(
 		val savedSinnonhyeonPost = postRepository.save(sinnonhyeonPost)
 		val savedNonhyeonPost = postRepository.save(nonhyeonPost)
 		val nearGangnamPostIdList =
-			postRepository.findByCoordinatesNear(
-				gangnamPost.coordinates,
+			postRepository.findByLocationNear(
+				gangnamPost.location,
 				Distance(1.0, Metrics.KILOMETERS)
 			).map { it.id }
 

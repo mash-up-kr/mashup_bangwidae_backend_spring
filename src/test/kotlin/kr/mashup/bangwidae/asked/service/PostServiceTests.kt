@@ -40,16 +40,16 @@ class PostServiceTests(
 		}
 
 		val nearPostsPage1 = postService.getNearPost(
-			gangnamPost.coordinates.getLongitude(),
-			gangnamPost.coordinates.getLatitude(),
+			gangnamPost.location.getLongitude(),
+			gangnamPost.location.getLatitude(),
 			1000.0,
 			null,
 			30
 		)
 		val lastId = nearPostsPage1.values.last().id
 		val nearPostsPage2 = postService.getNearPost(
-			gangnamPost.coordinates.getLongitude(),
-			gangnamPost.coordinates.getLatitude(),
+			gangnamPost.location.getLongitude(),
+			gangnamPost.location.getLatitude(),
 			1000.0,
 			ObjectId(lastId),
 			30

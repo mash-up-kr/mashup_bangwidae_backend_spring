@@ -31,7 +31,7 @@ class PostService(
 		lastId: ObjectId?,
 		size: Int
 	): CursorResult<PostDto> {
-		val postList = postRepository.findByCoordinatesNearAndIdBeforeOrderByIdDesc(
+		val postList = postRepository.findByLocationNearAndIdBeforeOrderByIdDesc(
 			GeoUtils.geoJsonPoint(longitude, latitude),
 			lastId ?: ObjectId(),
 			Distance(meterDistance / 1000, Metrics.KILOMETERS),
