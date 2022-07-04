@@ -72,6 +72,18 @@ enum class DoriDoriExceptionType(
         code = Code.PLACE_FETCH_FAIL,
         message = "위치 정보를 받아오지 못했어요"
     ),
+    REPRESENTATIVE_ADDRESS_NOT_EXIST(
+        httpStatus = HttpStatus.BAD_REQUEST,
+        code = Code.REPRESENTATIVE_ADDRESS_NOT_EXIST,
+        message = "대표 주소를 찾지 못했어요"
+    ),
+
+    // POST
+    POST_NOT_ALLOWED_FOR_USER(
+        httpStatus = HttpStatus.UNAUTHORIZED,
+        code = Code.POST_NOT_ALLOWED_FOR_USER,
+        message = "유저가 해당 포스트에 대한 권한이 없어요"
+    )
     ;
 
     object Code {
@@ -88,5 +100,8 @@ enum class DoriDoriExceptionType(
 
         const val INVALID_COUNTRY = "INVALID_COUNTRY"
         const val PLACE_FETCH_FAIL = "PLACE_FETCH_FAIL"
+        const val REPRESENTATIVE_ADDRESS_NOT_EXIST = "REPRESENTATIVE_ADDRESS_NOT_EXIST"
+
+        const val POST_NOT_ALLOWED_FOR_USER = "POST_NOT_ALLOWED_FOR_USER"
     }
 }

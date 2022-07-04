@@ -30,7 +30,7 @@ data class PostDto(
         fun from(post: Post): PostDto {
             return PostDto(
                 id = post.id!!.toHexString(),
-                userId= post.userId.toHexString(),
+                userId = post.userId.toHexString(),
                 content = post.content,
                 longitude = post.location.getLongitude(),
                 latitude = post.location.getLatitude(),
@@ -54,9 +54,16 @@ data class PostWriteRequest(
         return Post(
             content = content,
             userId = userId,
-            location = GeoUtils.geoJsonPoint(longitude, latitude),
-            representativeAddress = null,
-            fullAddress = null
+            location = GeoUtils.geoJsonPoint(longitude, latitude)
         )
     }
 }
+
+data class PostEditRequest(
+    @ApiModelProperty(value = "post content", example = "질문 post 샘플")
+    val content: String?,
+    @ApiModelProperty(value = "경도", example = "127.4")
+    val longitude: Double?,
+    @ApiModelProperty(value = "위도", example = "23.5")
+    val latitude: Double?
+)

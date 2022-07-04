@@ -2,11 +2,11 @@ package kr.mashup.bangwidae.asked.controller
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
-import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
-import kr.mashup.bangwidae.asked.controller.dto.CursorResult
-import kr.mashup.bangwidae.asked.controller.dto.PostDto
-import kr.mashup.bangwidae.asked.controller.dto.PostWriteRequest
+import kr.mashup.bangwidae.asked.controller.dto.*
+import kr.mashup.bangwidae.asked.exception.DoriDoriException
+import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.service.PostService
 import org.bson.types.ObjectId
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -22,11 +22,36 @@ class PostController(
     @ApiOperation("포스트 글 작성")
     @PostMapping
     fun writePost(
-        @ApiIgnore @AuthenticationPrincipal user: User,
-        @RequestBody postWriteRequest: PostWriteRequest
+        @ApiIgnore @AuthenticationPrincipal user: User, @RequestBody postWriteRequest: PostWriteRequest
     ): ApiResponse<PostDto> {
-        val savedPost = postService.upsert(postWriteRequest.toEntity(user.id!!))
+        val savedPost = postService.save(postWriteRequest.toEntity(user.id!!))
         return ApiResponse.success(PostDto.from(savedPost))
+    }
+
+    @ApiOperation("포스트 글 수정")
+    @PatchMapping("/{id}")
+    fun editPost(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @RequestBody postEditRequest: PostEditRequest,
+        @PathVariable id: ObjectId
+    ): ApiResponse<PostDto> {
+        val post = postService.findById(id)
+        if (isPostValidForUser(post, user)) {
+            val updatedPost = postService.update(post.update(postEditRequest))
+            return ApiResponse.success(PostDto.from(updatedPost))
+        } else throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
+    }
+
+    @ApiOperation("포스트 글 삭제")
+    @DeleteMapping("/{id}")
+    fun deletePost(
+        @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
+    ): ApiResponse<Boolean> {
+        val post = postService.findById(id)
+        if (isPostValidForUser(post, user)) {
+            postService.delete(post)
+            return ApiResponse.success(true)
+        } else throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
     }
 
     @ApiOperation("거리 반경 포스트 글 페이징")
@@ -39,5 +64,9 @@ class PostController(
         @RequestParam lastId: ObjectId?
     ): ApiResponse<CursorResult<PostDto>> {
         return ApiResponse.success(postService.getNearPost(longitude, latitude, meterDistance, lastId, size))
+    }
+
+    private fun isPostValidForUser(post: Post, user: User): Boolean {
+        return post.userId == user.id!!
     }
 }
