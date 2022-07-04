@@ -37,7 +37,7 @@ class PostController(
     ): ApiResponse<PostDto> {
         val post = postService.findById(id)
         require(isPostValidForUser(post, user)) {
-            DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
+            throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
         }
         val updatedPost = postService.update(post.update(postEditRequest))
         return ApiResponse.success(PostDto.from(updatedPost))
@@ -50,7 +50,7 @@ class PostController(
     ): ApiResponse<Boolean> {
         val post = postService.findById(id)
         require(isPostValidForUser(post, user)) {
-            DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
+            throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
         }
         postService.delete(post)
         return ApiResponse.success(true)
