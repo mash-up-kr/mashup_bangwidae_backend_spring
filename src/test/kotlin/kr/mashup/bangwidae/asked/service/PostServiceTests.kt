@@ -4,6 +4,7 @@ import kr.mashup.bangwidae.asked.mockGangnamPost
 import kr.mashup.bangwidae.asked.mockSinnonhyeonPost
 import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.repository.PostRepository
+import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.getLatitude
 import kr.mashup.bangwidae.asked.utils.getLongitude
 import org.assertj.core.api.Assertions.assertThat
@@ -23,8 +24,10 @@ class PostServiceTests(
     private val mongoTemplate: MongoTemplate,
     @Autowired
     private val postRepository: PostRepository,
+    @Autowired
+    private val placeService: PlaceService
 ) {
-    private val postService = PostService(postRepository)
+    private val postService = PostService(postRepository, placeService)
 
     @Test
     @DisplayName("커서 테스트")
