@@ -36,10 +36,11 @@ class PostController(
         @PathVariable id: ObjectId
     ): ApiResponse<PostDto> {
         val post = postService.findById(id)
-        if (isPostValidForUser(post, user)) {
-            val updatedPost = postService.update(post.update(postEditRequest))
-            return ApiResponse.success(PostDto.from(updatedPost))
-        } else throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
+        require(isPostValidForUser(post, user)) {
+            DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
+        }
+        val updatedPost = postService.update(post.update(postEditRequest))
+        return ApiResponse.success(PostDto.from(updatedPost))
     }
 
     @ApiOperation("포스트 글 삭제")
@@ -48,10 +49,11 @@ class PostController(
         @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
     ): ApiResponse<Boolean> {
         val post = postService.findById(id)
-        if (isPostValidForUser(post, user)) {
-            postService.delete(post)
-            return ApiResponse.success(true)
-        } else throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
+        require(isPostValidForUser(post, user)) {
+            DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
+        }
+        postService.delete(post)
+        return ApiResponse.success(true)
     }
 
     @ApiOperation("거리 반경 포스트 글 페이징")
