@@ -57,7 +57,7 @@ class PostService(
 
     private fun hasNext(id: ObjectId?): Boolean {
         if (id == null) return false
-        return postRepository.existsByIdBeforeAndDeletedFalse(id, false)
+        return postRepository.existsByIdBeforeAndDeletedFalse(id)
     }
 
     private fun updatePlaceInfo(post: Post): Post {

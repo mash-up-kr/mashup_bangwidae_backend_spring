@@ -17,6 +17,6 @@ interface PostRepository : MongoRepository<Post, ObjectId> {
         pageRequest: PageRequest
     ): List<Post>
 
-    fun existsByIdBeforeAndDeletedFalse(id: ObjectId, deleted: Boolean): Boolean
+    fun existsByIdBeforeAndDeletedFalse(id: ObjectId): Boolean
     fun findByLocationNear(location: GeoJsonPoint, distance: Distance): List<Post>
 }
