@@ -22,9 +22,9 @@ data class PostDto(
     @ApiModelProperty(value = "대표 주소", example = "경기도 성남시 분당구 불정로 6")
     val representativeAddress: String?,
     @ApiModelProperty(value = "생성일", example = "2022-06-23T16:51:30.717+00:00")
-    val createdAt: LocalDateTime,
+    val createdAt: LocalDateTime?,
     @ApiModelProperty(value = "수정일", example = "2022-06-23T16:51:30.717+00:00")
-    val updatedAt: LocalDateTime
+    val updatedAt: LocalDateTime?
 ) {
     companion object {
         fun from(post: Post): PostDto {
