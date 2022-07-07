@@ -62,8 +62,8 @@ data class PostWriteRequest(
 data class PostEditRequest(
     @ApiModelProperty(value = "post content", example = "질문 post 샘플")
     val content: String?,
-    @ApiModelProperty(value = "경도", example = "127.4")
+    @ApiModelProperty(value = "경도(nullable)", example = "127.4")
     val longitude: Double?,
-    @ApiModelProperty(value = "위도", example = "23.5")
+    @ApiModelProperty(value = "위도(nullable)", example = "23.5")
     val latitude: Double?
 )
