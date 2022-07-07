@@ -66,7 +66,6 @@ data class NaverReverseGeocodeRegion(
 data class NaverReverseGeocodeRegionArea(
     val name: String?,
     val coords: NaverReverseGeocodeCoords?,
-    val alias: String?,
 )
 
 data class NaverReverseGeocodeCoords(
