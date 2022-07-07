@@ -33,13 +33,13 @@ class PostService(
     }
 
     fun delete(post: Post) {
-        postRepository.delete(post)
+        postRepository.save(post.copy(deleted = true))
     }
 
     fun getNearPost(
         longitude: Double, latitude: Double, meterDistance: Double, lastId: ObjectId?, size: Int
     ): CursorResult<PostDto> {
-        val postList = postRepository.findByLocationNearAndIdBeforeOrderByIdDesc(
+        val postList = postRepository.findByLocationNearAndIdBeforeAndDeletedFalseOrderByIdDesc(
             GeoUtils.geoJsonPoint(longitude, latitude),
             lastId ?: ObjectId(),
             Distance(meterDistance / 1000, Metrics.KILOMETERS),
@@ -50,7 +50,7 @@ class PostService(
 
     private fun hasNext(id: ObjectId?): Boolean {
         if (id == null) return false
-        return postRepository.existsByIdBefore(id)
+        return postRepository.existsByIdBeforeAndDeletedFalse(id, false)
     }
 
     private fun updatePlaceInfo(post: Post): Post {

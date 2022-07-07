@@ -24,6 +24,7 @@ data class Post(
     val representativeAddress: String? = null,
     val region: Region? = null,
 
+    val deleted: Boolean = false,
     @Version var version: Int? = null,
     @CreatedDate var createdAt: LocalDateTime? = null,
     @LastModifiedDate var updatedAt: LocalDateTime? = null
