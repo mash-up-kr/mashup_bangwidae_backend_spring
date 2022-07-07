@@ -3,10 +3,7 @@ package kr.mashup.bangwidae.asked.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.*
-import kr.mashup.bangwidae.asked.exception.DoriDoriException
-import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.service.PostService
 import org.bson.types.ObjectId
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -36,10 +33,7 @@ class PostController(
         @PathVariable id: ObjectId
     ): ApiResponse<PostDto> {
         val post = postService.findById(id)
-        require(isPostValidForUser(post, user)) {
-            throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
-        }
-        val updatedPost = postService.update(post.update(postEditRequest))
+        val updatedPost = postService.update(user, post.update(postEditRequest))
         return ApiResponse.success(PostDto.from(updatedPost))
     }
 
@@ -49,10 +43,7 @@ class PostController(
         @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
     ): ApiResponse<Boolean> {
         val post = postService.findById(id)
-        require(isPostValidForUser(post, user)) {
-            throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
-        }
-        postService.delete(post)
+        postService.delete(user, post)
         return ApiResponse.success(true)
     }
 
@@ -63,12 +54,8 @@ class PostController(
         @RequestParam latitude: Double,
         @RequestParam meterDistance: Double,
         @RequestParam size: Int,
-        @RequestParam lastId: ObjectId?
+        @RequestParam(required = false) lastId: ObjectId?
     ): ApiResponse<CursorResult<PostDto>> {
         return ApiResponse.success(postService.getNearPost(longitude, latitude, meterDistance, lastId, size))
-    }
-
-    private fun isPostValidForUser(post: Post, user: User): Boolean {
-        return post.userId == user.id!!
     }
 }

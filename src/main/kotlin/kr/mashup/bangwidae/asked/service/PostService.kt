@@ -4,6 +4,7 @@ import kr.mashup.bangwidae.asked.controller.dto.CursorResult
 import kr.mashup.bangwidae.asked.controller.dto.PostDto
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
+import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.service.place.PlaceService
@@ -28,11 +29,17 @@ class PostService(
         return postRepository.save(updatePlaceInfo(post))
     }
 
-    fun update(post: Post): Post {
+    fun update(user: User, post: Post): Post {
+        require(isPostValidForUser(post, user)) {
+            throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
+        }
         return postRepository.save(updatePlaceInfo(post))
     }
 
-    fun delete(post: Post) {
+    fun delete(user: User, post: Post) {
+        require(isPostValidForUser(post, user)) {
+            throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
+        }
         postRepository.save(post.copy(deleted = true))
     }
 
@@ -59,5 +66,9 @@ class PostService(
         val region = placeService.reverseGeocode(longitude, latitude)
         val representativeAddress = placeService.getRepresentativeAddress(longitude, latitude)
         return post.copy(representativeAddress = representativeAddress, region = region)
+    }
+
+    private fun isPostValidForUser(post: Post, user: User): Boolean {
+        return post.userId == user.id!!
     }
 }
