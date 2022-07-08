@@ -1,6 +1,9 @@
 package kr.mashup.bangwidae.asked.external.map
 
 import com.fasterxml.jackson.annotation.JsonProperty
+import feign.FeignException
+import kr.mashup.bangwidae.asked.exception.DoriDoriException
+import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import org.springframework.stereotype.Component
 
 @Component
@@ -9,16 +12,19 @@ class NaverMapClient(
     private val naverMapProperties: NaverMapProperties,
 ) {
     fun reverseGeocode(longitude: Double, latitude: Double): List<NaverReverseGeocodeResult> {
-        val response = naverMapFeignClient.reverseGeocode(
-            clientId = naverMapProperties.authorization.clientId,
-            clientSecret = naverMapProperties.authorization.clientSecret,
-            coordinates = "${longitude},${latitude}",
-            responseType = "json"
-        )
-
-        // TODO FeignException 을 DoriDoriException 으로
-
-        return response.results!!
+        return try {
+            naverMapFeignClient.reverseGeocode(
+                clientId = naverMapProperties.authorization.clientId,
+                clientSecret = naverMapProperties.authorization.clientSecret,
+                coordinates = "${longitude},${latitude}",
+                responseType = "json"
+            ).results!!
+        } catch (feignException: FeignException) {
+            throw DoriDoriException.of(
+                type = DoriDoriExceptionType.PLACE_FETCH_FAIL,
+                message = feignException.message,
+            )
+        }
     }
 }
 
