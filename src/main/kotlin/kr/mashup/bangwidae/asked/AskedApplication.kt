@@ -11,3 +11,4 @@ class AskedApplication
 fun main(args: Array<String>) {
     runApplication<AskedApplication>(*args)
 }
+//CODEOWNER 테스트
