@@ -8,7 +8,7 @@ data class LoginRequest(
     @ApiModelProperty(value = "이메일", example = "doridori@gmail.com")
     val email: String,
     @ApiModelProperty(value = "login password", example = "1q2w3e")
-    val loginPassword: String? = null,
+    val password: String? = null,
     @ApiModelProperty(value = "login type", example = "BASIC, KAKAO, APPLE")
     val loginType: LoginType,
 )

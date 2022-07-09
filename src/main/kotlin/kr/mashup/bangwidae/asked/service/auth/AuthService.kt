@@ -47,7 +47,7 @@ class AuthService(
 
     private fun loginWithType(user: User, loginRequest: LoginRequest) {
         when(loginRequest.loginType) {
-            LoginType.BASIC -> passwordService.matchPassword(loginRequest.loginPassword!!, user.password!!)
+            LoginType.BASIC -> passwordService.matchPassword(loginRequest.password!!, user.password!!)
             LoginType.APPLE -> authProviderFactory.findBy(LoginType.APPLE).socialLogin(user)
             LoginType.KAKAO -> authProviderFactory.findBy(LoginType.KAKAO).socialLogin(user)
             else -> DoriDoriException.of(DoriDoriExceptionType.COMMON_ERROR)
@@ -55,7 +55,7 @@ class AuthService(
     }
 
     fun sendCertMail(certMailSendRequest: CertMailSendRequest) {
-        userService.checkDuplicatedUser(certMailSendRequest.email)
+        userService.checkDuplicatedUserByEmail(certMailSendRequest.email)
 
         val certificationNumber = createCertificationNumber()
         certMailService.create(certMailSendRequest.email, certificationNumber)

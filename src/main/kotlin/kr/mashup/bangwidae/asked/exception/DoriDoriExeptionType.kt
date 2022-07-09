@@ -61,6 +61,13 @@ enum class DoriDoriExceptionType(
         message = "비밀번호는 8자리 이상이어야 해요"
     ),
 
+    // USER
+    DUPLICATED_NICKNAME(
+        httpStatus = HttpStatus.BAD_REQUEST,
+        code = Code.DUPLICATED_NICKNAME,
+        message = "이미 존재하는 닉네임이에요"
+    ),
+
     // PLACE
     INVALID_COUNTRY(
         httpStatus = HttpStatus.BAD_REQUEST,
@@ -98,6 +105,7 @@ enum class DoriDoriExceptionType(
         const val INVALID_PASSWORD_REGEX = "INVALID_PASSWORD_REGEX"
         const val INVALID_PASSWORD_LENGTH = "INVALID_PASSWORD_LENGTH"
 
+        const val DUPLICATED_NICKNAME = "DUPLICATED_NICKNAME"
         const val INVALID_COUNTRY = "INVALID_COUNTRY"
         const val PLACE_FETCH_FAIL = "PLACE_FETCH_FAIL"
         const val REPRESENTATIVE_ADDRESS_NOT_EXIST = "REPRESENTATIVE_ADDRESS_NOT_EXIST"
