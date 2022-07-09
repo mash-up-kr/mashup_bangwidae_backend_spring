@@ -14,8 +14,8 @@ class S3ImageUtil(
     private val amazonS3: AmazonS3,
     @Value("\${cloud.aws.s3.bucket}") private val bucket: String
 ) {
-    fun upload(file: MultipartFile, dirName: String): String {
-        val fileName = "$dirName/${UUID.randomUUID()}${file.name}"
+    fun upload(file: MultipartFile, dirName: UploadDirName): String {
+        val fileName = "$dirName/${UUID.randomUUID()}${file.originalFilename}"
         amazonS3.putObject(
             PutObjectRequest(
                 bucket,
@@ -30,4 +30,8 @@ class S3ImageUtil(
     private fun getObjectMetadata(contentLength: Long): ObjectMetadata {
         return ObjectMetadata().apply { this.contentLength = contentLength }
     }
+}
+
+enum class UploadDirName {
+    PROFILE
 }

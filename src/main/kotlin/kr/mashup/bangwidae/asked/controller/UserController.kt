@@ -7,6 +7,7 @@ import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.UserService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import springfox.documentation.annotations.ApiIgnore
 
 @Api(tags = ["유저 컨트롤러"])
@@ -46,6 +47,15 @@ class UserController(
 				updateProfileRequest.tags
 			)
 		)
+	}
+
+	@ApiOperation("프로필 이미지 업로드")
+	@PostMapping("/profile/image")
+	fun profileImageUpload(
+		@ApiIgnore @AuthenticationPrincipal user: User,
+		@RequestParam image: MultipartFile
+	): ApiResponse<String>{
+		return ApiResponse.success(userService.updateProfileImage(user, image))
 	}
 
 	// 우선 principal 동작 테스트 용도

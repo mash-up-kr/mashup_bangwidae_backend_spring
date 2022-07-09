@@ -8,9 +8,12 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.repository.UserRepository
+import kr.mashup.bangwidae.asked.utils.S3ImageUtil
+import kr.mashup.bangwidae.asked.utils.UploadDirName
 import org.bson.types.ObjectId
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class UserService(
@@ -18,6 +21,7 @@ class UserService(
     private val userRepository: UserRepository,
     private val certMailService: CertMailService,
     private val passwordService: PasswordService,
+    private val s3ImageUtil: S3ImageUtil
 ) {
 
     fun joinUser(joinUserRequest: JoinUserRequest): JoinUserResponse {
@@ -51,6 +55,12 @@ class UserService(
             user.updateProfile(description, tags)
         )
         return true
+    }
+
+    fun updateProfileImage(user: User, image: MultipartFile): String {
+        val uploadedUrl = s3ImageUtil.upload(image, UploadDirName.PROFILE)
+        userRepository.save(user.updateProfileImageUrl(uploadedUrl))
+        return uploadedUrl
     }
 
     fun findById(id: ObjectId): User {

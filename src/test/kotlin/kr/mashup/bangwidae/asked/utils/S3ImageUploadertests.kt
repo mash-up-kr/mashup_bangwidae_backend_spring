@@ -19,7 +19,7 @@ class S3ImageUploadertests(
         //given
         val imageFiles = MockMultipartFile("imageFiles", ByteArray(1))
         //when
-        val url = s3ImageUploader.upload(imageFiles, "test")
+        val url = s3ImageUploader.upload(imageFiles, UploadDirName.PROFILE)
         println(url)
     }
 }
