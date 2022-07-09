@@ -19,7 +19,7 @@ class GlobalExceptionHandler {
                     success = false,
                     data = null,
                     error = ApiErrorResponse(
-                        code = DoriDoriExceptionType.Code.FAIL,
+                        code = DoriDoriExceptionType.FAIL.name,
                         message = exception.message,
                     ),
                 )
@@ -28,7 +28,7 @@ class GlobalExceptionHandler {
 
     @ExceptionHandler(DoriDoriException::class)
     fun handleDoriDoriException(exception: DoriDoriException): ResponseEntity<ApiResponse<Any>> {
-        return ResponseEntity.status(exception.httpStatus)
+        return ResponseEntity.status(HttpStatus.OK)
             .body(
                 ApiResponse(
                     success = false,
