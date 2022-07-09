@@ -3,8 +3,8 @@ package kr.mashup.bangwidae.asked.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
+import kr.mashup.bangwidae.asked.model.Region
 import kr.mashup.bangwidae.asked.service.place.PlaceService
-import kr.mashup.bangwidae.asked.service.place.Region
 import org.springframework.web.bind.annotation.*
 
 @Api(tags = ["장소 컨트롤러"])

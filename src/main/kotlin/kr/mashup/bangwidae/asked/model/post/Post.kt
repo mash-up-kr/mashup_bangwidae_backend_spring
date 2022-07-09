@@ -1,7 +1,7 @@
 package kr.mashup.bangwidae.asked.model.post
 
 import kr.mashup.bangwidae.asked.controller.dto.PostEditRequest
-import kr.mashup.bangwidae.asked.service.place.Region
+import kr.mashup.bangwidae.asked.model.Region
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
