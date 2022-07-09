@@ -17,6 +17,7 @@ data class User(
     val description: String? = null,
     val tags: List<String> = emptyList(),
     val profileImageUrl: String? = null,
+    val refreshToken: String? = null,
 
     @CreatedDate // TODO: KST 변환방법 알아보기 JAVA TIME Module
     val createdAt: LocalDateTime = LocalDateTime.now(), // TODO: modified, created 되는지 테스트해보기
@@ -38,6 +39,12 @@ data class User(
 
     fun updateProfileImageUrl(profileImageUrl: String): User {
         return this.copy(profileImageUrl = profileImageUrl)
+    }
+
+    fun updateRefreshToken(refreshToken: String): User {
+        return this.copy(
+            refreshToken = refreshToken
+        )
     }
 
     companion object {

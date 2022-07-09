@@ -9,10 +9,12 @@ import kr.mashup.bangwidae.asked.external.mail.GmailSender
 import kr.mashup.bangwidae.asked.model.LoginType
 import kr.mashup.bangwidae.asked.model.MailTemplate
 import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.CertMailService
 import kr.mashup.bangwidae.asked.service.UserService
 import mu.KotlinLogging
 import org.apache.commons.lang3.RandomStringUtils
+import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 
 private val logger = KotlinLogging.logger {}
@@ -23,6 +25,7 @@ class AuthService(
 
     private val jwtService: JwtService,
     private val userService: UserService,
+    private val userRepository: UserRepository,
     private val certMailService: CertMailService,
     private val passwordService: PasswordService,
     private val authProviderFactory: AuthProviderFactory,
@@ -31,17 +34,23 @@ class AuthService(
         val user = userService.findByEmail(loginRequest.email)
             ?: throw DoriDoriException.of(DoriDoriExceptionType.LOGIN_FAILED)
 
+
+        val refreshToken = jwtService.createRefreshToken(user.id!!.toHexString())
         runCatching {
             loginWithType(user, loginRequest)
         }.onSuccess {
             logger.info { "$LOG_PREFIX ${user.email} ${user.loginType} 인증 성공" }
+            userRepository.save(
+                user.updateRefreshToken(refreshToken)
+            )
         }.onFailure {
             logger.info { "$LOG_PREFIX ${user.email} ${user.loginType} 인증 실패" }
             throw DoriDoriException.of(DoriDoriExceptionType.LOGIN_FAILED)
         }
 
         return LoginResponse(
-            accessToken = jwtService.createAccessToken(user.id!!.toHexString())
+            accessToken = jwtService.createAccessToken(user.id.toHexString()),
+            refreshToken = refreshToken
         )
     }
 
@@ -72,6 +81,25 @@ class AuthService(
 
     fun certMail(certMailRequest: CertMailRequest) {
         certMailService.certificate(certMailRequest.email, certMailRequest.certificationNumber)
+    }
+
+    fun issueToken(refreshToken: String): IssueTokenResponse {
+        logger.info { "토큰 재발급 요청" }
+        return try {
+            val userId = jwtService.decodeToken(refreshToken)
+            val user = userService.findById(ObjectId(userId))
+            if (user.refreshToken == refreshToken) {
+                logger.info { "토큰 발급 성공" }
+                val accessToken = jwtService.createAccessToken(userId!!)
+                IssueTokenResponse(accessToken)
+            } else {
+                logger.info { "요청 파라미터가 DB에 저장된 리프레시 토큰과 다름" }
+                IssueTokenResponse()
+            }
+        } catch (e: Exception) {
+            logger.info { "토큰 발급 실패 ${e.message}" }
+            IssueTokenResponse()
+        }
     }
 
     companion object {

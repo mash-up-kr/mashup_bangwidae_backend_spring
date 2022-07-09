@@ -39,4 +39,12 @@ class AuthController(
         return ApiResponse.success(true)
     }
 
+    @ApiOperation("토큰 재발급")
+    @PostMapping("/issue/token")
+    fun issueToken(
+        @RequestBody issueTokenRequest: IssueTokenRequest
+    ): ApiResponse<IssueTokenResponse> {
+        return ApiResponse.success(authService.issueToken(issueTokenRequest.refreshToken))
+    }
+
 }
