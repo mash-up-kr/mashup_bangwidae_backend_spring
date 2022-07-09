@@ -3,6 +3,7 @@ package kr.mashup.bangwidae.asked.controller.dto
 import io.swagger.annotations.ApiModelProperty
 import kr.mashup.bangwidae.asked.model.User
 import org.bson.types.ObjectId
+import java.time.LocalDateTime
 
 data class UserDto(
     @ApiModelProperty(value = "user id", example = "gardenlee")
@@ -50,27 +51,23 @@ data class UpdateProfileRequest (
 )
 
 data class AnsweredQuestionsDto (
-    @ApiModelProperty(value = "헤더 텍스트", example = "새 질문이 3개나!")
     val headerText: String,
     val user: UserDto,
     val questions: List<QuestionDto>,
 ) {
     data class QuestionDto (
-        @ApiModelProperty(value = "질문 내용", example = "#도리가 뭐야?")
         val content: String,
-        @ApiModelProperty(value = "지역", example = "강남구")
         val representativeAddress: String,
         val user: UserDto,
         val answer: AnswerDto,
+        val createdAt: LocalDateTime,
     )
 
     data class AnswerDto (
-        @ApiModelProperty(value = "답변 내용", example = "안녕하세요! 도리도리입니다.")
         val content: String,
-        @ApiModelProperty(value = "지역", example = "강남구")
         val representativeAddress: String,
-        @ApiModelProperty(value = "좋아요 갯수", example = "4")
         val likeCount: Int,
+        val createdAt: LocalDateTime,
     )
 
     companion object {
@@ -98,8 +95,10 @@ data class AnsweredQuestionsDto (
                         answer = AnswerDto(
                             content = "#니모 절친 물고기 임다",
                             representativeAddress = "강남구",
-                            likeCount = 1
-                        )
+                            likeCount = 1,
+                            createdAt = LocalDateTime.now()
+                        ),
+                        createdAt = LocalDateTime.now().minusHours(1)
                     ),
                     QuestionDto(
                         content = "#도리 를 찾아서가 뭐에요?",
@@ -114,8 +113,10 @@ data class AnsweredQuestionsDto (
                         answer = AnswerDto(
                             content = "#니모 절친 물고기 임다",
                             representativeAddress = "강남구",
-                            likeCount = 1
-                        )
+                            likeCount = 1,
+                            createdAt = LocalDateTime.now()
+                        ),
+                        createdAt = LocalDateTime.now().minusHours(2),
                     ),
                     QuestionDto(
                         content = "#도리 를 찾아서가 뭐에요?",
@@ -130,8 +131,10 @@ data class AnsweredQuestionsDto (
                         answer = AnswerDto(
                             content = "#니모 절친 물고기 임다",
                             representativeAddress = "강남구",
-                            likeCount = 1
-                        )
+                            likeCount = 1,
+                            createdAt = LocalDateTime.now().minusMinutes(40)
+                        ),
+                        createdAt = LocalDateTime.now().minusHours(2),
                     )
                 )
             )
