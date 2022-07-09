@@ -6,7 +6,6 @@ import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
 import kr.mashup.bangwidae.asked.controller.dto.CreateWardRequest
 import kr.mashup.bangwidae.asked.controller.dto.WardDto
 import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.Ward
 import kr.mashup.bangwidae.asked.service.WardService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
