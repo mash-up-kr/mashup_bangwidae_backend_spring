@@ -34,7 +34,7 @@ data class PostDto(
                 user = PostWriter(
                     id = user.id!!.toHexString(),
                     tags = user.tags,
-                    nickname = user.nickname
+                    nickname = user.nickname!!
                 ),
                 content = post.content,
                 longitude = post.location.getLongitude(),

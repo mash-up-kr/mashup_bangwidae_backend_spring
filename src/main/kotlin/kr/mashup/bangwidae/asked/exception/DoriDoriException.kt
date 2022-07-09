@@ -5,23 +5,20 @@ import org.springframework.http.HttpStatus
 import java.lang.RuntimeException
 
 class DoriDoriException(
-    val httpStatus: HttpStatus,
     val code: String,
     override val message: String? = null,
 ) : RuntimeException() {
     companion object {
         fun of(type: DoriDoriExceptionType): DoriDoriException {
             return DoriDoriException(
-                httpStatus = type.httpStatus,
-                code = type.code,
+                code = type.name,
                 message = type.message,
             )
         }
 
         fun of(type: DoriDoriExceptionType, message: String?): DoriDoriException {
             return DoriDoriException(
-                httpStatus = type.httpStatus,
-                code = type.code,
+                code = type.name,
                 message = message,
             )
         }
