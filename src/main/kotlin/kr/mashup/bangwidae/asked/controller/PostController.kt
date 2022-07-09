@@ -22,7 +22,7 @@ class PostController(
         @ApiIgnore @AuthenticationPrincipal user: User, @RequestBody postWriteRequest: PostWriteRequest
     ): ApiResponse<PostDto> {
         val savedPost = postService.save(postWriteRequest.toEntity(user.id!!))
-        return ApiResponse.success(PostDto.from(savedPost))
+        return ApiResponse.success(PostDto.from(user, savedPost))
     }
 
     @ApiOperation("포스트 글 수정")
@@ -34,7 +34,7 @@ class PostController(
     ): ApiResponse<PostDto> {
         val post = postService.findById(id)
         val updatedPost = postService.update(user, post.update(postEditRequest))
-        return ApiResponse.success(PostDto.from(updatedPost))
+        return ApiResponse.success(PostDto.from(user, updatedPost))
     }
 
     @ApiOperation("포스트 글 삭제")

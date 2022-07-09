@@ -7,6 +7,7 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.repository.PostRepository
+import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import kr.mashup.bangwidae.asked.utils.getLatitude
@@ -19,7 +20,9 @@ import org.springframework.stereotype.Service
 
 @Service
 class PostService(
-    private val postRepository: PostRepository, private val placeService: PlaceService
+    private val postRepository: PostRepository,
+    private val placeService: PlaceService,
+    private val userRepository: UserRepository
 ) {
     fun findById(id: ObjectId): Post {
         return postRepository.findById(id).orElseThrow { DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST) }
@@ -52,7 +55,8 @@ class PostService(
             Distance(meterDistance / 1000, Metrics.KILOMETERS),
             PageRequest.of(0, size)
         )
-        return CursorResult(postList.map { PostDto.from(it) }, hasNext(postList.last().id))
+        val userMap = userRepository.findAllByIdIn(postList.map { it.userId }).associateBy { it.id }
+        return CursorResult(postList.map { PostDto.from(userMap[it.userId]!!, it) }, hasNext(postList.last().id))
     }
 
     private fun hasNext(id: ObjectId?): Boolean {
