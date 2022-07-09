@@ -58,4 +58,12 @@ class PostController(
     ): ApiResponse<CursorResult<PostDto>> {
         return ApiResponse.success(postService.getNearPost(longitude, latitude, meterDistance, lastId, size))
     }
+
+    @ApiOperation("포스트 글 조회")
+    @GetMapping("/{id}")
+    fun getPostById(
+        @PathVariable id: ObjectId
+    ): ApiResponse<PostDto> {
+        return ApiResponse.success(postService.getPostById(id))
+    }
 }

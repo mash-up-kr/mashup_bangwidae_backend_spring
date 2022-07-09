@@ -16,6 +16,7 @@ import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.geo.Distance
 import org.springframework.data.geo.Metrics
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -57,6 +58,13 @@ class PostService(
         )
         val userMap = userRepository.findAllByIdIn(postList.map { it.userId }).associateBy { it.id }
         return CursorResult(postList.map { PostDto.from(userMap[it.userId]!!, it) }, hasNext(postList.last().id))
+    }
+
+    fun getPostById(id: ObjectId): PostDto {
+        val post = findById(id)
+        val user = userRepository.findByIdOrNull(post.userId)
+            ?: throw DoriDoriException.of(DoriDoriExceptionType.POST_WRITER_USER_NOT_EXIST)
+        return PostDto.from(user, post)
     }
 
     private fun hasNext(id: ObjectId?): Boolean {
