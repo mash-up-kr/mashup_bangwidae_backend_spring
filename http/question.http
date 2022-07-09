@@ -1,0 +1,51 @@
+### 질문 작성
+POST {{doridori}}/api/v1/questions
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJiYW5nd2lkYWUiLCJ1c2VySWQiOiI2MmMzMGRkMmI5MGUzZDY4YWQwMmI0ODEifQ.Nx_YxOXpXOee3h3oiFp6r4OqduZEGeN0tn4y0cgOcy0
+Content-Type: application/json
+
+{
+  "toUserId": "62b6eccb092d0d7ae1504ad0",
+  "content": "작성 테스트 입니당"
+}
+
+### 질문 수정
+PATCH {{doridori}}/api/v1/questions/62c9d18b44714c51feffc6af
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJiYW5nd2lkYWUiLCJ1c2VySWQiOiI2MmMzMGRkMmI5MGUzZDY4YWQwMmI0ODEifQ.Nx_YxOXpXOee3h3oiFp6r4OqduZEGeN0tn4y0cgOcy0
+Content-Type: application/json
+
+{
+  "content": "수정 테스트 입니당"
+}
+
+### 질문 삭제
+DELETE {{doridori}}/api/v1/questions/62c9d18b44714c51feffc6af
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJiYW5nd2lkYWUiLCJ1c2VySWQiOiI2MmMzMGRkMmI5MGUzZDY4YWQwMmI0ODEifQ.Nx_YxOXpXOee3h3oiFp6r4OqduZEGeN0tn4y0cgOcy0
+Content-Type: application/json
+
+### 질문 거절
+POST {{doridori}}/api/v1/questions/62c9d1e244714c51feffc6b0/deny
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJiYW5nd2lkYWUiLCJ1c2VySWQiOiI2MmMzMGRkMmI5MGUzZDY4YWQwMmI0ODEifQ.Nx_YxOXpXOee3h3oiFp6r4OqduZEGeN0tn4y0cgOcy0
+Content-Type: application/json
+
+### 질문 답변
+POST {{doridori}}/api/v1/questions/62c9d16b44714c51feffc6ae/answer
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJiYW5nd2lkYWUiLCJ1c2VySWQiOiI2MmMzMGRkMmI5MGUzZDY4YWQwMmI0ODEifQ.Nx_YxOXpXOee3h3oiFp6r4OqduZEGeN0tn4y0cgOcy0
+Content-Type: application/json
+
+{
+  "content": "답변 테스트 입니당"
+}
+
+### 답변 수정
+PATCH {{doridori}}/api/v1/answers/62c9d4f16b003477e38577c8
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJiYW5nd2lkYWUiLCJ1c2VySWQiOiI2MmMzMGRkMmI5MGUzZDY4YWQwMmI0ODEifQ.Nx_YxOXpXOee3h3oiFp6r4OqduZEGeN0tn4y0cgOcy0
+Content-Type: application/json
+
+{
+  "content": "답변 수정 테스트 입니당"
+}
+
+### 답변 삭제
+DELETE {{doridori}}/api/v1/answers/62c9d4f16b003477e38577c8
+Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJiYW5nd2lkYWUiLCJ1c2VySWQiOiI2MmMzMGRkMmI5MGUzZDY4YWQwMmI0ODEifQ.Nx_YxOXpXOee3h3oiFp6r4OqduZEGeN0tn4y0cgOcy0
+Content-Type: application/json
