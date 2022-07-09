@@ -22,15 +22,15 @@ data class PostDto(
     @ApiModelProperty(value = "대표 주소", example = "경기도 성남시 분당구 불정로 6")
     val representativeAddress: String?,
     @ApiModelProperty(value = "생성일", example = "2022-06-23T16:51:30.717+00:00")
-    val createdAt: LocalDateTime,
+    val createdAt: LocalDateTime?,
     @ApiModelProperty(value = "수정일", example = "2022-06-23T16:51:30.717+00:00")
-    val updatedAt: LocalDateTime
+    val updatedAt: LocalDateTime?
 ) {
     companion object {
         fun from(post: Post): PostDto {
             return PostDto(
                 id = post.id!!.toHexString(),
-                userId= post.userId.toHexString(),
+                userId = post.userId.toHexString(),
                 content = post.content,
                 longitude = post.location.getLongitude(),
                 latitude = post.location.getLatitude(),
@@ -54,9 +54,16 @@ data class PostWriteRequest(
         return Post(
             content = content,
             userId = userId,
-            location = GeoUtils.geoJsonPoint(longitude, latitude),
-            representativeAddress = null,
-            fullAddress = null
+            location = GeoUtils.geoJsonPoint(longitude, latitude)
         )
     }
 }
+
+data class PostEditRequest(
+    @ApiModelProperty(value = "post content", example = "질문 post 샘플")
+    val content: String?,
+    @ApiModelProperty(value = "경도(nullable)", example = "127.4")
+    val longitude: Double?,
+    @ApiModelProperty(value = "위도(nullable)", example = "23.5")
+    val latitude: Double?
+)
