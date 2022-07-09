@@ -7,6 +7,7 @@ enum class DoriDoriExceptionType(
     COMMON_ERROR("문제가 발생했어요"),
     NOT_EXIST("It does not exist."),
     FAIL("Internal server error."),
+    NOT_ALLOWED_TO_ACCESS("접근 권한이 없어요."),
 
     // AUTH
     TOKEN_EXPIRED("토큰이 만료되었어요"),
