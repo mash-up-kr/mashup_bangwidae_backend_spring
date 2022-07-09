@@ -6,10 +6,9 @@ import kr.mashup.bangwidae.asked.controller.dto.JoinUserRequest
 import kr.mashup.bangwidae.asked.controller.dto.JoinUserResponse
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
+import kr.mashup.bangwidae.asked.external.aws.S3ImageUploader
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.repository.UserRepository
-import kr.mashup.bangwidae.asked.external.aws.S3ImageUploader
-import kr.mashup.bangwidae.asked.external.aws.UploadDirName
 import org.bson.types.ObjectId
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -66,7 +65,7 @@ class UserService(
     }
 
     fun updateProfileImage(user: User, image: MultipartFile): String {
-        val uploadedUrl = s3ImageUploader.upload(image, UploadDirName.PROFILE)
+        val uploadedUrl = s3ImageUploader.upload(image, "profile")
         userRepository.save(user.updateProfileImageUrl(uploadedUrl))
         return uploadedUrl
     }
