@@ -38,6 +38,21 @@ class UserService(
         return JoinUserResponse(jwtService.createAccessToken(user.id!!.toHexString()))
     }
 
+    fun updateNickname(user: User, nickname: String): Boolean {
+        checkDuplicatedUserByNickname(nickname)
+        userRepository.save(
+            user.updateNickname(nickname)
+        )
+        return true
+    }
+
+    fun updateProfile(user: User, description: String, tags: List<String>): Boolean {
+        userRepository.save(
+            user.updateProfile(description, tags)
+        )
+        return true
+    }
+
     fun findById(id: ObjectId): User {
         return userRepository.findByIdOrNull(id) ?: throw RuntimeException("User {id: $id} Not Found")
     }
@@ -46,10 +61,17 @@ class UserService(
         return userRepository.findByEmail(email)
     }
 
-    fun checkDuplicatedUser(email: String) {
+    fun checkDuplicatedUserByEmail(email: String) {
         val user = userRepository.findByEmail(email)
         if (user != null) {
             throw DoriDoriException.of(DoriDoriExceptionType.DUPLICATED_USER)
+        }
+    }
+
+    fun checkDuplicatedUserByNickname(nickname: String) {
+        val user = userRepository.findByNickname(nickname)
+        if (user != null) {
+            throw DoriDoriException.of(DoriDoriExceptionType.DUPLICATED_NICKNAME)
         }
     }
 }
