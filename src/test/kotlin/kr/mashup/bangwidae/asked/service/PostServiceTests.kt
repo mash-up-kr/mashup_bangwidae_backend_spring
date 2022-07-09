@@ -4,6 +4,7 @@ import kr.mashup.bangwidae.asked.mockGangnamPost
 import kr.mashup.bangwidae.asked.mockSinnonhyeonPost
 import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.repository.PostRepository
+import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.getLatitude
 import kr.mashup.bangwidae.asked.utils.getLongitude
@@ -25,9 +26,11 @@ class PostServiceTests(
     @Autowired
     private val postRepository: PostRepository,
     @Autowired
-    private val placeService: PlaceService
+    private val placeService: PlaceService,
+    @Autowired
+    private val userRepository: UserRepository
 ) {
-    private val postService = PostService(postRepository, placeService)
+    private val postService = PostService(postRepository, placeService, userRepository)
 
     @Test
     @DisplayName("커서 테스트")
