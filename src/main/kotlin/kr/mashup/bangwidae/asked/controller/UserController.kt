@@ -66,4 +66,16 @@ class UserController(
     ): ApiResponse<String> {
         return ApiResponse.success(user.nickname!!)
     }
+
+    @ApiOperation("답변완료(본인)")
+    @GetMapping("/answered-questions")
+    fun getMyAnsweredQuestions(): ApiResponse<AnsweredQuestionsDto> {
+        return ApiResponse.success(AnsweredQuestionsDto.createMock())
+    }
+
+    @ApiOperation("받은 질문(본인)")
+    @GetMapping("/received-questions")
+    fun getMyReceivedQuestions(): ApiResponse<ReceivedQuestionsDto> {
+        return ApiResponse.success(ReceivedQuestionsDto.createMock())
+    }
 }

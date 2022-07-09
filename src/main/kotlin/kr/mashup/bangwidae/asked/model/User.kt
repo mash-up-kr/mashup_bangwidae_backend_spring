@@ -1,5 +1,6 @@
 package kr.mashup.bangwidae.asked.model
 
+import io.swagger.annotations.ApiModel
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
@@ -58,6 +59,7 @@ data class User(
     }
 }
 
+@ApiModel
 enum class LoginType {
     BASIC, APPLE, KAKAO
 }

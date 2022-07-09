@@ -46,7 +46,11 @@ class SecurityConfig {
                 "/api/v1/auth/login",
                 "/api/v1/place/reverse/geocode",
                 "/api/v1/auth/mail/send",
-                "/api/v1/auth/mail/cert"
+                "/api/v1/auth/mail/cert",
+
+                // 테스트를 위해 임시로 허용
+                "/api/v1/user/answered-questions",
+                "/api/v1/user/received-questions",
             ).permitAll()
             .antMatchers("/api/**").hasAuthority("ROLE")
         http.csrf().disable()
