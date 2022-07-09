@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 @Document("user")
 data class User(
     val id: ObjectId? = null,
-    val nickname: String = "noname",
+    val nickname: String? = null,
     val email: String,
     val password: String? = null,
     val providerId: String? = null,
