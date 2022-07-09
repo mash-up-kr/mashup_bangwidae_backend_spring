@@ -2,46 +2,184 @@ package kr.mashup.bangwidae.asked.controller.dto
 
 import io.swagger.annotations.ApiModelProperty
 import kr.mashup.bangwidae.asked.model.User
+import org.bson.types.ObjectId
+import java.time.LocalDateTime
 
 data class UserDto(
-    @ApiModelProperty(value = "user id", example = "gardenlee")
     val id: String,
-    @ApiModelProperty(value = "user nickname", example = "gardenlee")
-    val nickname: String
+    val nickname: String,
+    val tags: List<String>,
 ) {
     companion object {
         fun from(user: User): UserDto {
             return UserDto(
                 id = user.id!!.toHexString(),
-                nickname = user.nickname!!
+                nickname = user.nickname!!,
+                tags = user.tags,
             )
         }
     }
 }
 
 data class JoinUserRequest(
-    @ApiModelProperty(value = "이메일", example = "doridori@gmail.com")
     val email: String,
-    @ApiModelProperty(value = "로그인 비밀번호", example = "12345")
     val password: String
 )
 
 data class JoinUserResponse(
-    @ApiModelProperty(value = "인증 토큰", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.~~~")
     val accessToken: String,
-    @ApiModelProperty(value = "리프레시 토큰", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.~~~")
     val refreshToken: String
 )
 
 data class UpdateNicknameRequest (
-    @ApiModelProperty(value = "닉네임", example = "도리를찾아서")
     val nickname: String
 )
 
 data class UpdateProfileRequest (
-    @ApiModelProperty(value = "프로필 소개", example = "안녕하세요! 도리도리입니다.")
     val description: String,
-    @ApiModelProperty(value = "관심사 리스트", example = "[MBTI, 넷플릭스]")
     val tags: List<String>,
 )
 
+data class AnsweredQuestionsDto (
+    val headerText: String,
+    val user: UserDto,
+    val questions: List<QuestionDto>,
+) {
+    data class QuestionDto (
+        val content: String,
+        val representativeAddress: String,
+        val user: UserDto,
+        val answer: AnswerDto,
+        val createdAt: LocalDateTime,
+    )
+
+    data class AnswerDto (
+        val content: String,
+        val representativeAddress: String,
+        val likeCount: Int,
+        val createdAt: LocalDateTime,
+    )
+
+    companion object {
+        fun createMock(): AnsweredQuestionsDto {
+            return AnsweredQuestionsDto(
+                headerText = "새로운 질문이 3개 도착했어요!",
+                user = UserDto(
+                    id = ObjectId("62c9797528889852507cec07").toHexString(),
+                    nickname = "도리도리도링",
+                    tags = listOf(
+                        "MBTI", "디즈니"
+                    ),
+                ),
+                questions = listOf(
+                    QuestionDto(
+                        content = "#도리 를 찾아서가 뭐에요?",
+                        representativeAddress = "강남구",
+                        user = UserDto(
+                            id = ObjectId("62c9797528889852507cec07").toHexString(),
+                            nickname = "감자도리도리",
+                            tags = listOf(
+                                "MBTI", "디즈니"
+                            ),
+                        ),
+                        answer = AnswerDto(
+                            content = "#니모 절친 물고기 임다",
+                            representativeAddress = "강남구",
+                            likeCount = 1,
+                            createdAt = LocalDateTime.now()
+                        ),
+                        createdAt = LocalDateTime.now().minusHours(1)
+                    ),
+                    QuestionDto(
+                        content = "#도리 를 찾아서가 뭐에요?",
+                        representativeAddress = "강남구",
+                        user = UserDto(
+                            id = ObjectId("62c9797528889852507cec07").toHexString(),
+                            nickname = "감자도리도리",
+                            tags = listOf(
+                                "MBTI", "디즈니"
+                            ),
+                        ),
+                        answer = AnswerDto(
+                            content = "#니모 절친 물고기 임다",
+                            representativeAddress = "강남구",
+                            likeCount = 1,
+                            createdAt = LocalDateTime.now()
+                        ),
+                        createdAt = LocalDateTime.now().minusHours(2),
+                    ),
+                    QuestionDto(
+                        content = "#도리 를 찾아서가 뭐에요?",
+                        representativeAddress = "강남구",
+                        user = UserDto(
+                            id = ObjectId("62c9797528889852507cec07").toHexString(),
+                            nickname = "감자도리도리",
+                            tags = listOf(
+                                "MBTI", "디즈니"
+                            ),
+                        ),
+                        answer = AnswerDto(
+                            content = "#니모 절친 물고기 임다",
+                            representativeAddress = "강남구",
+                            likeCount = 1,
+                            createdAt = LocalDateTime.now().minusMinutes(40)
+                        ),
+                        createdAt = LocalDateTime.now().minusHours(2),
+                    )
+                )
+            )
+        }
+    }
+}
+
+data class ReceivedQuestionsDto(
+    val questions: List<QuestionDto>
+) {
+    data class QuestionDto (
+        val content: String,
+        val representativeAddress: String,
+        val user: UserDto,
+    )
+
+    companion object{
+        fun createMock(): ReceivedQuestionsDto {
+            return ReceivedQuestionsDto(
+                listOf(
+                    QuestionDto(
+                        content = "#도리 를 찾아서가 뭐에요?",
+                        representativeAddress = "강남구",
+                        user = UserDto(
+                            id = ObjectId("62c9797528889852507cec07").toHexString(),
+                            nickname = "감자도리도리",
+                            tags = listOf(
+                                "MBTI", "디즈니"
+                            ),
+                        )
+                    ),
+                    QuestionDto(
+                        content = "#도리 를 찾아서가 뭐에요?",
+                        representativeAddress = "강남구",
+                        user = UserDto(
+                            id = ObjectId("62c9797528889852507cec07").toHexString(),
+                            nickname = "감자도리도리",
+                            tags = listOf(
+                                "MBTI", "디즈니"
+                            ),
+                        )
+                    ),
+                    QuestionDto(
+                        content = "#도리 를 찾아서가 뭐에요?",
+                        representativeAddress = "강남구",
+                        user = UserDto(
+                            id = ObjectId("62c9797528889852507cec07").toHexString(),
+                            nickname = "감자도리도리",
+                            tags = listOf(
+                                "MBTI", "디즈니"
+                            ),
+                        )
+                    )
+                )
+            )
+        }
+    }
+}

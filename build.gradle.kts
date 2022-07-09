@@ -39,6 +39,9 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb")
     implementation("org.springframework.cloud:spring-cloud-starter-openfeign")
 
+    implementation ("io.springfox:springfox-swagger2:${swaggerVersion}")
+    implementation ("io.springfox:springfox-swagger-ui:${swaggerVersion}")
+
     implementation("com.auth0:java-jwt:$javaJwtVersion")
     implementation("com.github.ulisesbocchio:jasypt-spring-boot-starter:${jasyptVersion}")
     implementation("io.github.microutils:kotlin-logging-jvm:${kotlinLoggingVersion}")
@@ -46,7 +49,6 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-    implementation("io.springfox:springfox-boot-starter:${swaggerVersion}")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${jacksonKotlinModuleVersion}")
     implementation("org.apache.commons:commons-lang3:${apacheCommonsVersion}")
     implementation("com.amazonaws:aws-java-sdk-s3:1.11.238")

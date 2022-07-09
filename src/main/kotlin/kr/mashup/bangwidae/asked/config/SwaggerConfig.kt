@@ -14,7 +14,7 @@ import java.util.*
 import javax.servlet.ServletContext
 import kotlin.streams.toList
 
-
+@EnableSwagger2
 @Configuration
 class SwaggerConfig {
     @Bean
@@ -25,20 +25,5 @@ class SwaggerConfig {
             .apis(RequestHandlerSelectors.any())
             .paths(PathSelectors.ant("/api/**"))
             .build()
-    }
-
-    // SpringBoot 2.6.X ~ + Swagger3 + actuator 조합일 때 뭔가 잘 안된다...
-    // https://github.com/springfox/springfox/issues/3462
-    @Bean
-    fun webMvcRequestHandlerProvider(
-        servletContext: Optional<ServletContext?>,
-        methodResolver: HandlerMethodResolver?,
-        handlerMappings: List<RequestMappingInfoHandlerMapping>
-    ): WebMvcRequestHandlerProvider? {
-        var handlerMappings = handlerMappings
-        handlerMappings = handlerMappings.filter {
-            it.javaClass.name.contains("RequestMapping")
-        }.toList()
-        return WebMvcRequestHandlerProvider(servletContext, methodResolver, handlerMappings)
     }
 }
