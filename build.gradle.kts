@@ -49,6 +49,7 @@ dependencies {
     implementation("io.springfox:springfox-boot-starter:${swaggerVersion}")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:${jacksonKotlinModuleVersion}")
     implementation("org.apache.commons:commons-lang3:${apacheCommonsVersion}")
+    implementation("com.amazonaws:aws-java-sdk-s3:1.11.238")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
