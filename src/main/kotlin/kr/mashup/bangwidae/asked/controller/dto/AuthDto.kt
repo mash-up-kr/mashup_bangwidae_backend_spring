@@ -15,7 +15,9 @@ data class LoginRequest(
 
 data class LoginResponse(
     @ApiModelProperty(value = "access token", example = "eherhljerghjlejrgligjl")
-    val accessToken: String
+    val accessToken: String,
+    @ApiModelProperty(value = "리프레시 토큰", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.~~~")
+    val refreshToken: String,
 )
 
 data class CertMailSendRequest(
@@ -28,4 +30,14 @@ data class CertMailRequest(
     val email: String,
     @ApiModelProperty(value = "인증 번호 (6자리 숫자)", example = "000000")
     val certificationNumber: String,
+)
+
+data class IssueTokenRequest(
+    @ApiModelProperty(value = "리프레시 토큰", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.~~~")
+    val refreshToken: String,
+)
+
+data class IssueTokenResponse(
+    @ApiModelProperty(value = "액세스 토큰", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.~~~")
+    val accessToken: String? = null,
 )

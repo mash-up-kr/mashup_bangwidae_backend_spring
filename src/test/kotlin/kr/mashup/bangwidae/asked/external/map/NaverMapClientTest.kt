@@ -77,7 +77,7 @@ internal class NaverMapClientTest : FunSpec({
             }
 
             // then
-            exception.code shouldBe DoriDoriExceptionType.PLACE_FETCH_FAIL.code
+            exception.code shouldBe DoriDoriExceptionType.PLACE_FETCH_FAIL
             exception.message shouldBe "test message"
         }
     }

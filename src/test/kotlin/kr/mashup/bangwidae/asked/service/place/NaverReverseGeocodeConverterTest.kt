@@ -13,6 +13,7 @@ import kr.mashup.bangwidae.asked.external.map.NaverMapClient
 import kr.mashup.bangwidae.asked.external.map.NaverReverseGeocodeRegion
 import kr.mashup.bangwidae.asked.external.map.NaverReverseGeocodeRegionArea
 import kr.mashup.bangwidae.asked.external.map.NaverReverseGeocodeResult
+import kr.mashup.bangwidae.asked.model.Region
 
 internal class NaverReverseGeocodeConverterTest : FunSpec({
     lateinit var naverMapClient: NaverMapClient
@@ -159,7 +160,7 @@ internal class NaverReverseGeocodeConverterTest : FunSpec({
             }
 
             // then
-            exception.code shouldBe DoriDoriExceptionType.PLACE_FETCH_FAIL.code
+            exception.code shouldBe DoriDoriExceptionType.PLACE_FETCH_FAIL
         }
 
         test("리스트 첫 원소의 region 이 없으면 PLACE_FETCH_FAIL 을 던진다.") {
@@ -177,7 +178,7 @@ internal class NaverReverseGeocodeConverterTest : FunSpec({
             }
 
             // then
-            exception.code shouldBe DoriDoriExceptionType.PLACE_FETCH_FAIL.code
+            exception.code shouldBe DoriDoriExceptionType.PLACE_FETCH_FAIL
         }
     }
 })
