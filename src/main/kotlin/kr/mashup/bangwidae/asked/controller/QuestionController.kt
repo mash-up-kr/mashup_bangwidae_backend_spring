@@ -49,7 +49,7 @@ class QuestionController(
     }
 
     @ApiOperation("질문 삭제")
-    @PatchMapping("/{questionId}")
+    @DeleteMapping("/{questionId}")
     fun deleteQuestion(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable questionId: ObjectId,
