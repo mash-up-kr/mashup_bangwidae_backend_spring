@@ -4,6 +4,8 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.post.Comment
+import kr.mashup.bangwidae.asked.service.post.CommentService
 import kr.mashup.bangwidae.asked.service.post.PostService
 import org.bson.types.ObjectId
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -14,7 +16,8 @@ import springfox.documentation.annotations.ApiIgnore
 @RestController
 @RequestMapping("/api/v1/posts")
 class PostController(
-    private val postService: PostService
+    private val postService: PostService,
+    private val commentService: CommentService
 ) {
     @ApiOperation("포스트 글 작성")
     @PostMapping
@@ -65,5 +68,21 @@ class PostController(
         @PathVariable id: ObjectId
     ): ApiResponse<PostDto> {
         return ApiResponse.success(postService.getPostById(id))
+    }
+
+    @ApiOperation("댓글 작성")
+    @PostMapping("/{postId}/comment")
+    fun commentPost(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @PathVariable postId: ObjectId,
+        @RequestBody commentWriteRequest: CommentWriteRequest,
+    ): ApiResponse<Comment> {
+        return ApiResponse.success(
+            commentService.write(
+                postId = postId,
+                request = commentWriteRequest,
+                user = user,
+            )
+        )
     }
 }
