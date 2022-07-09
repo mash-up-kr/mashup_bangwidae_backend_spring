@@ -38,17 +38,17 @@ class UserService(
         return JoinUserResponse(jwtService.createAccessToken(user.id!!.toHexString()))
     }
 
-    fun createNickname(user: User, nickname: String): Boolean {
+    fun updateNickname(user: User, nickname: String): Boolean {
         checkDuplicatedUserByNickname(nickname)
         userRepository.save(
-            user.createNickname(nickname)
+            user.updateNickname(nickname)
         )
         return true
     }
 
-    fun createProfile(user: User, description: String, tags: List<String>): Boolean {
+    fun updateProfile(user: User, description: String, tags: List<String>): Boolean {
         userRepository.save(
-            user.createProfile(description, tags)
+            user.updateProfile(description, tags)
         )
         return true
     }

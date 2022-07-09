@@ -28,22 +28,22 @@ class UserController(
 	@PostMapping("/nickname")
 	fun createNickname(
 		@ApiIgnore @AuthenticationPrincipal user: User,
-		@RequestBody createNicknameRequest: CreateNicknameRequest
+		@RequestBody updateNicknameRequest: UpdateNicknameRequest
 	): ApiResponse<Boolean> {
-		return ApiResponse.success(userService.createNickname(user, createNicknameRequest.nickname))
+		return ApiResponse.success(userService.updateNickname(user, updateNicknameRequest.nickname))
 	}
 
 	@ApiOperation("프로필 설정")
 	@PostMapping("/profile")
 	fun createProfile(
 		@ApiIgnore @AuthenticationPrincipal user: User,
-		@RequestBody createProfileRequest: CreateProfileRequest
+		@RequestBody updateProfileRequest: UpdateProfileRequest
 	): ApiResponse<Boolean> {
 		return ApiResponse.success(
-			userService.createProfile(
+			userService.updateProfile(
 				user,
-				createProfileRequest.description,
-				createProfileRequest.tags,
+				updateProfileRequest.description,
+				updateProfileRequest.tags
 			)
 		)
 	}
@@ -54,6 +54,6 @@ class UserController(
 	fun getMyInfo(
 		@ApiIgnore @AuthenticationPrincipal user: User
 	): ApiResponse<String> {
-		return ApiResponse.success(user.nickname)
+		return ApiResponse.success(user.nickname!!)
 	}
 }

@@ -22,13 +22,13 @@ data class User(
     @LastModifiedDate
     val updatedAt: LocalDateTime = LocalDateTime.now(),
 ) {
-    fun createNickname(nickname: String): User {
+    fun updateNickname(nickname: String): User {
         return this.copy(
             nickname = nickname
         )
     }
 
-    fun createProfile(description: String, tags: List<String>): User {
+    fun updateProfile(description: String, tags: List<String>): User {
         return this.copy(
             description = description,
             tags = tags
