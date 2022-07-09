@@ -1,5 +1,9 @@
 package kr.mashup.bangwidae.asked.external.map
 
+import com.fasterxml.jackson.annotation.JsonProperty
+import feign.FeignException
+import kr.mashup.bangwidae.asked.exception.DoriDoriException
+import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import org.springframework.stereotype.Component
 
 @Component
@@ -8,16 +12,19 @@ class NaverMapClient(
     private val naverMapProperties: NaverMapProperties,
 ) {
     fun reverseGeocode(longitude: Double, latitude: Double): List<NaverReverseGeocodeResult> {
-        val response = naverMapFeignClient.reverseGeocode(
-            clientId = naverMapProperties.authorization.clientId,
-            clientSecret = naverMapProperties.authorization.clientSecret,
-            coordinates = "${longitude},${latitude}",
-            responseType = "json"
-        )
-
-        // TODO FeignException 을 DoriDoriException 으로
-
-        return response.results!!
+        return try {
+            naverMapFeignClient.reverseGeocode(
+                clientId = naverMapProperties.authorization.clientId,
+                clientSecret = naverMapProperties.authorization.clientSecret,
+                coordinates = "${longitude},${latitude}",
+                responseType = "json"
+            ).results!!
+        } catch (feignException: FeignException) {
+            throw DoriDoriException.of(
+                type = DoriDoriExceptionType.PLACE_FETCH_FAIL,
+                message = feignException.message,
+            )
+        }
     }
 }
 
@@ -41,33 +48,30 @@ data class NaverReverseGeocodeError(
 
 data class NaverReverseGeocodeResult(
     val name: String?,
-    val code: NaverReverseGeocodeCode?,
     val region: NaverReverseGeocodeRegion?,
-)
-
-data class NaverReverseGeocodeCode(
-    val id: String?,
-    val type: String?,
-    val mappingId: String?,
 )
 
 data class NaverReverseGeocodeRegion(
     // 국가 코드 최상위 도메인 두 자리 (KR)
-    val area0: NaverReverseGeocodeRegionArea?,
+    @JsonProperty("area0")
+    val 국가: NaverReverseGeocodeRegionArea?,
     // 행정안전부에서 공시된 시/도 명칭
-    val area1: NaverReverseGeocodeRegionArea?,
+    @JsonProperty("area1")
+    val 시도: NaverReverseGeocodeRegionArea?,
     // 행정안전부에서 공시된 시/군/구 명칭
-    val area2: NaverReverseGeocodeRegionArea?,
+    @JsonProperty("area2")
+    val 시군구: NaverReverseGeocodeRegionArea?,
     // 행정안전부에서 공시된 읍/면/동 명칭
-    val area3: NaverReverseGeocodeRegionArea?,
+    @JsonProperty("area3")
+    val 읍면동: NaverReverseGeocodeRegionArea?,
     // 행정안전부에서 공시된 리 명칭
-    val area4: NaverReverseGeocodeRegionArea?,
+    @JsonProperty("area4")
+    val 리: NaverReverseGeocodeRegionArea?,
 )
 
 data class NaverReverseGeocodeRegionArea(
     val name: String?,
     val coords: NaverReverseGeocodeCoords?,
-    val alias: String?,
 )
 
 data class NaverReverseGeocodeCoords(
@@ -76,7 +80,9 @@ data class NaverReverseGeocodeCoords(
 
 data class NaverReverseGeocodeCenter(
     val crs: String?,
-    val x: Double?,
-    val y: Double?,
+    @JsonProperty("x")
+    val longitude: Double?,
+    @JsonProperty("y")
+    val latitude: Double?,
 )
 

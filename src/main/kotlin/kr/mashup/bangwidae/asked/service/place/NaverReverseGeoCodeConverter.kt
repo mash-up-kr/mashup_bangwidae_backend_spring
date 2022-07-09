@@ -20,11 +20,11 @@ class NaverReverseGeocodeConverter(
             ?.region
             ?.let {
                 NaverRegion(
-                    국가 = it.area0?.name,
-                    시도 = it.area1?.name,
-                    시군구 = it.area2?.name,
-                    읍면동 = it.area3?.name,
-                    리 = it.area4?.name
+                    국가 = it.국가?.name,
+                    시도 = it.시도?.name,
+                    시군구 = it.시군구?.name,
+                    읍면동 = it.읍면동?.name,
+                    리 = it.리?.name
                 )
             } ?: throw DoriDoriException.of(
             type = DoriDoriExceptionType.PLACE_FETCH_FAIL,
