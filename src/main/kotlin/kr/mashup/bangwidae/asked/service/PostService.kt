@@ -7,6 +7,7 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.repository.PostRepository
+import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import kr.mashup.bangwidae.asked.utils.getLatitude
@@ -15,11 +16,14 @@ import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.geo.Distance
 import org.springframework.data.geo.Metrics
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
 class PostService(
-    private val postRepository: PostRepository, private val placeService: PlaceService
+    private val postRepository: PostRepository,
+    private val placeService: PlaceService,
+    private val userRepository: UserRepository
 ) {
     fun findById(id: ObjectId): Post {
         return postRepository.findById(id).orElseThrow { DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST) }
@@ -52,7 +56,15 @@ class PostService(
             Distance(meterDistance / 1000, Metrics.KILOMETERS),
             PageRequest.of(0, size)
         )
-        return CursorResult(postList.map { PostDto.from(it) }, hasNext(postList.last().id))
+        val userMap = userRepository.findAllByIdIn(postList.map { it.userId }).associateBy { it.id }
+        return CursorResult(postList.map { PostDto.from(userMap[it.userId]!!, it) }, hasNext(postList.last().id))
+    }
+
+    fun getPostById(id: ObjectId): PostDto {
+        val post = findById(id)
+        val user = userRepository.findByIdOrNull(post.userId)
+            ?: throw DoriDoriException.of(DoriDoriExceptionType.POST_WRITER_USER_NOT_EXIST)
+        return PostDto.from(user, post)
     }
 
     private fun hasNext(id: ObjectId?): Boolean {

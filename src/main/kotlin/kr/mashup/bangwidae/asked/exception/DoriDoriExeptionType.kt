@@ -90,6 +90,11 @@ enum class DoriDoriExceptionType(
         httpStatus = HttpStatus.UNAUTHORIZED,
         code = Code.POST_NOT_ALLOWED_FOR_USER,
         message = "유저가 해당 포스트에 대한 권한이 없어요"
+    ),
+    POST_WRITER_USER_NOT_EXIST(
+        httpStatus = HttpStatus.NOT_FOUND,
+        code = Code.POST_WRITER_USER_NOT_EXIST,
+        message = "포스트에 대한 작성자를 찾을 수 없어요"
     )
     ;
 
@@ -111,5 +116,6 @@ enum class DoriDoriExceptionType(
         const val REPRESENTATIVE_ADDRESS_NOT_EXIST = "REPRESENTATIVE_ADDRESS_NOT_EXIST"
 
         const val POST_NOT_ALLOWED_FOR_USER = "POST_NOT_ALLOWED_FOR_USER"
+        const val POST_WRITER_USER_NOT_EXIST = "POST_WRITER_USER_NOT_EXIST"
     }
 }

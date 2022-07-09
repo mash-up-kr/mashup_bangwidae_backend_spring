@@ -3,6 +3,7 @@ package kr.mashup.bangwidae.asked.service.place
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.external.map.NaverMapClient
+import kr.mashup.bangwidae.asked.model.Region
 import org.springframework.stereotype.Component
 
 @Component

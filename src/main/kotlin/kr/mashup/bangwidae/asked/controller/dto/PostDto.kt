@@ -1,6 +1,7 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
 import io.swagger.annotations.ApiModelProperty
+import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import kr.mashup.bangwidae.asked.utils.getLatitude
@@ -12,7 +13,7 @@ data class PostDto(
     @ApiModelProperty(value = "post id", example = "62b49a12507aeb02e6534572")
     val id: String,
     @ApiModelProperty(value = "작성자 user id", example = "62b49a12507aeb02e6534572")
-    val userId: String,
+    val user: PostWriter,
     @ApiModelProperty(value = "post content", example = "질문 post 샘플")
     val content: String = "",
     @ApiModelProperty(value = "경도", example = "127.4")
@@ -27,10 +28,14 @@ data class PostDto(
     val updatedAt: LocalDateTime?
 ) {
     companion object {
-        fun from(post: Post): PostDto {
+        fun from(user: User, post: Post): PostDto {
             return PostDto(
                 id = post.id!!.toHexString(),
-                userId = post.userId.toHexString(),
+                user = PostWriter(
+                    id = user.id!!.toHexString(),
+                    tags = user.tags,
+                    nickname = user.nickname
+                ),
                 content = post.content,
                 longitude = post.location.getLongitude(),
                 latitude = post.location.getLatitude(),
@@ -66,4 +71,13 @@ data class PostEditRequest(
     val longitude: Double?,
     @ApiModelProperty(value = "위도(nullable)", example = "23.5")
     val latitude: Double?
+)
+
+data class PostWriter(
+    @ApiModelProperty(value = "작성자 user id", example = "62b49a12507aeb02e6534572")
+    val id: String,
+    @ApiModelProperty(value = "작성자 태그 리스트", example = "['MBTI', '모임', '방탈출']")
+    val tags: List<String> = emptyList(),
+    @ApiModelProperty(value = "작성자 닉네임", example = "니모를 찾아서")
+    val nickname: String
 )
