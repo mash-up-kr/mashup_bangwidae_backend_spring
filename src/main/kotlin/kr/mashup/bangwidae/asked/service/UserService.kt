@@ -35,7 +35,15 @@ class UserService(
                 password = encodedPassword
             )
         )
-        return JoinUserResponse(jwtService.createAccessToken(user.id!!.toHexString()))
+
+        val refreshToken = jwtService.createRefreshToken(user.id!!.toHexString())
+        userRepository.save(
+            user.updateRefreshToken(refreshToken)
+        )
+        return JoinUserResponse(
+            accessToken = jwtService.createAccessToken(user.id.toHexString()),
+            refreshToken = refreshToken,
+        )
     }
 
     fun updateNickname(user: User, nickname: String): Boolean {

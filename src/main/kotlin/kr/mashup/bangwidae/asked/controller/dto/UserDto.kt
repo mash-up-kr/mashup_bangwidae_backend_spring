@@ -28,7 +28,9 @@ data class JoinUserRequest(
 
 data class JoinUserResponse(
     @ApiModelProperty(value = "인증 토큰", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.~~~")
-    val accessToken: String
+    val accessToken: String,
+    @ApiModelProperty(value = "리프레시 토큰", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.~~~")
+    val refreshToken: String
 )
 
 data class UpdateNicknameRequest (

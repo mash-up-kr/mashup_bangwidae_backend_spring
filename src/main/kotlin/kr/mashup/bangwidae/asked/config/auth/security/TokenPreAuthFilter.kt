@@ -1,5 +1,11 @@
 package kr.mashup.bangwidae.asked.config.auth.security
 
+import com.auth0.jwt.exceptions.JWTVerificationException
+import com.auth0.jwt.exceptions.TokenExpiredException
+import kr.mashup.bangwidae.asked.config.auth.jwt.JwtService
+import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
+import kr.mashup.bangwidae.asked.service.UserService
+import org.bson.types.ObjectId
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
 import org.springframework.util.StringUtils
 import java.util.regex.Matcher
@@ -7,11 +13,25 @@ import java.util.regex.Pattern
 import javax.servlet.http.HttpServletRequest
 
 
-class TokenPreAuthFilter : AbstractPreAuthenticatedProcessingFilter() {
+class TokenPreAuthFilter(
+    private val jwtService: JwtService,
+    private val userService: UserService,
+) : AbstractPreAuthenticatedProcessingFilter() {
     override fun getPreAuthenticatedPrincipal(request: HttpServletRequest): Any? {
-        return resolveToken(request)
-    }
+        val token: String = resolveToken(request)?: return null
+        val user = runCatching {
+            jwtService.decodeToken(token)?.let {
+                userService.findById(ObjectId(it))
+            }
+        }.onFailure {
+            when(it) {
+                is TokenExpiredException -> request.setAttribute("error", DoriDoriExceptionType.TOKEN_EXPIRED)
+                is JWTVerificationException -> request.setAttribute("error", DoriDoriExceptionType.AUTHENTICATED_FAIL)
+            }
+        }.getOrNull()?: return null
 
+        return user
+    }
     override fun getPreAuthenticatedCredentials(request: HttpServletRequest): Any? {
         return resolveToken(request)
     }

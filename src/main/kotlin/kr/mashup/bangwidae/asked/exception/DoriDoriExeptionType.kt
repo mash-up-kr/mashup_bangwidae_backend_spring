@@ -9,6 +9,9 @@ enum class DoriDoriExceptionType(
     FAIL("Internal server error."),
 
     // AUTH
+    TOKEN_EXPIRED("토큰이 만료되었어요"),
+    AUTHENTICATED_FAIL("인증에 실패 했어요"),
+    PERMISSION_DENIED("권한이 없어요"),
     DUPLICATED_USER("이미 가입된 이메일 이에요"),
     CERTIFICATE_FAILED("인증번호가 일치하지 않아요"),
     NOT_CERTIFICATED_EMAIL("이메일 인증이 되지 않았어요"),
