@@ -1,0 +1,72 @@
+package kr.mashup.bangwidae.asked.service.question
+
+import kr.mashup.bangwidae.asked.controller.dto.AnswerEditRequest
+import kr.mashup.bangwidae.asked.controller.dto.AnswerWriteRequest
+import kr.mashup.bangwidae.asked.exception.DoriDoriException
+import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
+import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.question.Answer
+import kr.mashup.bangwidae.asked.repository.AnswerRepository
+import kr.mashup.bangwidae.asked.repository.QuestionRepository
+import org.bson.types.ObjectId
+import org.springframework.data.repository.findByIdOrNull
+import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
+
+@Transactional
+@Service
+class AnswerService(
+    private val answerRepository: AnswerRepository,
+    private val questionRepository: QuestionRepository,
+) : WithQuestionAuthorityValidator, WithAnswerAuthorityValidator {
+    fun findById(answerId: ObjectId): Answer {
+        return answerRepository.findByIdOrNull(answerId)
+            ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+    }
+
+    fun write(user: User, questionId: ObjectId, request: AnswerWriteRequest): Answer {
+        val question = questionRepository.findByIdOrNull(questionId)
+            ?.also { it.validateToAnswer(user) }
+            ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+
+        questionRepository.save(
+            question.answer()
+        )
+
+        return answerRepository.save(
+            Answer(
+                userId = user.id!!,
+                questionId = questionId,
+                content = request.content,
+            )
+        )
+    }
+
+    fun edit(user: User, answerId: ObjectId, request: AnswerEditRequest): Answer {
+        val answer = findById(answerId)
+            .also { it.validateToUpdate(user) }
+
+        return answerRepository.save(
+            answer.updateContent(request.content)
+        )
+    }
+
+    fun delete(user: User, answerId: ObjectId): Answer {
+        val answer = findById(answerId)
+            .also { it.validateToDelete(user) }
+
+        return answerRepository.save(
+            answer.delete()
+        ).also {
+            val count = answerRepository.countByQuestionIdAndDeletedFalse(it.questionId)
+            if (count == 0L) {
+                val question = questionRepository.findByIdOrNull(answer.questionId)
+                    ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+
+                questionRepository.save(
+                    question.waiting()
+                )
+            }
+        }
+    }
+}
