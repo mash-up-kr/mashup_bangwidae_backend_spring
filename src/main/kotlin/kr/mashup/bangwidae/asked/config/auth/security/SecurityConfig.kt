@@ -2,6 +2,10 @@ package kr.mashup.bangwidae.asked.config.auth.security
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import kr.mashup.bangwidae.asked.config.auth.jwt.JwtService
+import kr.mashup.bangwidae.asked.config.auth.security.handler.AuthenticationExceptionHandler
+import kr.mashup.bangwidae.asked.controller.dto.ApiErrorResponse
+import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
+import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.service.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -12,7 +16,9 @@ import org.springframework.security.authentication.ProviderManager
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
 
 
@@ -36,6 +42,7 @@ class SecurityConfig {
             .antMatchers(
                 "actuator/health",
                 "/api/v1/user/join",
+                "/api/v1/auth/issue/token",
                 "/api/v1/auth/login",
                 "/api/v1/place/reverse/geocode",
                 "/api/v1/auth/mail/send",
@@ -51,20 +58,18 @@ class SecurityConfig {
             .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             .and()
             .exceptionHandling()
-            .authenticationEntryPoint { request, response, authException ->
-                response.status = HttpStatus.UNAUTHORIZED.value()
-                response.contentType = MediaType.APPLICATION_JSON_VALUE
-                objectMapper.writeValue(
-                    response.outputStream,
-                    "인증관련 에러 정의"
-                )
-            }
+            .authenticationEntryPoint(authenticationEntryPoint())
             .accessDeniedHandler { request, response, accessDeniedException ->
                 response.status = HttpStatus.FORBIDDEN.value()
                 response.contentType = MediaType.APPLICATION_JSON_VALUE
                 objectMapper.writeValue(
                     response.outputStream,
-                    "권한관련 에러 정의"
+                    ApiResponse.fail(
+                        ApiErrorResponse(
+                            code = DoriDoriExceptionType.PERMISSION_DENIED.name,
+                            message = DoriDoriExceptionType.PERMISSION_DENIED.message
+                        )
+                    )
                 )
             }
 
@@ -73,16 +78,18 @@ class SecurityConfig {
 
     @Bean
     fun tokenPreAuthFilter(): TokenPreAuthFilter {
-        val tokenPreAuthFilter = TokenPreAuthFilter()
+        val tokenPreAuthFilter = TokenPreAuthFilter(jwtService, userService)
         tokenPreAuthFilter.setAuthenticationManager(ProviderManager(preAuthTokenProvider()))
         return tokenPreAuthFilter
     }
 
     @Bean
     fun preAuthTokenProvider(): PreAuthTokenProvider {
-        return PreAuthTokenProvider(
-            jwtService,
-            userService
-        )
+        return PreAuthTokenProvider()
+    }
+
+    @Bean
+    fun authenticationEntryPoint(): AuthenticationEntryPoint {
+        return AuthenticationExceptionHandler(objectMapper)
     }
 }

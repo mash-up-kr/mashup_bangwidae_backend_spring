@@ -1,8 +1,6 @@
 package kr.mashup.bangwidae.asked.config.auth.security
 
-import kr.mashup.bangwidae.asked.config.auth.jwt.JwtService
-import kr.mashup.bangwidae.asked.service.UserService
-import org.bson.types.ObjectId
+import kr.mashup.bangwidae.asked.model.User
 import org.springframework.security.authentication.AuthenticationProvider
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.authority.SimpleGrantedAuthority
@@ -10,16 +8,11 @@ import org.springframework.security.web.authentication.preauth.PreAuthenticatedA
 import java.util.*
 
 
-class PreAuthTokenProvider(
-    private val jwtService: JwtService,
-    private val userService: UserService
-) : AuthenticationProvider {
+class PreAuthTokenProvider : AuthenticationProvider {
 
     override fun authenticate(authentication: Authentication): Authentication? {
         if (authentication is PreAuthenticatedAuthenticationToken) {
-            val token: String = authentication.getPrincipal().toString()
-            val userId = ObjectId(jwtService.decodeToken(token))
-            val user = userService.findById(userId)
+            val user = authentication.getPrincipal() as User
             return PreAuthenticatedAuthenticationToken(
                 user,
                 "",
