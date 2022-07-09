@@ -1,6 +1,7 @@
 package kr.mashup.bangwidae.asked.utils
 
-import org.junit.jupiter.api.Disabled
+import kr.mashup.bangwidae.asked.external.aws.S3ImageUploader
+import kr.mashup.bangwidae.asked.external.aws.UploadDirName
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,7 +12,7 @@ import org.springframework.mock.web.MockMultipartFile
 @SpringBootTest
 class S3ImageUploadertests(
     @Autowired
-    val s3ImageUploader: S3ImageUtil
+    val s3ImageUploader: S3ImageUploader
 ) {
     @Test
     @DisplayName("s3Upload test")
