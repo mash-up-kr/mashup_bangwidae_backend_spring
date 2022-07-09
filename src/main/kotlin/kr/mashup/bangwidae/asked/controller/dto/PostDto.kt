@@ -10,21 +10,13 @@ import org.bson.types.ObjectId
 import java.time.LocalDateTime
 
 data class PostDto(
-    @ApiModelProperty(value = "post id", example = "62b49a12507aeb02e6534572")
     val id: String,
-    @ApiModelProperty(value = "작성자 user id", example = "62b49a12507aeb02e6534572")
     val user: PostWriter,
-    @ApiModelProperty(value = "post content", example = "질문 post 샘플")
     val content: String = "",
-    @ApiModelProperty(value = "경도", example = "127.4")
     val longitude: Double,
-    @ApiModelProperty(value = "위도", example = "23.5")
     val latitude: Double,
-    @ApiModelProperty(value = "대표 주소", example = "경기도 성남시 분당구 불정로 6")
     val representativeAddress: String?,
-    @ApiModelProperty(value = "생성일", example = "2022-06-23T16:51:30.717+00:00")
     val createdAt: LocalDateTime?,
-    @ApiModelProperty(value = "수정일", example = "2022-06-23T16:51:30.717+00:00")
     val updatedAt: LocalDateTime?
 ) {
     companion object {
@@ -48,11 +40,8 @@ data class PostDto(
 }
 
 data class PostWriteRequest(
-    @ApiModelProperty(value = "post content", example = "질문 post 샘플")
     val content: String,
-    @ApiModelProperty(value = "경도", example = "127.4")
     val longitude: Double,
-    @ApiModelProperty(value = "위도", example = "23.5")
     val latitude: Double
 ) {
     fun toEntity(userId: ObjectId): Post {
@@ -65,19 +54,13 @@ data class PostWriteRequest(
 }
 
 data class PostEditRequest(
-    @ApiModelProperty(value = "post content", example = "질문 post 샘플")
     val content: String?,
-    @ApiModelProperty(value = "경도(nullable)", example = "127.4")
     val longitude: Double?,
-    @ApiModelProperty(value = "위도(nullable)", example = "23.5")
     val latitude: Double?
 )
 
 data class PostWriter(
-    @ApiModelProperty(value = "작성자 user id", example = "62b49a12507aeb02e6534572")
     val id: String,
-    @ApiModelProperty(value = "작성자 태그 리스트", example = "['MBTI', '모임', '방탈출']")
     val tags: List<String> = emptyList(),
-    @ApiModelProperty(value = "작성자 닉네임", example = "니모를 찾아서")
     val nickname: String
 )
