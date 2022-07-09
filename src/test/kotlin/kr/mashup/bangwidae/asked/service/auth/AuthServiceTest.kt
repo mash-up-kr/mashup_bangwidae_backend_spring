@@ -52,7 +52,7 @@ internal class AuthServiceTest : FunSpec({
             val exception = shouldThrow<DoriDoriException> {
                 authService.login(loginRequest)
             }
-            exception.code shouldBe DoriDoriExceptionType.LOGIN_FAILED.code
+            exception.code shouldBe DoriDoriExceptionType.LOGIN_FAILED
         }
         test("LOGIN_FAILED Error 를 던진다.") {
             every { userService.findByEmail(any()) } returns mockk()
@@ -60,7 +60,7 @@ internal class AuthServiceTest : FunSpec({
             val exception = shouldThrow<DoriDoriException> {
                 authService.login(loginRequest)
             }
-            exception.code shouldBe DoriDoriExceptionType.LOGIN_FAILED.code
+            exception.code shouldBe DoriDoriExceptionType.LOGIN_FAILED
         }
 
         test("인증에 성공했다면 jwtToken 을 반환한다.") {

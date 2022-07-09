@@ -9,6 +9,7 @@ import io.mockk.mockk
 import io.mockk.verify
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
+import kr.mashup.bangwidae.asked.model.Region
 
 internal class PlaceServiceTest : FunSpec({
     lateinit var naverReverseGeocodeConverter: NaverReverseGeocodeConverter
@@ -71,7 +72,7 @@ internal class PlaceServiceTest : FunSpec({
             }
 
             // then
-            exception.code shouldBe DoriDoriExceptionType.INVALID_COUNTRY.code
+            exception.code shouldBe DoriDoriExceptionType.INVALID_COUNTRY
         }
     }
 })
