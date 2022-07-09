@@ -20,12 +20,12 @@ class AnswerService(
     private val questionRepository: QuestionRepository,
 ) : WithQuestionAuthorityValidator, WithAnswerAuthorityValidator {
     fun findById(answerId: ObjectId): Answer {
-        return answerRepository.findByIdOrNull(answerId)
+        return answerRepository.findByIdAndDeletedFalse(answerId)
             ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
     }
 
     fun write(user: User, questionId: ObjectId, request: AnswerWriteRequest): Answer {
-        val question = questionRepository.findByIdOrNull(questionId)
+        val question = questionRepository.findByIdAndDeletedFalse(questionId)
             ?.also { it.validateToAnswer(user) }
             ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
 

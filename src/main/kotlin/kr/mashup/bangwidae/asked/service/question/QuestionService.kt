@@ -20,7 +20,7 @@ class QuestionService(
     private val userRepository: UserRepository,
 ) : WithQuestionAuthorityValidator {
     fun findById(questionId: ObjectId): Question {
-        return questionRepository.findByIdOrNull(questionId)
+        return questionRepository.findByIdAndDeletedFalse(questionId)
             ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
     }
 

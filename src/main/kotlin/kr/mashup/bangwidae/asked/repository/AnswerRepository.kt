@@ -7,5 +7,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface AnswerRepository : MongoRepository<Answer, ObjectId> {
+    fun findByIdAndDeletedFalse(id: ObjectId): Answer?
+
     fun countByQuestionIdAndDeletedFalse(questionId: ObjectId): Long
 }
