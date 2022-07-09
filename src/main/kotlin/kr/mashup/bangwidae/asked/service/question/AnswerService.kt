@@ -58,15 +58,22 @@ class AnswerService(
         return answerRepository.save(
             answer.delete()
         ).also {
-            val count = answerRepository.countByQuestionIdAndDeletedFalse(it.questionId)
-            if (count == 0L) {
-                val question = questionRepository.findByIdOrNull(answer.questionId)
-                    ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
-
-                questionRepository.save(
-                    question.waiting()
-                )
+            if (answerDoesNotExist(it.questionId)) {
+                makeQuestionWaiting(it.questionId)
             }
         }
+    }
+
+    private fun answerDoesNotExist(questionId: ObjectId): Boolean {
+        return answerRepository.countByQuestionIdAndDeletedFalse(questionId) == 0L
+    }
+
+    private fun makeQuestionWaiting(questionId: ObjectId) {
+        val question = questionRepository.findByIdOrNull(questionId)
+            ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+
+        questionRepository.save(
+            question.waiting()
+        )
     }
 }
