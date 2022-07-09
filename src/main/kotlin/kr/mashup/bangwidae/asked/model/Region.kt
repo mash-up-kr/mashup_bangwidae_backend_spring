@@ -9,4 +9,7 @@ data class Region(
     val 군구: String?,
     val 읍면동: String?,
     val 리: String?,
-)
+) {
+    val representativeAddress: String?
+        get() = 군구 ?: 시 ?: 읍면동 ?: 리 ?: 도
+}

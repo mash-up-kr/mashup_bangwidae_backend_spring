@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.service
+package kr.mashup.bangwidae.asked.service.post
 
 import kr.mashup.bangwidae.asked.controller.dto.CursorResult
 import kr.mashup.bangwidae.asked.controller.dto.PostDto
