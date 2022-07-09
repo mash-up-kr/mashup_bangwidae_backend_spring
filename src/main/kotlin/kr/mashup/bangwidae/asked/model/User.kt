@@ -16,6 +16,7 @@ data class User(
     val loginType: LoginType,
     val description: String? = null,
     val tags: List<String> = emptyList(),
+    val profileImageUrl: String? = null,
     val refreshToken: String? = null,
 
     @CreatedDate // TODO: KST 변환방법 알아보기 JAVA TIME Module
@@ -34,6 +35,10 @@ data class User(
             description = description,
             tags = tags
         )
+    }
+
+    fun updateProfileImageUrl(profileImageUrl: String): User {
+        return this.copy(profileImageUrl = profileImageUrl)
     }
 
     fun updateRefreshToken(refreshToken: String): User {

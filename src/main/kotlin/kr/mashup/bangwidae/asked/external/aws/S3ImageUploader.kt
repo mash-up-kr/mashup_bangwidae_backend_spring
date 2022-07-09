@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.utils
+package kr.mashup.bangwidae.asked.external.aws
 
 import com.amazonaws.services.s3.AmazonS3
 import com.amazonaws.services.s3.model.CannedAccessControlList
@@ -10,12 +10,12 @@ import org.springframework.web.multipart.MultipartFile
 import java.util.*
 
 @Component
-class S3ImageUtil(
+class S3ImageUploader(
     private val amazonS3: AmazonS3,
     @Value("\${cloud.aws.s3.bucket}") private val bucket: String
 ) {
     fun upload(file: MultipartFile, dirName: String): String {
-        val fileName = "$dirName/${UUID.randomUUID()}${file.name}"
+        val fileName = "$dirName/${UUID.randomUUID()}${file.originalFilename}"
         amazonS3.putObject(
             PutObjectRequest(
                 bucket,
