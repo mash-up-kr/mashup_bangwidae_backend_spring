@@ -3,6 +3,7 @@ package kr.mashup.bangwidae.asked.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
+import kr.mashup.bangwidae.asked.controller.dto.CommentDto
 import kr.mashup.bangwidae.asked.controller.dto.CommentEditRequest
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.post.CommentService
@@ -23,13 +24,13 @@ class CommentController(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable commentId: ObjectId,
         @RequestBody commentEditRequest: CommentEditRequest,
-    ): ApiResponse<ObjectId> {
+    ): ApiResponse<CommentDto> {
+        val comment = commentService.findById(commentId)
         return commentService.edit(
-            commentId = commentId,
-            request = commentEditRequest,
             user = user,
+            comment = comment.update(commentEditRequest)
         ).let {
-            ApiResponse.success(it.id!!)
+            ApiResponse.success(CommentDto.from(user, it))
         }
     }
 
@@ -38,12 +39,13 @@ class CommentController(
     fun deleteAnswer(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable commentId: ObjectId,
-    ): ApiResponse<ObjectId> {
+    ): ApiResponse<CommentDto> {
+        val comment = commentService.findById(commentId)
         return commentService.delete(
-            commentId = commentId,
+            comment = comment,
             user = user,
         ).let {
-            ApiResponse.success(it.id!!)
+            ApiResponse.success(CommentDto.from(user, it))
         }
     }
 }

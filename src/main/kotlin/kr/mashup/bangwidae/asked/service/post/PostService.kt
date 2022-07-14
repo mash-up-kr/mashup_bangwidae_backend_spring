@@ -26,7 +26,8 @@ class PostService(
     private val userRepository: UserRepository
 ) {
     fun findById(id: ObjectId): Post {
-        return postRepository.findById(id).orElseThrow { DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST) }
+        return postRepository.findByIdAndDeletedFalse(id)
+            ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
     }
 
     fun save(post: Post): Post {

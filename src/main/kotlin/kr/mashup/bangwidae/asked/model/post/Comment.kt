@@ -1,10 +1,13 @@
 package kr.mashup.bangwidae.asked.model.post
 
+import kr.mashup.bangwidae.asked.controller.dto.CommentEditRequest
 import kr.mashup.bangwidae.asked.model.Region
+import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Version
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
@@ -14,6 +17,7 @@ data class Comment(
     val userId: ObjectId,
     val postId: ObjectId,
     val content: String,
+    val location: GeoJsonPoint,
     val region: Region? = null,
 
     val deleted: Boolean = false,
@@ -22,10 +26,14 @@ data class Comment(
     @CreatedDate var createdAt: LocalDateTime? = null,
     @LastModifiedDate var updatedAt: LocalDateTime? = null
 ) {
-    fun updateContent(content: String): Comment {
-        return this.copy(
-            content = content,
-        )
+    fun update(commentEditRequest: CommentEditRequest): Comment {
+        return commentEditRequest.let {
+            this.copy(
+                content = it.content,
+                location = if (it.longitude != null && it.latitude != null)
+                    GeoUtils.geoJsonPoint(it.longitude, it.latitude) else this.location
+            )
+        }
     }
 
     fun delete(): Comment {
