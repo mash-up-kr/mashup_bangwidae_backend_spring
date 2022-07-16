@@ -23,7 +23,8 @@ class PostController(
     fun writePost(
         @ApiIgnore @AuthenticationPrincipal user: User, @RequestBody postWriteRequest: PostWriteRequest
     ): ApiResponse<PostDto> {
-        return postService.save(postWriteRequest.toEntity(user.id!!))
+        val post = postWriteRequest.toEntity(user.id!!)
+        return postService.write(post)
             .let {
                 ApiResponse.success(PostDto.from(user, it))
             }

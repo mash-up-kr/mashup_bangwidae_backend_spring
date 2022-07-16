@@ -24,28 +24,24 @@ class PostService(
     private val postRepository: PostRepository,
     private val placeService: PlaceService,
     private val userRepository: UserRepository
-) {
+) : WithPostAuthorityValidator {
     fun findById(id: ObjectId): Post {
         return postRepository.findByIdAndDeletedFalse(id)
             ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
     }
 
-    fun save(post: Post): Post {
+    fun write(post: Post): Post {
         return postRepository.save(updatePlaceInfo(post))
     }
 
     fun update(user: User, post: Post): Post {
-        require(isPostValidForUser(post, user)) {
-            throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
-        }
+        post.validateToUpdate(user)
         return postRepository.save(updatePlaceInfo(post))
     }
 
     fun delete(user: User, post: Post) {
-        require(isPostValidForUser(post, user)) {
-            throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
-        }
-        postRepository.save(post.copy(deleted = true))
+        post.validateToDelete(user)
+        postRepository.save(post.delete())
     }
 
     fun getNearPost(
@@ -79,9 +75,5 @@ class PostService(
         val region = placeService.reverseGeocode(longitude, latitude)
         val representativeAddress = placeService.getRepresentativeAddress(longitude, latitude)
         return post.copy(representativeAddress = representativeAddress, region = region)
-    }
-
-    private fun isPostValidForUser(post: Post, user: User): Boolean {
-        return post.userId == user.id!!
     }
 }
