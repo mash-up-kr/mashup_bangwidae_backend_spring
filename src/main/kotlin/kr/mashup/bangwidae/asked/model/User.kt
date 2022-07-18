@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.annotation.Version
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
@@ -20,10 +21,9 @@ data class User(
     val profileImageUrl: String? = null,
     val refreshToken: String? = null,
 
-    @CreatedDate // TODO: KST 변환방법 알아보기 JAVA TIME Module
-    val createdAt: LocalDateTime = LocalDateTime.now(), // TODO: modified, created 되는지 테스트해보기
-    @LastModifiedDate
-    val updatedAt: LocalDateTime = LocalDateTime.now(),
+    @Version var version: Int? = null,
+    @CreatedDate var createdAt: LocalDateTime? = null,
+    @LastModifiedDate var updatedAt: LocalDateTime? = null
 ) {
     fun updateNickname(nickname: String): User {
         return this.copy(
