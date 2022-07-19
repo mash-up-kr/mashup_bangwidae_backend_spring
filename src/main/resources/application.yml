@@ -47,3 +47,12 @@ cloud:
       secret-key: ENC(UOgpOvh49EqL84zh1eRjBv6uyhqq6F2yWOlK7t6vOd12MgwlyEL0DIO8C7fm1qD5KnalWHYN9whEgD/SSRGmUkhgvryne77x5+quhUfrayU=)
     s3:
       bucket: dori-dori-bucket
+
+logging:
+  level:
+    org:
+      springframework:
+        data:
+          mongodb:
+            core:
+              MongoTemplate: DEBUG

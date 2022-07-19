@@ -4,7 +4,8 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.service.PostService
+import kr.mashup.bangwidae.asked.service.post.CommentService
+import kr.mashup.bangwidae.asked.service.post.PostService
 import org.bson.types.ObjectId
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
@@ -14,15 +15,19 @@ import springfox.documentation.annotations.ApiIgnore
 @RestController
 @RequestMapping("/api/v1/posts")
 class PostController(
-    private val postService: PostService
+    private val postService: PostService,
+    private val commentService: CommentService
 ) {
     @ApiOperation("포스트 글 작성")
     @PostMapping
     fun writePost(
         @ApiIgnore @AuthenticationPrincipal user: User, @RequestBody postWriteRequest: PostWriteRequest
     ): ApiResponse<PostDto> {
-        val savedPost = postService.save(postWriteRequest.toEntity(user.id!!))
-        return ApiResponse.success(PostDto.from(user, savedPost))
+        val post = postWriteRequest.toEntity(user.id!!)
+        return postService.write(post)
+            .let {
+                ApiResponse.success(PostDto.from(user, it))
+            }
     }
 
     @ApiOperation("포스트 글 수정")
@@ -33,8 +38,10 @@ class PostController(
         @PathVariable id: ObjectId
     ): ApiResponse<PostDto> {
         val post = postService.findById(id)
-        val updatedPost = postService.update(user, post.update(postEditRequest))
-        return ApiResponse.success(PostDto.from(user, updatedPost))
+        return postService.update(user, post.update(postEditRequest))
+            .let {
+                ApiResponse.success(PostDto.from(user, it))
+            }
     }
 
     @ApiOperation("포스트 글 삭제")
@@ -43,8 +50,10 @@ class PostController(
         @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
     ): ApiResponse<Boolean> {
         val post = postService.findById(id)
-        postService.delete(user, post)
-        return ApiResponse.success(true)
+        return postService.delete(user, post)
+            .let {
+                ApiResponse.success(true)
+            }
     }
 
     @ApiOperation("거리 반경 포스트 글 페이징")
@@ -56,7 +65,10 @@ class PostController(
         @RequestParam size: Int,
         @RequestParam(required = false) lastId: ObjectId?
     ): ApiResponse<CursorResult<PostDto>> {
-        return ApiResponse.success(postService.getNearPost(longitude, latitude, meterDistance, lastId, size))
+        return postService.getNearPost(longitude, latitude, meterDistance, lastId, size)
+            .let {
+                ApiResponse.success(it)
+            }
     }
 
     @ApiOperation("포스트 글 조회")
@@ -64,6 +76,40 @@ class PostController(
     fun getPostById(
         @PathVariable id: ObjectId
     ): ApiResponse<PostDto> {
-        return ApiResponse.success(postService.getPostById(id))
+        return postService.getPostById(id)
+            .let {
+                ApiResponse.success(it)
+            }
+    }
+
+    @ApiOperation("댓글 작성")
+    @PostMapping("/{postId}/comment")
+    fun commentPost(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @PathVariable postId: ObjectId,
+        @RequestBody commentWriteRequest: CommentWriteRequest,
+    ): ApiResponse<CommentDto> {
+        val post = postService.findById(postId)
+        return commentService.write(
+            user = user,
+            post = post,
+            comment = commentWriteRequest.toEntity(user.id!!, postId)
+        ).let {
+            ApiResponse.success(CommentDto.from(user, it))
+        }
+    }
+
+    @ApiOperation("댓글 조희 페이징")
+    @GetMapping("/{postId}/comment")
+    fun getComments(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @PathVariable postId: ObjectId,
+        @RequestParam size: Int,
+        @RequestParam(required = false) lastId: ObjectId?
+    ): ApiResponse<CursorResult<CommentDto>> {
+        return commentService.getCommentsByPostId(postId, lastId, size)
+            .let {
+                ApiResponse.success(it)
+            }
     }
 }

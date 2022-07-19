@@ -39,4 +39,10 @@ data class Post(
             )
         }
     }
+
+    fun delete(): Post {
+        return this.copy(
+            deleted = true,
+        )
+    }
 }

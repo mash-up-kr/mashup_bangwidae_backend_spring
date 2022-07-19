@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.service
+package kr.mashup.bangwidae.asked.service.post
 
 import kr.mashup.bangwidae.asked.controller.dto.CursorResult
 import kr.mashup.bangwidae.asked.controller.dto.PostDto
@@ -16,6 +16,7 @@ import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.geo.Distance
 import org.springframework.data.geo.Metrics
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -24,40 +25,42 @@ class PostService(
     private val postRepository: PostRepository,
     private val placeService: PlaceService,
     private val userRepository: UserRepository
-) {
+) : WithPostAuthorityValidator {
     fun findById(id: ObjectId): Post {
-        return postRepository.findById(id).orElseThrow { DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST) }
+        return postRepository.findByIdAndDeletedFalse(id)
+            ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
     }
 
-    fun save(post: Post): Post {
+    fun write(post: Post): Post {
         return postRepository.save(updatePlaceInfo(post))
     }
 
     fun update(user: User, post: Post): Post {
-        require(isPostValidForUser(post, user)) {
-            throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
-        }
+        post.validateToUpdate(user)
         return postRepository.save(updatePlaceInfo(post))
     }
 
     fun delete(user: User, post: Post) {
-        require(isPostValidForUser(post, user)) {
-            throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
-        }
-        postRepository.save(post.copy(deleted = true))
+        post.validateToDelete(user)
+        postRepository.save(post.delete())
     }
 
     fun getNearPost(
         longitude: Double, latitude: Double, meterDistance: Double, lastId: ObjectId?, size: Int
     ): CursorResult<PostDto> {
+        val location = GeoUtils.geoJsonPoint(longitude, latitude)
+        val distance = Distance(meterDistance / 1000, Metrics.KILOMETERS)
         val postList = postRepository.findByLocationNearAndIdBeforeAndDeletedFalseOrderByIdDesc(
-            GeoUtils.geoJsonPoint(longitude, latitude),
+            location,
             lastId ?: ObjectId(),
-            Distance(meterDistance / 1000, Metrics.KILOMETERS),
+            distance,
             PageRequest.of(0, size)
         )
         val userMap = userRepository.findAllByIdIn(postList.map { it.userId }).associateBy { it.id }
-        return CursorResult(postList.map { PostDto.from(userMap[it.userId]!!, it) }, hasNext(postList.last().id))
+        return CursorResult(
+            postList.map { PostDto.from(userMap[it.userId]!!, it) },
+            hasNext(location, postList.last().id, distance)
+        )
     }
 
     fun getPostById(id: ObjectId): PostDto {
@@ -67,9 +70,14 @@ class PostService(
         return PostDto.from(user, post)
     }
 
-    private fun hasNext(id: ObjectId?): Boolean {
+    private fun hasNext(location: GeoJsonPoint, id: ObjectId?, distance: Distance): Boolean {
         if (id == null) return false
-        return postRepository.existsByIdBeforeAndDeletedFalse(id)
+        return postRepository.findByLocationNearAndIdBeforeAndDeletedFalseOrderByIdDesc(
+            location,
+            id,
+            distance,
+            PageRequest.of(0, 1)
+        ).isNotEmpty()
     }
 
     private fun updatePlaceInfo(post: Post): Post {
@@ -78,9 +86,5 @@ class PostService(
         val region = placeService.reverseGeocode(longitude, latitude)
         val representativeAddress = placeService.getRepresentativeAddress(longitude, latitude)
         return post.copy(representativeAddress = representativeAddress, region = region)
-    }
-
-    private fun isPostValidForUser(post: Post, user: User): Boolean {
-        return post.userId == user.id!!
     }
 }
