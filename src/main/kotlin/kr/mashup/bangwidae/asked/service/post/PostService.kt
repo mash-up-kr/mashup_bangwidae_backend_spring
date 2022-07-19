@@ -16,6 +16,7 @@ import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.geo.Distance
 import org.springframework.data.geo.Metrics
+import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -47,14 +48,19 @@ class PostService(
     fun getNearPost(
         longitude: Double, latitude: Double, meterDistance: Double, lastId: ObjectId?, size: Int
     ): CursorResult<PostDto> {
+        val location = GeoUtils.geoJsonPoint(longitude, latitude)
+        val distance = Distance(meterDistance / 1000, Metrics.KILOMETERS)
         val postList = postRepository.findByLocationNearAndIdBeforeAndDeletedFalseOrderByIdDesc(
-            GeoUtils.geoJsonPoint(longitude, latitude),
+            location,
             lastId ?: ObjectId(),
-            Distance(meterDistance / 1000, Metrics.KILOMETERS),
+            distance,
             PageRequest.of(0, size)
         )
         val userMap = userRepository.findAllByIdIn(postList.map { it.userId }).associateBy { it.id }
-        return CursorResult(postList.map { PostDto.from(userMap[it.userId]!!, it) }, hasNext(postList.last().id))
+        return CursorResult(
+            postList.map { PostDto.from(userMap[it.userId]!!, it) },
+            hasNext(location, postList.last().id, distance)
+        )
     }
 
     fun getPostById(id: ObjectId): PostDto {
@@ -64,9 +70,14 @@ class PostService(
         return PostDto.from(user, post)
     }
 
-    private fun hasNext(id: ObjectId?): Boolean {
+    private fun hasNext(location: GeoJsonPoint, id: ObjectId?, distance: Distance): Boolean {
         if (id == null) return false
-        return postRepository.existsByIdBeforeAndDeletedFalse(id)
+        return postRepository.findByLocationNearAndIdBeforeAndDeletedFalseOrderByIdDesc(
+            location,
+            id,
+            distance,
+            PageRequest.of(0, 1)
+        ).isNotEmpty()
     }
 
     private fun updatePlaceInfo(post: Post): Post {

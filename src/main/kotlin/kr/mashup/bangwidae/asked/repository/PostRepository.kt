@@ -12,12 +12,11 @@ import org.springframework.stereotype.Repository
 interface PostRepository : MongoRepository<Post, ObjectId> {
     fun findByLocationNearAndIdBeforeAndDeletedFalseOrderByIdDesc(
         location: GeoJsonPoint,
-        id: ObjectId,
+        lastId: ObjectId,
         distance: Distance,
         pageRequest: PageRequest
     ): List<Post>
 
     fun findByIdAndDeletedFalse(id: ObjectId): Post?
-    fun existsByIdBeforeAndDeletedFalse(id: ObjectId): Boolean
     fun findByLocationNear(location: GeoJsonPoint, distance: Distance): List<Post>
 }

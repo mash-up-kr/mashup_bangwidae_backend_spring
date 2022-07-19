@@ -40,7 +40,7 @@ class CommentService(
         val userMap = userRepository.findAllByIdIn(userIdList).associateBy { it.id }
         return CursorResult(
             commentList.map { CommentDto.from(userMap[it.userId]!!, it) },
-            hasNext(commentList.last().id)
+            hasNext(postId, commentList.last().id)
         )
     }
 
@@ -59,9 +59,9 @@ class CommentService(
         return commentRepository.save(comment.delete())
     }
 
-    private fun hasNext(id: ObjectId?): Boolean {
+    private fun hasNext(postId: ObjectId, id: ObjectId?): Boolean {
         if (id == null) return false
-        return commentRepository.existsByIdBeforeAndDeletedFalse(id)
+        return commentRepository.existsByPostIdAndIdBeforeAndDeletedFalse(postId, id)
     }
 
     private fun updatePlaceInfo(comment: Comment): Comment {
