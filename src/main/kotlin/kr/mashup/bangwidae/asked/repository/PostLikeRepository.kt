@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface PostLikeRepository : MongoRepository<PostLike, ObjectId> {
+    fun existsByPostIdAndUserId(postId: ObjectId, userId: ObjectId): Boolean
 }

@@ -78,7 +78,9 @@ class PostService(
     }
 
     fun postLike(postId: ObjectId, userId: ObjectId) {
-        postLikeRepository.save(PostLike(userId = userId, postId = postId))
+        if (!postLikeRepository.existsByPostIdAndUserId(postId, userId)) {
+            postLikeRepository.save(PostLike(userId = userId, postId = postId))
+        }
     }
 
     private fun hasNext(location: GeoJsonPoint, id: ObjectId?, distance: Distance): Boolean {
