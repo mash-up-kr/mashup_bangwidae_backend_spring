@@ -3,6 +3,7 @@ package kr.mashup.bangwidae.asked.model
 import io.swagger.annotations.ApiModel
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Version
 import org.springframework.data.mongodb.core.mapping.Document
@@ -10,6 +11,7 @@ import java.time.LocalDateTime
 
 @Document("user")
 data class User(
+    @Id
     val id: ObjectId? = null,
     val nickname: String? = null,
     val email: String,
