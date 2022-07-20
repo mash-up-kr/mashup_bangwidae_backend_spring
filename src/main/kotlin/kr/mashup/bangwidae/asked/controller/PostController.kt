@@ -3,6 +3,8 @@ package kr.mashup.bangwidae.asked.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.*
+import kr.mashup.bangwidae.asked.exception.DoriDoriException
+import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.post.CommentService
 import kr.mashup.bangwidae.asked.service.post.PostService
@@ -51,6 +53,18 @@ class PostController(
     ): ApiResponse<Boolean> {
         val post = postService.findById(id)
         return postService.delete(user, post)
+            .let {
+                ApiResponse.success(true)
+            }
+    }
+
+    @ApiOperation("포스트 글 좋아요")
+    @PostMapping("/{id}/like")
+    fun likePost(
+        @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
+    ): ApiResponse<Boolean> {
+        require(postService.existsById(id)) { throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST) }
+        return postService.postLike(id, user.id!!)
             .let {
                 ApiResponse.success(true)
             }

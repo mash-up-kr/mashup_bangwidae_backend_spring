@@ -6,6 +6,8 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Post
+import kr.mashup.bangwidae.asked.model.post.PostLike
+import kr.mashup.bangwidae.asked.repository.PostLikeRepository
 import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.place.PlaceService
@@ -24,11 +26,16 @@ import org.springframework.stereotype.Service
 class PostService(
     private val postRepository: PostRepository,
     private val placeService: PlaceService,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val postLikeRepository: PostLikeRepository
 ) : WithPostAuthorityValidator {
     fun findById(id: ObjectId): Post {
         return postRepository.findByIdAndDeletedFalse(id)
             ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+    }
+
+    fun existsById(id: ObjectId): Boolean {
+        return postRepository.existsByIdAndDeletedFalse(id)
     }
 
     fun write(post: Post): Post {
@@ -68,6 +75,10 @@ class PostService(
         val user = userRepository.findByIdOrNull(post.userId)
             ?: throw DoriDoriException.of(DoriDoriExceptionType.POST_WRITER_USER_NOT_EXIST)
         return PostDto.from(user, post)
+    }
+
+    fun postLike(postId: ObjectId, userId: ObjectId) {
+        postLikeRepository.save(PostLike(userId = userId, postId = postId))
     }
 
     private fun hasNext(location: GeoJsonPoint, id: ObjectId?, distance: Distance): Boolean {
