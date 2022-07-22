@@ -37,11 +37,13 @@ class PostController(
         @RequestBody postEditRequest: PostEditRequest,
         @PathVariable id: ObjectId
     ): ApiResponse<PostDto> {
-        val post = postService.findById(id)
-        return postService.update(user, post.update(postEditRequest))
-            .let {
-                ApiResponse.success(PostDto.from(user, it))
-            }
+        return postService.edit(
+            postId = id,
+            user = user,
+            request = postEditRequest
+        ).let {
+            ApiResponse.success(PostDto.from(user, it))
+        }
     }
 
     @ApiOperation("포스트 글 삭제")
@@ -49,8 +51,7 @@ class PostController(
     fun deletePost(
         @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
     ): ApiResponse<Boolean> {
-        val post = postService.findById(id)
-        postService.delete(user, post)
+        postService.delete(postId = id, user = user)
         return ApiResponse.success(true)
     }
 
@@ -105,10 +106,9 @@ class PostController(
         @PathVariable postId: ObjectId,
         @RequestBody commentWriteRequest: CommentWriteRequest,
     ): ApiResponse<CommentDto> {
-        val post = postService.findById(postId)
         return commentService.write(
             user = user,
-            post = post,
+            postId = postId,
             comment = commentWriteRequest.toEntity(user.id!!, postId)
         ).let {
             ApiResponse.success(CommentDto.from(user, it))

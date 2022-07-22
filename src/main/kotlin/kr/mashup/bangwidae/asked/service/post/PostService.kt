@@ -2,6 +2,7 @@ package kr.mashup.bangwidae.asked.service.post
 
 import kr.mashup.bangwidae.asked.controller.dto.CursorResult
 import kr.mashup.bangwidae.asked.controller.dto.PostDto
+import kr.mashup.bangwidae.asked.controller.dto.PostEditRequest
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
@@ -38,13 +39,14 @@ class PostService(
         return postRepository.save(updatePlaceInfo(post))
     }
 
-    fun update(user: User, post: Post): Post {
-        post.validateToUpdate(user)
-        return postRepository.save(updatePlaceInfo(post))
+    fun edit(user: User, postId: ObjectId, request: PostEditRequest): Post {
+        val post = findById(postId)
+            .also { it.validateToUpdate(user) }
+        return postRepository.save(updatePlaceInfo(post.update(request)))
     }
 
-    fun delete(user: User, post: Post) {
-        post.validateToDelete(user)
+    fun delete(user: User, postId: ObjectId) {
+        val post = findById(postId).also { it.validateToDelete(user) }
         postRepository.save(post.delete())
     }
 

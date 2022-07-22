@@ -10,6 +10,7 @@ import kr.mashup.bangwidae.asked.model.post.CommentLike
 import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.repository.CommentLikeRepository
 import kr.mashup.bangwidae.asked.repository.CommentRepository
+import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.getLatitude
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service
 class CommentService(
     private val commentRepository: CommentRepository,
     private val commentLikeRepository: CommentLikeRepository,
+    private val postRepository: PostRepository,
     private val userRepository: UserRepository,
     private val placeService: PlaceService
 ) : WithPostAuthorityValidator, WithCommentAuthorityValidator {
@@ -47,18 +49,20 @@ class CommentService(
         )
     }
 
-    fun write(user: User, post: Post, comment: Comment): Comment {
-        post.validateToComment(user)
+    fun write(user: User, postId: ObjectId, comment: Comment): Comment {
+        postRepository.findByIdAndDeletedFalse(postId)
+            ?.also { it.validateToComment(user) }
+            ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
         return commentRepository.save(updatePlaceInfo(comment))
     }
 
-    fun edit(user: User, comment: Comment): Comment {
-        comment.validateToUpdate(user)
+    fun edit(user: User, commentId: ObjectId): Comment {
+        val comment = findById(commentId).also { it.validateToUpdate(user) }
         return commentRepository.save(updatePlaceInfo(comment))
     }
 
-    fun delete(user: User, comment: Comment): Comment {
-        comment.validateToDelete(user)
+    fun delete(user: User, commentId: ObjectId): Comment {
+        val comment = findById(commentId).also { it.validateToDelete(user) }
         return commentRepository.save(comment.delete())
     }
 
