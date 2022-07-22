@@ -2,6 +2,7 @@ package kr.mashup.bangwidae.asked.model
 
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
+import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.annotation.Version
 import org.springframework.data.mongodb.core.geo.GeoJsonPoint
@@ -13,6 +14,7 @@ import java.time.LocalDateTime
 
 @Document("ward")
 data class Ward(
+    @Id
     val id: ObjectId? = null,
     val userId: ObjectId,
     val name: String,
