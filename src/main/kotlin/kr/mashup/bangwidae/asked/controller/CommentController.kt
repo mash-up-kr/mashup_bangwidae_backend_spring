@@ -25,10 +25,9 @@ class CommentController(
         @PathVariable commentId: ObjectId,
         @RequestBody commentEditRequest: CommentEditRequest,
     ): ApiResponse<CommentDto> {
-        val comment = commentService.findById(commentId)
         return commentService.edit(
-            user = user,
-            comment = comment.update(commentEditRequest)
+            commentId = commentId,
+            user = user
         ).let {
             ApiResponse.success(CommentDto.from(user, it))
         }
@@ -40,9 +39,8 @@ class CommentController(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable commentId: ObjectId,
     ): ApiResponse<CommentDto> {
-        val comment = commentService.findById(commentId)
         return commentService.delete(
-            comment = comment,
+            commentId = commentId,
             user = user,
         ).let {
             ApiResponse.success(CommentDto.from(user, it))
