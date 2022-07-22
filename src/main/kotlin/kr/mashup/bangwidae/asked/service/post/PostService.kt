@@ -16,9 +16,9 @@ import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.geo.Distance
 import org.springframework.data.geo.Metrics
-import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import kotlin.math.min
 
 @Service
 class PostService(
@@ -54,12 +54,13 @@ class PostService(
             location,
             lastId ?: ObjectId(),
             distance,
-            PageRequest.of(0, size)
+            PageRequest.of(0, size + 1)
         )
         val userMap = userRepository.findAllByIdIn(postList.map { it.userId }).associateBy { it.id }
         return CursorResult(
-            postList.map { PostDto.from(userMap[it.userId]!!, it) },
-            hasNext(location, postList.last().id, distance)
+            values = postList.subList(0, min(postList.size, size))
+                .map { PostDto.from(userMap[it.userId]!!, it) },
+            hasNext = (postList.size == size + 1)
         )
     }
 
@@ -68,16 +69,6 @@ class PostService(
         val user = userRepository.findByIdOrNull(post.userId)
             ?: throw DoriDoriException.of(DoriDoriExceptionType.POST_WRITER_USER_NOT_EXIST)
         return PostDto.from(user, post)
-    }
-
-    private fun hasNext(location: GeoJsonPoint, id: ObjectId?, distance: Distance): Boolean {
-        if (id == null) return false
-        return postRepository.findByLocationNearAndIdBeforeAndDeletedFalseOrderByIdDesc(
-            location,
-            id,
-            distance,
-            PageRequest.of(0, 1)
-        ).isNotEmpty()
     }
 
     private fun updatePlaceInfo(post: Post): Post {

@@ -15,6 +15,7 @@ import kr.mashup.bangwidae.asked.utils.getLongitude
 import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import kotlin.math.min
 
 
 @Service
@@ -34,13 +35,14 @@ class CommentService(
         val commentList = commentRepository.findByPostIdAndIdBeforeAndDeletedFalseOrderByIdDesc(
             postId,
             lastId ?: ObjectId(),
-            PageRequest.of(0, size)
+            PageRequest.of(0, size + 1)
         )
         val userIdList = commentList.map { it.userId }.distinct()
         val userMap = userRepository.findAllByIdIn(userIdList).associateBy { it.id }
         return CursorResult(
-            commentList.map { CommentDto.from(userMap[it.userId]!!, it) },
-            hasNext(postId, commentList.last().id)
+            values = commentList.subList(0, min(commentList.size, size))
+                .map { CommentDto.from(userMap[it.userId]!!, it) },
+            hasNext = (commentList.size == size + 1)
         )
     }
 
@@ -57,11 +59,6 @@ class CommentService(
     fun delete(user: User, comment: Comment): Comment {
         comment.validateToDelete(user)
         return commentRepository.save(comment.delete())
-    }
-
-    private fun hasNext(postId: ObjectId, id: ObjectId?): Boolean {
-        if (id == null) return false
-        return commentRepository.existsByPostIdAndIdBeforeAndDeletedFalse(postId, id)
     }
 
     private fun updatePlaceInfo(comment: Comment): Comment {
