@@ -34,10 +34,6 @@ class PostService(
             ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
     }
 
-    fun existsById(id: ObjectId): Boolean {
-        return postRepository.existsByIdAndDeletedFalse(id)
-    }
-
     fun write(post: Post): Post {
         return postRepository.save(updatePlaceInfo(post))
     }
@@ -78,8 +74,17 @@ class PostService(
     }
 
     fun postLike(postId: ObjectId, userId: ObjectId) {
+        require(postRepository.existsByIdAndDeletedFalse(postId)) {
+            throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+        }
         if (!postLikeRepository.existsByPostIdAndUserId(postId, userId)) {
             postLikeRepository.save(PostLike(userId = userId, postId = postId))
+        }
+    }
+
+    fun postUnlike(postId: ObjectId, userId: ObjectId) {
+        postLikeRepository.findByPostIdAndUserId(postId, userId)?.let {
+            postLikeRepository.delete(it)
         }
     }
 
