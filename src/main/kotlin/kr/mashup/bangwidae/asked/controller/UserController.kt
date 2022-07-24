@@ -70,6 +70,14 @@ class UserController(
         return ApiResponse.success(user.nickname!!)
     }
 
+    @ApiOperation("헤더 문구")
+    @GetMapping("/header-text")
+    fun getHeaderText(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+    ): ApiResponse<String> {
+        return ApiResponse.success("헤더 텍스트 예시")
+    }
+
     @ApiOperation("답변완료(본인)")
     @GetMapping("/answered-questions")
     fun getMyAnsweredQuestions(
