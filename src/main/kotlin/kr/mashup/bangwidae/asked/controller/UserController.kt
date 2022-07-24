@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.UserService
+import kr.mashup.bangwidae.asked.service.question.QuestionService
+import org.bson.types.ObjectId
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -14,7 +16,8 @@ import springfox.documentation.annotations.ApiIgnore
 @RestController
 @RequestMapping("/api/v1/user")
 class UserController(
-    private val userService: UserService
+    private val userService: UserService,
+    private val questionService: QuestionService,
 ) {
 
     @ApiOperation("ID/PW 회원가입")
@@ -69,13 +72,46 @@ class UserController(
 
     @ApiOperation("답변완료(본인)")
     @GetMapping("/answered-questions")
-    fun getMyAnsweredQuestions(): ApiResponse<AnsweredQuestionsDto> {
-        return ApiResponse.success(AnsweredQuestionsDto.createMock())
+    fun getMyAnsweredQuestions(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @RequestParam size: Int,
+        @RequestParam(required = false) lastId: ObjectId?,
+    ): ApiResponse<AnsweredQuestionsDto> {
+        return questionService.findAnswerCompleteByToUser(
+            user = user,
+            lastId = lastId,
+            size = size + 1,
+        ).let {
+            ApiResponse.success(
+                AnsweredQuestionsDto.from(
+                    questions = it.questions,
+                    userMapByUserId = it.userMapByUserId,
+                    answerMapByQuestionId = it.answerMapByQuestionId,
+                    requestedSize = size,
+                )
+            )
+        }
     }
 
     @ApiOperation("받은 질문(본인)")
     @GetMapping("/received-questions")
-    fun getMyReceivedQuestions(): ApiResponse<ReceivedQuestionsDto> {
-        return ApiResponse.success(ReceivedQuestionsDto.createMock())
+    fun getMyReceivedQuestions(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @RequestParam size: Int,
+        @RequestParam(required = false) lastId: ObjectId?,
+    ): ApiResponse<ReceivedQuestionsDto> {
+        return questionService.findAnswerWaitingByToUser(
+            user = user,
+            lastId = lastId,
+            size = size + 1,
+        ).let {
+            ApiResponse.success(
+                ReceivedQuestionsDto.from(
+                    questions = it.questions,
+                    userMapByUserId = it.userMapByUserId,
+                    requestedSize = size,
+                )
+            )
+        }
     }
 }
