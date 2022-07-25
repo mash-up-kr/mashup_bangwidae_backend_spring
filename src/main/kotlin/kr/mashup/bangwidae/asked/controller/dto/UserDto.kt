@@ -49,7 +49,7 @@ data class AnsweredQuestionsDto(
     data class QuestionDto(
         val id: String,
         val content: String,
-        val representativeAddress: String,
+        val representativeAddress: String?,
         val fromUser: UserDto,
         val toUser: UserDto,
         val answer: AnswerDto,
@@ -60,8 +60,7 @@ data class AnsweredQuestionsDto(
                 return QuestionDto(
                     id = question.id!!.toHexString(),
                     content = question.content,
-                    // TODO Question 에 주소 저장
-                    representativeAddress = "대표 주소",
+                    representativeAddress = question.representativeAddress,
                     fromUser = UserDto.from(fromUser),
                     toUser = UserDto.from(toUser),
                     answer = AnswerDto.from(answer, toUser),
