@@ -74,7 +74,7 @@ data class AnsweredQuestionsDto(
     data class AnswerDto(
         val id: String,
         val content: String,
-        val representativeAddress: String,
+        val representativeAddress: String?,
         val user: UserDto,
         val likeCount: Int,
         val createdAt: LocalDateTime,
@@ -84,8 +84,7 @@ data class AnsweredQuestionsDto(
                 return AnswerDto(
                     id = answer.id!!.toHexString(),
                     content = answer.content,
-                    // TODO Question 에 주소 저장
-                    representativeAddress = "대표 주소",
+                    representativeAddress = answer.representativeAddress,
                     user = UserDto.from(answerUser),
                     // TODO 좋아요 개수 저장
                     likeCount = 0,
@@ -126,7 +125,7 @@ data class ReceivedQuestionsDto(
     data class QuestionDto(
         val id: String,
         val content: String,
-        val representativeAddress: String,
+        val representativeAddress: String?,
         val fromUser: UserDto,
         val toUser: UserDto,
         val createdAt: LocalDateTime,
@@ -136,8 +135,7 @@ data class ReceivedQuestionsDto(
                 return QuestionDto(
                     id = question.id!!.toHexString(),
                     content = question.content,
-                    // TODO Question 에 주소 저장
-                    representativeAddress = "대표 주소",
+                    representativeAddress = question.representativeAddress,
                     fromUser = UserDto.from(fromUser),
                     toUser = UserDto.from(toUser),
                     createdAt = question.createdAt!!,
@@ -174,7 +172,7 @@ data class AskedQuestionsDto(
     data class QuestionDto(
         val id: String,
         val content: String,
-        val representativeAddress: String,
+        val representativeAddress: String?,
         val fromUser: UserDto,
         val toUser: UserDto,
         val createdAt: LocalDateTime,
@@ -184,8 +182,7 @@ data class AskedQuestionsDto(
                 return QuestionDto(
                     id = question.id!!.toHexString(),
                     content = question.content,
-                    // TODO Question 에 주소 저장
-                    representativeAddress = "대표 주소",
+                    representativeAddress = question.representativeAddress,
                     fromUser = UserDto.from(fromUser),
                     toUser = UserDto.from(toUser),
                     createdAt = question.createdAt!!,

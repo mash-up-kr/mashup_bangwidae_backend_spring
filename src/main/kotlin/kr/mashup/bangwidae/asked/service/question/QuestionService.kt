@@ -10,6 +10,8 @@ import kr.mashup.bangwidae.asked.model.question.QuestionStatus
 import kr.mashup.bangwidae.asked.repository.AnswerRepository
 import kr.mashup.bangwidae.asked.repository.QuestionRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
+import kr.mashup.bangwidae.asked.service.place.PlaceService
+import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 @Service
 class QuestionService(
+    private val placeService: PlaceService,
     private val questionRepository: QuestionRepository,
     private val answerRepository: AnswerRepository,
     private val userRepository: UserRepository,
@@ -107,13 +110,23 @@ class QuestionService(
                 message = "${request.toUserId} 사용자가 존재하지 않아요",
             )
 
-        return questionRepository.save(
-            Question(
-                fromUserId = user.id!!,
-                toUserId = request.toUserId,
-                content = request.content,
+        runCatching {
+            placeService.reverseGeocode(
+                longitude = request.longitude,
+                latitude = request.latitude
             )
-        )
+        }.getOrNull().let {
+            return questionRepository.save(
+                Question(
+                    fromUserId = user.id!!,
+                    toUserId = request.toUserId,
+                    content = request.content,
+                    location = GeoUtils.geoJsonPoint(longitude = request.longitude, latitude = request.latitude),
+                    representativeAddress = it?.representativeAddress,
+                    region = it,
+                )
+            )
+        }
     }
 
     fun edit(user: User, questionId: ObjectId, request: QuestionEditRequest): Question {
