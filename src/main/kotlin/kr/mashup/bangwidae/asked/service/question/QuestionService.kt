@@ -83,6 +83,23 @@ class QuestionService(
         )
     }
 
+    fun findByFromUser(user: User, lastId: ObjectId?, size: Int): QuestionSearchResultImpl {
+        val questions = questionRepository.findByFromUserIdAndIdBeforeAndDeletedFalseOrderByCreatedAtDesc(
+            fromUserId = user.id!!,
+            lastId = lastId ?: ObjectId(),
+            pageRequest = PageRequest.of(0, size)
+        )
+
+        val userMapByUserId = userRepository
+            .findAllByIdIn(questions.map { it.toUserId } + user.id)
+            .associateBy { it.id!! }
+
+        return QuestionSearchResultImpl(
+            questions = questions,
+            userMapByUserId = userMapByUserId,
+        )
+    }
+
     fun write(user: User, request: QuestionWriteRequest): Question {
         userRepository.findByIdOrNull(request.toUserId)
             ?: throw DoriDoriException.of(

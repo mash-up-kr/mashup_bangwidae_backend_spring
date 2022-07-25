@@ -17,4 +17,10 @@ interface QuestionRepository : MongoRepository<Question, ObjectId> {
         lastId: ObjectId,
         pageRequest: PageRequest,
     ): List<Question>
+
+    fun findByFromUserIdAndIdBeforeAndDeletedFalseOrderByCreatedAtDesc(
+        fromUserId: ObjectId,
+        lastId: ObjectId,
+        pageRequest: PageRequest,
+    ): List<Question>
 }

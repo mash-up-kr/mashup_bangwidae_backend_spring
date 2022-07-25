@@ -122,4 +122,26 @@ class UserController(
             )
         }
     }
+
+    @ApiOperation("한 질문(본인)")
+    @GetMapping("/asked-questions")
+    fun getMyAskedQuestions(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @RequestParam size: Int,
+        @RequestParam(required = false) lastId: ObjectId?,
+    ): ApiResponse<AskedQuestionsDto> {
+        return questionService.findByFromUser(
+            user = user,
+            lastId = lastId,
+            size = size + 1,
+        ).let {
+            ApiResponse.success(
+                AskedQuestionsDto.from(
+                    questions = it.questions,
+                    userMapByUserId = it.userMapByUserId,
+                    requestedSize = size,
+                )
+            )
+        }
+    }
 }

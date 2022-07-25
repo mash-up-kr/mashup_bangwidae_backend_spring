@@ -33,11 +33,11 @@ data class JoinUserResponse(
     val refreshToken: String
 )
 
-data class UpdateNicknameRequest (
+data class UpdateNicknameRequest(
     val nickname: String
 )
 
-data class UpdateProfileRequest (
+data class UpdateProfileRequest(
     val description: String,
     val tags: List<String>,
 )
@@ -50,19 +50,21 @@ data class AnsweredQuestionsDto(
         val id: String,
         val content: String,
         val representativeAddress: String,
-        val user: UserDto,
+        val fromUser: UserDto,
+        val toUser: UserDto,
         val answer: AnswerDto,
         val createdAt: LocalDateTime,
     ) {
         companion object {
-            fun from(question: Question, answer: Answer, questionUser: User, answerUser: User): QuestionDto {
+            fun from(question: Question, answer: Answer, fromUser: User, toUser: User): QuestionDto {
                 return QuestionDto(
                     id = question.id!!.toHexString(),
                     content = question.content,
                     // TODO Question 에 주소 저장
                     representativeAddress = "대표 주소",
-                    user = UserDto.from(questionUser),
-                    answer = AnswerDto.from(answer, answerUser),
+                    fromUser = UserDto.from(fromUser),
+                    toUser = UserDto.from(toUser),
+                    answer = AnswerDto.from(answer, toUser),
                     createdAt = question.createdAt!!,
                 )
             }
@@ -106,9 +108,9 @@ data class AnsweredQuestionsDto(
                         val answer = answerMapByQuestionId[it.id]!!.first()
                         QuestionDto.from(
                             question = it,
-                            questionUser = userMapByUserId[it.fromUserId]!!,
                             answer = answer,
-                            answerUser = userMapByUserId[answer.userId]!!,
+                            fromUser = userMapByUserId[it.fromUserId]!!,
+                            toUser = userMapByUserId[answer.userId]!!,
                         )
                     },
                 hasNext = questions.size > requestedSize
@@ -125,17 +127,19 @@ data class ReceivedQuestionsDto(
         val id: String,
         val content: String,
         val representativeAddress: String,
-        val user: UserDto,
+        val fromUser: UserDto,
+        val toUser: UserDto,
         val createdAt: LocalDateTime,
     ) {
         companion object {
-            fun from(question: Question, user: User): QuestionDto {
+            fun from(question: Question, fromUser: User, toUser: User): QuestionDto {
                 return QuestionDto(
                     id = question.id!!.toHexString(),
                     content = question.content,
                     // TODO Question 에 주소 저장
                     representativeAddress = "대표 주소",
-                    user = UserDto.from(user),
+                    fromUser = UserDto.from(fromUser),
+                    toUser = UserDto.from(toUser),
                     createdAt = question.createdAt!!,
                 )
             }
@@ -150,7 +154,61 @@ data class ReceivedQuestionsDto(
         ): ReceivedQuestionsDto {
             return ReceivedQuestionsDto(
                 questions = questions.subList(0, min(questions.size, requestedSize))
-                    .map { QuestionDto.from(it, userMapByUserId[it.fromUserId]!!) },
+                    .map {
+                        QuestionDto.from(
+                            question = it,
+                            fromUser = userMapByUserId[it.fromUserId]!!,
+                            toUser = userMapByUserId[it.toUserId]!!
+                        )
+                    },
+                hasNext = questions.size > requestedSize
+            )
+        }
+    }
+}
+
+data class AskedQuestionsDto(
+    val questions: List<QuestionDto>,
+    val hasNext: Boolean,
+) {
+    data class QuestionDto(
+        val id: String,
+        val content: String,
+        val representativeAddress: String,
+        val fromUser: UserDto,
+        val toUser: UserDto,
+        val createdAt: LocalDateTime,
+    ) {
+        companion object {
+            fun from(question: Question, fromUser: User, toUser: User): QuestionDto {
+                return QuestionDto(
+                    id = question.id!!.toHexString(),
+                    content = question.content,
+                    // TODO Question 에 주소 저장
+                    representativeAddress = "대표 주소",
+                    fromUser = UserDto.from(fromUser),
+                    toUser = UserDto.from(toUser),
+                    createdAt = question.createdAt!!,
+                )
+            }
+        }
+    }
+
+    companion object {
+        fun from(
+            questions: List<Question>,
+            userMapByUserId: Map<ObjectId, User>,
+            requestedSize: Int,
+        ): AskedQuestionsDto {
+            return AskedQuestionsDto(
+                questions = questions.subList(0, min(questions.size, requestedSize))
+                    .map {
+                        QuestionDto.from(
+                            question = it,
+                            fromUser = userMapByUserId[it.fromUserId]!!,
+                            toUser = userMapByUserId[it.toUserId]!!
+                        )
+                    },
                 hasNext = questions.size > requestedSize
             )
         }
