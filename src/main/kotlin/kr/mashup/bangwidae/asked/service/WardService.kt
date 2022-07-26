@@ -1,9 +1,12 @@
 package kr.mashup.bangwidae.asked.service
 
+import kr.mashup.bangwidae.asked.exception.DoriDoriException
+import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.Ward
 import kr.mashup.bangwidae.asked.repository.WardRepository
 import kr.mashup.bangwidae.asked.utils.GeoUtils
+import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime
 
@@ -24,5 +27,16 @@ class WardService(
 
     fun getMyWards(user: User): List<Ward> {
         return wardRepository.findAllByUserIdAndExpiredAtAfter(user.id!!, LocalDateTime.now())
+    }
+
+    fun deleteWard(user: User, wardId: ObjectId) {
+        val ward = wardRepository.findById(wardId)
+            .orElseThrow { DoriDoriException.of(DoriDoriExceptionType.WARD_NOT_FOUND) }
+
+        if (ward.userId != user.id!!) {
+            throw DoriDoriException.of(DoriDoriExceptionType.NOT_ALLOWED_TO_ACCESS)
+        }
+
+        wardRepository.delete(ward)
     }
 }

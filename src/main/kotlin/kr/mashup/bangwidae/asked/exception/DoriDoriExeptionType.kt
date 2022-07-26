@@ -32,4 +32,7 @@ enum class DoriDoriExceptionType(
     // POST
     POST_NOT_ALLOWED_FOR_USER("유저가 해당 포스트에 대한 권한이 없어요"),
     POST_WRITER_USER_NOT_EXIST("포스트에 대한 작성자를 찾을 수 없어요"),
+
+    // WARD
+    WARD_NOT_FOUND("와드를 찾을 수 없어요"),
 }
