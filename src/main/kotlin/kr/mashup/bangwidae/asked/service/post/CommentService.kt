@@ -1,6 +1,7 @@
 package kr.mashup.bangwidae.asked.service.post
 
 import kr.mashup.bangwidae.asked.controller.dto.CommentDto
+import kr.mashup.bangwidae.asked.controller.dto.CommentEditRequest
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
@@ -51,9 +52,9 @@ class CommentService(
         return commentRepository.save(updatePlaceInfo(comment))
     }
 
-    fun edit(user: User, commentId: ObjectId): Comment {
+    fun edit(user: User, commentId: ObjectId, request: CommentEditRequest): Comment {
         val comment = findById(commentId).also { it.validateToUpdate(user) }
-        return commentRepository.save(updatePlaceInfo(comment))
+        return commentRepository.save(updatePlaceInfo(comment.update(request)))
     }
 
     fun delete(user: User, commentId: ObjectId): Comment {

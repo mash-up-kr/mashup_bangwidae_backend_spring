@@ -27,7 +27,8 @@ class CommentController(
     ): ApiResponse<CommentDto> {
         return commentService.edit(
             commentId = commentId,
-            user = user
+            user = user,
+            request = commentEditRequest
         ).let {
             ApiResponse.success(CommentDto.from(user, it))
         }
