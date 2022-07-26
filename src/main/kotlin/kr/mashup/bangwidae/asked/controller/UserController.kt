@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.UserService
+import org.bson.types.ObjectId
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -23,6 +24,14 @@ class UserController(
         @RequestBody joinUserRequest: JoinUserRequest
     ): ApiResponse<JoinUserResponse> {
         return ApiResponse.success(userService.joinUser(joinUserRequest))
+    }
+
+    @ApiOperation("유저 정보")
+    @GetMapping("/{userId}/info")
+    fun getUserInfo(
+        @PathVariable userId: ObjectId
+    ): ApiResponse<UserInfoDto> {
+        return ApiResponse.success(UserInfoDto.from(userService.getUserInfo(userId)))
     }
 
     @ApiOperation("닉네임 설정")
