@@ -28,6 +28,14 @@ class UserController(
         return ApiResponse.success(userService.joinUser(joinUserRequest))
     }
 
+    @ApiOperation("유저 정보")
+    @GetMapping("/{userId}/info")
+    fun getUserInfo(
+        @PathVariable userId: ObjectId
+    ): ApiResponse<UserInfoDto> {
+        return ApiResponse.success(UserInfoDto.from(userService.getUserInfo(userId)))
+    }
+
     @ApiOperation("닉네임 설정")
     @PostMapping("/nickname")
     fun createNickname(
