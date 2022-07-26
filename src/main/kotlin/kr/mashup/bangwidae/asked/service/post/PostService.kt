@@ -1,6 +1,5 @@
 package kr.mashup.bangwidae.asked.service.post
 
-import kr.mashup.bangwidae.asked.controller.dto.CursorResult
 import kr.mashup.bangwidae.asked.controller.dto.PostDto
 import kr.mashup.bangwidae.asked.controller.dto.PostEditRequest
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
@@ -21,7 +20,6 @@ import org.springframework.data.geo.Distance
 import org.springframework.data.geo.Metrics
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import kotlin.math.min
 
 @Service
 class PostService(
@@ -52,21 +50,17 @@ class PostService(
 
     fun getNearPost(
         longitude: Double, latitude: Double, meterDistance: Double, lastId: ObjectId?, size: Int
-    ): CursorResult<PostDto> {
+    ): List<PostDto> {
         val location = GeoUtils.geoJsonPoint(longitude, latitude)
         val distance = Distance(meterDistance / 1000, Metrics.KILOMETERS)
         val postList = postRepository.findByLocationNearAndIdBeforeAndDeletedFalseOrderByIdDesc(
             location,
             lastId ?: ObjectId(),
             distance,
-            PageRequest.of(0, size + 1)
+            PageRequest.of(0, size)
         )
         val userMap = userRepository.findAllByIdIn(postList.map { it.userId }).associateBy { it.id }
-        return CursorResult(
-            values = postList.subList(0, min(postList.size, size))
-                .map { PostDto.from(userMap[it.userId]!!, it) },
-            hasNext = (postList.size == size + 1)
-        )
+        return postList.map { PostDto.from(userMap[it.userId]!!, it) }
     }
 
     fun getPostById(id: ObjectId): PostDto {

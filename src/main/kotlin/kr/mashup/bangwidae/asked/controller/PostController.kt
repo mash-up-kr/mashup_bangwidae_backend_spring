@@ -82,9 +82,9 @@ class PostController(
         @RequestParam size: Int,
         @RequestParam(required = false) lastId: ObjectId?
     ): ApiResponse<CursorResult<PostDto>> {
-        return postService.getNearPost(longitude, latitude, meterDistance, lastId, size)
+        return postService.getNearPost(longitude, latitude, meterDistance, lastId, size + 1)
             .let {
-                ApiResponse.success(it)
+                ApiResponse.success(CursorResult.from(values = it, requestedSize = size))
             }
     }
 
@@ -123,9 +123,9 @@ class PostController(
         @RequestParam size: Int,
         @RequestParam(required = false) lastId: ObjectId?
     ): ApiResponse<CursorResult<CommentDto>> {
-        return commentService.getCommentsByPostId(postId, lastId, size)
+        return commentService.getCommentsByPostId(postId, lastId, size + 1)
             .let {
-                ApiResponse.success(it)
+                ApiResponse.success(CursorResult.from(values = it, requestedSize = size))
             }
     }
 }
