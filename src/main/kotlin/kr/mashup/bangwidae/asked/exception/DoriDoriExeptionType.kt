@@ -23,6 +23,7 @@ enum class DoriDoriExceptionType(
 
     // USER
     DUPLICATED_NICKNAME("이미 존재하는 닉네임이에요"),
+    USER_NOT_FOUND("유저를 찾을 수 없어요"),
 
     // PLACE
     INVALID_COUNTRY("한국에서만 위치 기능을 사용할 수 있어요"),
@@ -32,4 +33,7 @@ enum class DoriDoriExceptionType(
     // POST
     POST_NOT_ALLOWED_FOR_USER("유저가 해당 포스트에 대한 권한이 없어요"),
     POST_WRITER_USER_NOT_EXIST("포스트에 대한 작성자를 찾을 수 없어요"),
+
+    // WARD
+    WARD_NOT_FOUND("와드를 찾을 수 없어요"),
 }

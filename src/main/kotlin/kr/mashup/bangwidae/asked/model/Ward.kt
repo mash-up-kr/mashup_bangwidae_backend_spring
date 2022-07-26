@@ -25,6 +25,12 @@ data class Ward(
     @CreatedDate var createdAt: LocalDateTime? = null,
     @LastModifiedDate var updatedAt: LocalDateTime? = null
 ) {
+    fun extendPeriod(period: Int): Ward {
+        return this.copy(
+            expiredAt = expiredAt.plusDays(period.toLong())
+        )
+    }
+
     fun getDDays(): String {
         val remainingDay = (Duration.between(LocalDateTime.now(), expiredAt).toDays() + 1)
         return if (remainingDay == 0L) {
