@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository
 interface CommentRepository : MongoRepository<Comment, ObjectId> {
     fun findByIdAndDeletedFalse(id: ObjectId): Comment?
     fun existsByPostIdAndIdBeforeAndDeletedFalse(postId: ObjectId, lastId: ObjectId): Boolean
-
+    fun existsByIdAndDeletedFalse(id: ObjectId): Boolean
     fun findByPostIdAndIdBeforeAndDeletedFalseOrderByIdDesc(
         postId: ObjectId,
         lastId: ObjectId,

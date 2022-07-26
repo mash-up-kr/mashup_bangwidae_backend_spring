@@ -7,6 +7,8 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Post
+import kr.mashup.bangwidae.asked.model.post.PostLike
+import kr.mashup.bangwidae.asked.repository.PostLikeRepository
 import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.place.PlaceService
@@ -17,15 +19,16 @@ import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.geo.Distance
 import org.springframework.data.geo.Metrics
-import org.springframework.data.mongodb.core.geo.GeoJsonPoint
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
+import kotlin.math.min
 
 @Service
 class PostService(
     private val postRepository: PostRepository,
     private val placeService: PlaceService,
-    private val userRepository: UserRepository
+    private val userRepository: UserRepository,
+    private val postLikeRepository: PostLikeRepository
 ) : WithPostAuthorityValidator {
     fun findById(id: ObjectId): Post {
         return postRepository.findByIdAndDeletedFalse(id)
@@ -56,12 +59,13 @@ class PostService(
             location,
             lastId ?: ObjectId(),
             distance,
-            PageRequest.of(0, size)
+            PageRequest.of(0, size + 1)
         )
         val userMap = userRepository.findAllByIdIn(postList.map { it.userId }).associateBy { it.id }
         return CursorResult(
-            postList.map { PostDto.from(userMap[it.userId]!!, it) },
-            hasNext(location, postList.last().id, distance)
+            values = postList.subList(0, min(postList.size, size))
+                .map { PostDto.from(userMap[it.userId]!!, it) },
+            hasNext = (postList.size == size + 1)
         )
     }
 
@@ -72,14 +76,19 @@ class PostService(
         return PostDto.from(user, post)
     }
 
-    private fun hasNext(location: GeoJsonPoint, id: ObjectId?, distance: Distance): Boolean {
-        if (id == null) return false
-        return postRepository.findByLocationNearAndIdBeforeAndDeletedFalseOrderByIdDesc(
-            location,
-            id,
-            distance,
-            PageRequest.of(0, 1)
-        ).isNotEmpty()
+    fun postLike(postId: ObjectId, userId: ObjectId) {
+        require(postRepository.existsByIdAndDeletedFalse(postId)) {
+            throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+        }
+        if (!postLikeRepository.existsByPostIdAndUserId(postId, userId)) {
+            postLikeRepository.save(PostLike(userId = userId, postId = postId))
+        }
+    }
+
+    fun postUnlike(postId: ObjectId, userId: ObjectId) {
+        postLikeRepository.findByPostIdAndUserId(postId, userId)?.let {
+            postLikeRepository.delete(it)
+        }
     }
 
     private fun updatePlaceInfo(post: Post): Post {

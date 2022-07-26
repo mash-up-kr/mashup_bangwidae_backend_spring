@@ -1,14 +1,19 @@
 package kr.mashup.bangwidae.asked.service.question
 
-import kr.mashup.bangwidae.asked.controller.dto.QuestionEditRequest
-import kr.mashup.bangwidae.asked.controller.dto.QuestionWriteRequest
+import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.question.Answer
 import kr.mashup.bangwidae.asked.model.question.Question
+import kr.mashup.bangwidae.asked.model.question.QuestionStatus
+import kr.mashup.bangwidae.asked.repository.AnswerRepository
 import kr.mashup.bangwidae.asked.repository.QuestionRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
+import kr.mashup.bangwidae.asked.service.place.PlaceService
+import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -16,12 +21,86 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 @Service
 class QuestionService(
+    private val placeService: PlaceService,
     private val questionRepository: QuestionRepository,
+    private val answerRepository: AnswerRepository,
     private val userRepository: UserRepository,
 ) : WithQuestionAuthorityValidator {
     fun findById(questionId: ObjectId): Question {
         return questionRepository.findByIdAndDeletedFalse(questionId)
             ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+    }
+
+    fun findAnswerWaitingByToUser(user: User, lastId: ObjectId?, size: Int): QuestionSearchResultImpl {
+        val questions = questionRepository.findByToUserIdAndStatusAndIdBeforeAndDeletedFalseOrderByCreatedAtDesc(
+            toUserId = user.id!!,
+            status = QuestionStatus.ANSWER_WAITING,
+            lastId = lastId ?: ObjectId(),
+            pageRequest = PageRequest.of(0, size)
+        )
+
+        val userMapByUserId = userRepository
+            .findAllByIdIn(questions.map { it.fromUserId } + user.id)
+            .associateBy { it.id!! }
+
+        return QuestionSearchResultImpl(
+            questions = questions,
+            userMapByUserId = userMapByUserId,
+        )
+    }
+
+    fun findAnswerCompleteByToUser(userId: ObjectId, lastId: ObjectId?, size: Int): QuestionSearchResultWithAnswerImpl {
+        val user = userRepository.findByIdOrNull(userId)
+            ?: throw DoriDoriException.of(
+                type = DoriDoriExceptionType.NOT_EXIST,
+                message = "$userId 사용자가 존재하지 않아요",
+            )
+
+        return findAnswerCompleteByToUser(
+            user = user,
+            lastId = lastId,
+            size = size,
+        )
+    }
+
+    fun findAnswerCompleteByToUser(user: User, lastId: ObjectId?, size: Int): QuestionSearchResultWithAnswerImpl {
+        val questions = questionRepository.findByToUserIdAndStatusAndIdBeforeAndDeletedFalseOrderByCreatedAtDesc(
+            toUserId = user.id!!,
+            status = QuestionStatus.ANSWER_COMPLETE,
+            lastId = lastId ?: ObjectId(),
+            pageRequest = PageRequest.of(0, size)
+        )
+
+        val answerMapByQuestionId = answerRepository
+            .findByQuestionIdInAndDeletedFalseOrderByCreatedAtDesc(questions.map { it.id!! })
+            .groupBy { it.questionId }
+
+        val userMapByUserId = userRepository
+            .findAllByIdIn(questions.map { it.fromUserId } + user.id)
+            .associateBy { it.id!! }
+
+        return QuestionSearchResultWithAnswerImpl(
+            questions = questions,
+            userMapByUserId = userMapByUserId,
+            answerMapByQuestionId = answerMapByQuestionId,
+        )
+    }
+
+    fun findByFromUser(user: User, lastId: ObjectId?, size: Int): QuestionSearchResultImpl {
+        val questions = questionRepository.findByFromUserIdAndIdBeforeAndDeletedFalseOrderByCreatedAtDesc(
+            fromUserId = user.id!!,
+            lastId = lastId ?: ObjectId(),
+            pageRequest = PageRequest.of(0, size)
+        )
+
+        val userMapByUserId = userRepository
+            .findAllByIdIn(questions.map { it.toUserId } + user.id)
+            .associateBy { it.id!! }
+
+        return QuestionSearchResultImpl(
+            questions = questions,
+            userMapByUserId = userMapByUserId,
+        )
     }
 
     fun write(user: User, request: QuestionWriteRequest): Question {
@@ -31,13 +110,23 @@ class QuestionService(
                 message = "${request.toUserId} 사용자가 존재하지 않아요",
             )
 
-        return questionRepository.save(
-            Question(
-                fromUserId = user.id!!,
-                toUserId = request.toUserId,
-                content = request.content,
+        runCatching {
+            placeService.reverseGeocode(
+                longitude = request.longitude,
+                latitude = request.latitude
             )
-        )
+        }.getOrNull().let {
+            return questionRepository.save(
+                Question(
+                    fromUserId = user.id!!,
+                    toUserId = request.toUserId,
+                    content = request.content,
+                    location = GeoUtils.geoJsonPoint(longitude = request.longitude, latitude = request.latitude),
+                    representativeAddress = it?.representativeAddress,
+                    region = it,
+                )
+            )
+        }
     }
 
     fun edit(user: User, questionId: ObjectId, request: QuestionEditRequest): Question {
@@ -67,3 +156,19 @@ class QuestionService(
         )
     }
 }
+
+interface QuestionSearchResult {
+    val questions: List<Question>
+    val userMapByUserId: Map<ObjectId, User>
+}
+
+data class QuestionSearchResultImpl(
+    override val questions: List<Question>,
+    override val userMapByUserId: Map<ObjectId, User> = emptyMap(),
+) : QuestionSearchResult
+
+data class QuestionSearchResultWithAnswerImpl(
+    override val questions: List<Question>,
+    override val userMapByUserId: Map<ObjectId, User> = emptyMap(),
+    val answerMapByQuestionId: Map<ObjectId, List<Answer>> = emptyMap(),
+) : QuestionSearchResult

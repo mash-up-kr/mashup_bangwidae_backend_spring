@@ -46,4 +46,22 @@ class CommentController(
             ApiResponse.success(CommentDto.from(user, it))
         }
     }
+
+    @ApiOperation("댓글 좋아요")
+    @PostMapping("/{id}/like")
+    fun likeComment(
+        @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
+    ): ApiResponse<Boolean> {
+        commentService.commentLike(id, user.id!!)
+        return ApiResponse.success(true)
+    }
+
+    @ApiOperation("댓글 좋아요 취소")
+    @DeleteMapping("/{id}/like")
+    fun unlikeComment(
+        @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
+    ): ApiResponse<Boolean> {
+        commentService.commentUnlike(id, user.id!!)
+        return ApiResponse.success(true)
+    }
 }

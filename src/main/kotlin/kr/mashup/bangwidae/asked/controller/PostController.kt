@@ -51,10 +51,26 @@ class PostController(
     fun deletePost(
         @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
     ): ApiResponse<Boolean> {
-        return postService.delete(postId = id, user = user)
-            .let {
-                ApiResponse.success(true)
-            }
+        postService.delete(postId = id, user = user)
+        return ApiResponse.success(true)
+    }
+
+    @ApiOperation("포스트 글 좋아요")
+    @PostMapping("/{id}/like")
+    fun likePost(
+        @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
+    ): ApiResponse<Boolean> {
+        postService.postLike(id, user.id!!)
+        return ApiResponse.success(true)
+    }
+
+    @ApiOperation("포스트 글 좋아요 취소")
+    @DeleteMapping("/{id}/like")
+    fun unlikePost(
+        @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
+    ): ApiResponse<Boolean> {
+        postService.postUnlike(id, user.id!!)
+        return ApiResponse.success(true)
     }
 
     @ApiOperation("거리 반경 포스트 글 페이징")

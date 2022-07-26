@@ -6,6 +6,9 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Comment
+import kr.mashup.bangwidae.asked.model.post.CommentLike
+import kr.mashup.bangwidae.asked.model.post.Post
+import kr.mashup.bangwidae.asked.repository.CommentLikeRepository
 import kr.mashup.bangwidae.asked.repository.CommentRepository
 import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
@@ -15,11 +18,13 @@ import kr.mashup.bangwidae.asked.utils.getLongitude
 import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
+import kotlin.math.min
 
 
 @Service
 class CommentService(
     private val commentRepository: CommentRepository,
+    private val commentLikeRepository: CommentLikeRepository,
     private val postRepository: PostRepository,
     private val userRepository: UserRepository,
     private val placeService: PlaceService
@@ -35,13 +40,14 @@ class CommentService(
         val commentList = commentRepository.findByPostIdAndIdBeforeAndDeletedFalseOrderByIdDesc(
             postId,
             lastId ?: ObjectId(),
-            PageRequest.of(0, size)
+            PageRequest.of(0, size + 1)
         )
         val userIdList = commentList.map { it.userId }.distinct()
         val userMap = userRepository.findAllByIdIn(userIdList).associateBy { it.id }
         return CursorResult(
-            commentList.map { CommentDto.from(userMap[it.userId]!!, it) },
-            hasNext(postId, commentList.last().id)
+            values = commentList.subList(0, min(commentList.size, size))
+                .map { CommentDto.from(userMap[it.userId]!!, it) },
+            hasNext = (commentList.size == size + 1)
         )
     }
 
@@ -62,9 +68,19 @@ class CommentService(
         return commentRepository.save(comment.delete())
     }
 
-    private fun hasNext(postId: ObjectId, id: ObjectId?): Boolean {
-        if (id == null) return false
-        return commentRepository.existsByPostIdAndIdBeforeAndDeletedFalse(postId, id)
+    fun commentLike(commentId: ObjectId, userId: ObjectId) {
+        require(commentRepository.existsByIdAndDeletedFalse(commentId)) {
+            throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+        }
+        if (!commentLikeRepository.existsByCommentIdAndUserId(commentId, userId)) {
+            commentLikeRepository.save(CommentLike(userId = userId, commentId = commentId))
+        }
+    }
+
+    fun commentUnlike(commentId: ObjectId, userId: ObjectId) {
+        commentLikeRepository.findByCommentIdAndUserId(commentId, userId)?.let {
+            commentLikeRepository.delete(it)
+        }
     }
 
     private fun updatePlaceInfo(comment: Comment): Comment {

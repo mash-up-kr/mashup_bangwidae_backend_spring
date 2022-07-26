@@ -6,8 +6,12 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.question.Answer
+import kr.mashup.bangwidae.asked.model.question.AnswerLike
+import kr.mashup.bangwidae.asked.repository.AnswerLikeRepository
 import kr.mashup.bangwidae.asked.repository.AnswerRepository
 import kr.mashup.bangwidae.asked.repository.QuestionRepository
+import kr.mashup.bangwidae.asked.service.place.PlaceService
+import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -16,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 @Service
 class AnswerService(
+    private val placeService: PlaceService,
     private val answerRepository: AnswerRepository,
+    private val answerLikeRepository: AnswerLikeRepository,
     private val questionRepository: QuestionRepository,
 ) : WithQuestionAuthorityValidator, WithAnswerAuthorityValidator {
     fun findById(answerId: ObjectId): Answer {
@@ -33,13 +39,23 @@ class AnswerService(
             question.answer()
         )
 
-        return answerRepository.save(
-            Answer(
-                userId = user.id!!,
-                questionId = questionId,
-                content = request.content,
+        runCatching {
+            placeService.reverseGeocode(
+                longitude = request.longitude,
+                latitude = request.latitude
             )
-        )
+        }.getOrNull().let {
+            return answerRepository.save(
+                Answer(
+                    userId = user.id!!,
+                    questionId = questionId,
+                    content = request.content,
+                    location = GeoUtils.geoJsonPoint(longitude = request.longitude, latitude = request.latitude),
+                    representativeAddress = it?.representativeAddress,
+                    region = it,
+                )
+            )
+        }
     }
 
     fun edit(user: User, answerId: ObjectId, request: AnswerEditRequest): Answer {
@@ -61,6 +77,21 @@ class AnswerService(
             if (answerDoesNotExist(it.questionId)) {
                 makeQuestionWaiting(it.questionId)
             }
+        }
+    }
+
+    fun answerLike(answerId: ObjectId, userId: ObjectId) {
+        require(answerRepository.existsByIdAndDeletedFalse(answerId)) {
+            throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+        }
+        if (!answerLikeRepository.existsByAnswerIdAndUserId(answerId, userId)) {
+            answerLikeRepository.save(AnswerLike(userId = userId, answerId = answerId))
+        }
+    }
+
+    fun answerUnlike(answerId: ObjectId, userId: ObjectId) {
+        answerLikeRepository.findByAnswerIdAndUserId(answerId, userId)?.let {
+            answerLikeRepository.delete(it)
         }
     }
 
