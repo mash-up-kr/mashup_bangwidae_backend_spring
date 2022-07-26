@@ -10,7 +10,9 @@ import java.time.LocalDateTime
 data class CommentWriteRequest(
     @ApiModelProperty(value = "댓글 내용", example = "댓글 내용 string")
     val content: String,
+    @ApiModelProperty(value = "경도", example = "136.4")
     val longitude: Double,
+    @ApiModelProperty(value = "위도", example = "36.4")
     val latitude: Double
 ) {
     fun toEntity(userId: ObjectId, postId: ObjectId): Comment {
