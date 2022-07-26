@@ -46,4 +46,22 @@ class AnswerController(
             ApiResponse.success(it.id!!)
         }
     }
+
+    @ApiOperation("답변 좋아요")
+    @PostMapping("/{id}/like")
+    fun likeAnswer(
+        @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
+    ): ApiResponse<Boolean> {
+        answerService.answerLike(id, user.id!!)
+        return ApiResponse.success(true)
+    }
+
+    @ApiOperation("답변 좋아요 취소")
+    @DeleteMapping("/{id}/like")
+    fun unlikeComment(
+        @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
+    ): ApiResponse<Boolean> {
+        answerService.answerUnlike(id, user.id!!)
+        return ApiResponse.success(true)
+    }
 }

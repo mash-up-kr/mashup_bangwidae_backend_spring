@@ -6,6 +6,9 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Comment
+import kr.mashup.bangwidae.asked.model.post.CommentLike
+import kr.mashup.bangwidae.asked.model.post.Post
+import kr.mashup.bangwidae.asked.repository.CommentLikeRepository
 import kr.mashup.bangwidae.asked.repository.CommentRepository
 import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
@@ -21,6 +24,7 @@ import kotlin.math.min
 @Service
 class CommentService(
     private val commentRepository: CommentRepository,
+    private val commentLikeRepository: CommentLikeRepository,
     private val postRepository: PostRepository,
     private val userRepository: UserRepository,
     private val placeService: PlaceService
@@ -62,6 +66,21 @@ class CommentService(
     fun delete(user: User, commentId: ObjectId): Comment {
         val comment = findById(commentId).also { it.validateToDelete(user) }
         return commentRepository.save(comment.delete())
+    }
+
+    fun commentLike(commentId: ObjectId, userId: ObjectId) {
+        require(commentRepository.existsByIdAndDeletedFalse(commentId)) {
+            throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+        }
+        if (!commentLikeRepository.existsByCommentIdAndUserId(commentId, userId)) {
+            commentLikeRepository.save(CommentLike(userId = userId, commentId = commentId))
+        }
+    }
+
+    fun commentUnlike(commentId: ObjectId, userId: ObjectId) {
+        commentLikeRepository.findByCommentIdAndUserId(commentId, userId)?.let {
+            commentLikeRepository.delete(it)
+        }
     }
 
     private fun updatePlaceInfo(comment: Comment): Comment {
