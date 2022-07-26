@@ -49,6 +49,13 @@ class QuestionService(
         )
     }
 
+    fun countAnswerWaitingByToUser(user: User): Long {
+        return questionRepository.countByToUserIdAndStatusAndDeletedFalse(
+            toUserId = user.id!!,
+            status = QuestionStatus.ANSWER_WAITING,
+        )
+    }
+
     fun findAnswerCompleteByToUser(userId: ObjectId, lastId: ObjectId?, size: Int): QuestionSearchResultWithAnswerImpl {
         val user = userRepository.findByIdOrNull(userId)
             ?: throw DoriDoriException.of(
