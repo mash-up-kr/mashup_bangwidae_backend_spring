@@ -10,6 +10,7 @@ import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.WardService
 import org.bson.types.ObjectId
 import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -51,6 +52,16 @@ class WardController(
         )
     }
 
+    @ApiOperation("와드 삭제")
+    @DeleteMapping("/{wardId}")
+    fun deleteWard(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @PathVariable wardId: ObjectId,
+    ): ApiResponse<Boolean> {
+        wardService.deleteWard(user, wardId)
+        return ApiResponse.success(true)
+    }
+    
     @ApiOperation("와드 기간 연장")
     @PostMapping("{wardId}/extend-period")
     fun extendWardPeriod(

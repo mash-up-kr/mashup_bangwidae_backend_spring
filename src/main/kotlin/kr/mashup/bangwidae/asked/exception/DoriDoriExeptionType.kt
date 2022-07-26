@@ -35,5 +35,5 @@ enum class DoriDoriExceptionType(
     POST_WRITER_USER_NOT_EXIST("포스트에 대한 작성자를 찾을 수 없어요"),
 
     // WARD
-    WARD_NOT_FOUND("와드를 찾을 수 없어요")
+    WARD_NOT_FOUND("와드를 찾을 수 없어요"),
 }
