@@ -18,6 +18,29 @@ class QuestionController(
     private val questionService: QuestionService,
     private val answerService: AnswerService,
 ) {
+    @ApiOperation("답변완료(본인 외 사용자)")
+    @GetMapping("/answered")
+    fun getMyAnsweredQuestions(
+        @RequestParam userId: ObjectId,
+        @RequestParam size: Int,
+        @RequestParam(required = false) lastId: ObjectId?,
+    ): ApiResponse<AnsweredQuestionsDto> {
+        return questionService.findAnswerCompleteByToUser(
+            userId = userId,
+            lastId = lastId,
+            size = size + 1,
+        ).let {
+            ApiResponse.success(
+                AnsweredQuestionsDto.from(
+                    questions = it.questions,
+                    userMapByUserId = it.userMapByUserId,
+                    answerMapByQuestionId = it.answerMapByQuestionId,
+                    requestedSize = size,
+                )
+            )
+        }
+    }
+
     @ApiOperation("질문 작성")
     @PostMapping
     fun writeQuestion(

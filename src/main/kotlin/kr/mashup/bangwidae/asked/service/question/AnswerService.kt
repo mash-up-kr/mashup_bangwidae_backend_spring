@@ -10,6 +10,8 @@ import kr.mashup.bangwidae.asked.model.question.AnswerLike
 import kr.mashup.bangwidae.asked.repository.AnswerLikeRepository
 import kr.mashup.bangwidae.asked.repository.AnswerRepository
 import kr.mashup.bangwidae.asked.repository.QuestionRepository
+import kr.mashup.bangwidae.asked.service.place.PlaceService
+import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -18,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional
 @Transactional
 @Service
 class AnswerService(
+    private val placeService: PlaceService,
     private val answerRepository: AnswerRepository,
     private val answerLikeRepository: AnswerLikeRepository,
     private val questionRepository: QuestionRepository,
@@ -36,13 +39,23 @@ class AnswerService(
             question.answer()
         )
 
-        return answerRepository.save(
-            Answer(
-                userId = user.id!!,
-                questionId = questionId,
-                content = request.content,
+        runCatching {
+            placeService.reverseGeocode(
+                longitude = request.longitude,
+                latitude = request.latitude
             )
-        )
+        }.getOrNull().let {
+            return answerRepository.save(
+                Answer(
+                    userId = user.id!!,
+                    questionId = questionId,
+                    content = request.content,
+                    location = GeoUtils.geoJsonPoint(longitude = request.longitude, latitude = request.latitude),
+                    representativeAddress = it?.representativeAddress,
+                    region = it,
+                )
+            )
+        }
     }
 
     fun edit(user: User, answerId: ObjectId, request: AnswerEditRequest): Answer {

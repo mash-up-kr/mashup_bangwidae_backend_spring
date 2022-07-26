@@ -1,9 +1,11 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
-import io.swagger.annotations.ApiModelProperty
 import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.question.Answer
+import kr.mashup.bangwidae.asked.model.question.Question
 import org.bson.types.ObjectId
 import java.time.LocalDateTime
+import kotlin.math.min
 
 data class UserDto(
     val id: String,
@@ -31,154 +33,179 @@ data class JoinUserResponse(
     val refreshToken: String
 )
 
-data class UpdateNicknameRequest (
+data class UpdateNicknameRequest(
     val nickname: String
 )
 
-data class UpdateProfileRequest (
+data class UpdateProfileRequest(
     val description: String,
     val tags: List<String>,
 )
 
-data class AnsweredQuestionsDto (
-    val headerText: String,
-    val user: UserDto,
+data class AnsweredQuestionsDto(
     val questions: List<QuestionDto>,
+    val hasNext: Boolean,
 ) {
-    data class QuestionDto (
+    data class QuestionDto(
+        val id: String,
         val content: String,
-        val representativeAddress: String,
-        val user: UserDto,
+        val representativeAddress: String?,
+        val fromUser: UserDto,
+        val toUser: UserDto,
         val answer: AnswerDto,
         val createdAt: LocalDateTime,
-    )
+    ) {
+        companion object {
+            fun from(question: Question, answer: Answer, fromUser: User, toUser: User): QuestionDto {
+                return QuestionDto(
+                    id = question.id!!.toHexString(),
+                    content = question.content,
+                    representativeAddress = question.representativeAddress,
+                    fromUser = UserDto.from(fromUser),
+                    toUser = UserDto.from(toUser),
+                    answer = AnswerDto.from(answer, toUser),
+                    createdAt = question.createdAt!!,
+                )
+            }
+        }
+    }
 
-    data class AnswerDto (
+    data class AnswerDto(
+        val id: String,
         val content: String,
-        val representativeAddress: String,
+        val representativeAddress: String?,
+        val user: UserDto,
         val likeCount: Int,
         val createdAt: LocalDateTime,
-    )
+    ) {
+        companion object {
+            fun from(answer: Answer, answerUser: User): AnswerDto {
+                return AnswerDto(
+                    id = answer.id!!.toHexString(),
+                    content = answer.content,
+                    representativeAddress = answer.representativeAddress,
+                    user = UserDto.from(answerUser),
+                    // TODO 좋아요 개수 저장
+                    likeCount = 0,
+                    createdAt = answer.createdAt!!,
+                )
+            }
+        }
+    }
 
     companion object {
-        fun createMock(): AnsweredQuestionsDto {
+        fun from(
+            questions: List<Question>,
+            userMapByUserId: Map<ObjectId, User>,
+            answerMapByQuestionId: Map<ObjectId, List<Answer>>,
+            requestedSize: Int,
+        ): AnsweredQuestionsDto {
             return AnsweredQuestionsDto(
-                headerText = "새로운 질문이 3개 도착했어요!",
-                user = UserDto(
-                    id = ObjectId("62c9797528889852507cec07").toHexString(),
-                    nickname = "도리도리도링",
-                    tags = listOf(
-                        "MBTI", "디즈니"
-                    ),
-                ),
-                questions = listOf(
-                    QuestionDto(
-                        content = "#도리 를 찾아서가 뭐에요?",
-                        representativeAddress = "강남구",
-                        user = UserDto(
-                            id = ObjectId("62c9797528889852507cec07").toHexString(),
-                            nickname = "감자도리도리",
-                            tags = listOf(
-                                "MBTI", "디즈니"
-                            ),
-                        ),
-                        answer = AnswerDto(
-                            content = "#니모 절친 물고기 임다",
-                            representativeAddress = "강남구",
-                            likeCount = 1,
-                            createdAt = LocalDateTime.now()
-                        ),
-                        createdAt = LocalDateTime.now().minusHours(1)
-                    ),
-                    QuestionDto(
-                        content = "#도리 를 찾아서가 뭐에요?",
-                        representativeAddress = "강남구",
-                        user = UserDto(
-                            id = ObjectId("62c9797528889852507cec07").toHexString(),
-                            nickname = "감자도리도리",
-                            tags = listOf(
-                                "MBTI", "디즈니"
-                            ),
-                        ),
-                        answer = AnswerDto(
-                            content = "#니모 절친 물고기 임다",
-                            representativeAddress = "강남구",
-                            likeCount = 1,
-                            createdAt = LocalDateTime.now()
-                        ),
-                        createdAt = LocalDateTime.now().minusHours(2),
-                    ),
-                    QuestionDto(
-                        content = "#도리 를 찾아서가 뭐에요?",
-                        representativeAddress = "강남구",
-                        user = UserDto(
-                            id = ObjectId("62c9797528889852507cec07").toHexString(),
-                            nickname = "감자도리도리",
-                            tags = listOf(
-                                "MBTI", "디즈니"
-                            ),
-                        ),
-                        answer = AnswerDto(
-                            content = "#니모 절친 물고기 임다",
-                            representativeAddress = "강남구",
-                            likeCount = 1,
-                            createdAt = LocalDateTime.now().minusMinutes(40)
-                        ),
-                        createdAt = LocalDateTime.now().minusHours(2),
-                    )
-                )
+                questions = questions.subList(0, min(questions.size, requestedSize))
+                    .map {
+                        val answer = answerMapByQuestionId[it.id]!!.first()
+                        QuestionDto.from(
+                            question = it,
+                            answer = answer,
+                            fromUser = userMapByUserId[it.fromUserId]!!,
+                            toUser = userMapByUserId[answer.userId]!!,
+                        )
+                    },
+                hasNext = questions.size > requestedSize
             )
         }
     }
 }
 
 data class ReceivedQuestionsDto(
-    val questions: List<QuestionDto>
+    val questions: List<QuestionDto>,
+    val hasNext: Boolean,
 ) {
-    data class QuestionDto (
+    data class QuestionDto(
+        val id: String,
         val content: String,
-        val representativeAddress: String,
-        val user: UserDto,
-    )
-
-    companion object{
-        fun createMock(): ReceivedQuestionsDto {
-            return ReceivedQuestionsDto(
-                listOf(
-                    QuestionDto(
-                        content = "#도리 를 찾아서가 뭐에요?",
-                        representativeAddress = "강남구",
-                        user = UserDto(
-                            id = ObjectId("62c9797528889852507cec07").toHexString(),
-                            nickname = "감자도리도리",
-                            tags = listOf(
-                                "MBTI", "디즈니"
-                            ),
-                        )
-                    ),
-                    QuestionDto(
-                        content = "#도리 를 찾아서가 뭐에요?",
-                        representativeAddress = "강남구",
-                        user = UserDto(
-                            id = ObjectId("62c9797528889852507cec07").toHexString(),
-                            nickname = "감자도리도리",
-                            tags = listOf(
-                                "MBTI", "디즈니"
-                            ),
-                        )
-                    ),
-                    QuestionDto(
-                        content = "#도리 를 찾아서가 뭐에요?",
-                        representativeAddress = "강남구",
-                        user = UserDto(
-                            id = ObjectId("62c9797528889852507cec07").toHexString(),
-                            nickname = "감자도리도리",
-                            tags = listOf(
-                                "MBTI", "디즈니"
-                            ),
-                        )
-                    )
+        val representativeAddress: String?,
+        val fromUser: UserDto,
+        val toUser: UserDto,
+        val createdAt: LocalDateTime,
+    ) {
+        companion object {
+            fun from(question: Question, fromUser: User, toUser: User): QuestionDto {
+                return QuestionDto(
+                    id = question.id!!.toHexString(),
+                    content = question.content,
+                    representativeAddress = question.representativeAddress,
+                    fromUser = UserDto.from(fromUser),
+                    toUser = UserDto.from(toUser),
+                    createdAt = question.createdAt!!,
                 )
+            }
+        }
+    }
+
+    companion object {
+        fun from(
+            questions: List<Question>,
+            userMapByUserId: Map<ObjectId, User>,
+            requestedSize: Int,
+        ): ReceivedQuestionsDto {
+            return ReceivedQuestionsDto(
+                questions = questions.subList(0, min(questions.size, requestedSize))
+                    .map {
+                        QuestionDto.from(
+                            question = it,
+                            fromUser = userMapByUserId[it.fromUserId]!!,
+                            toUser = userMapByUserId[it.toUserId]!!
+                        )
+                    },
+                hasNext = questions.size > requestedSize
+            )
+        }
+    }
+}
+
+data class AskedQuestionsDto(
+    val questions: List<QuestionDto>,
+    val hasNext: Boolean,
+) {
+    data class QuestionDto(
+        val id: String,
+        val content: String,
+        val representativeAddress: String?,
+        val fromUser: UserDto,
+        val toUser: UserDto,
+        val createdAt: LocalDateTime,
+    ) {
+        companion object {
+            fun from(question: Question, fromUser: User, toUser: User): QuestionDto {
+                return QuestionDto(
+                    id = question.id!!.toHexString(),
+                    content = question.content,
+                    representativeAddress = question.representativeAddress,
+                    fromUser = UserDto.from(fromUser),
+                    toUser = UserDto.from(toUser),
+                    createdAt = question.createdAt!!,
+                )
+            }
+        }
+    }
+
+    companion object {
+        fun from(
+            questions: List<Question>,
+            userMapByUserId: Map<ObjectId, User>,
+            requestedSize: Int,
+        ): AskedQuestionsDto {
+            return AskedQuestionsDto(
+                questions = questions.subList(0, min(questions.size, requestedSize))
+                    .map {
+                        QuestionDto.from(
+                            question = it,
+                            fromUser = userMapByUserId[it.fromUserId]!!,
+                            toUser = userMapByUserId[it.toUserId]!!
+                        )
+                    },
+                hasNext = questions.size > requestedSize
             )
         }
     }

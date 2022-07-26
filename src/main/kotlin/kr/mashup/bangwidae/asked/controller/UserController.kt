@@ -5,6 +5,8 @@ import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.UserService
+import kr.mashup.bangwidae.asked.service.question.QuestionService
+import org.bson.types.ObjectId
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -14,7 +16,8 @@ import springfox.documentation.annotations.ApiIgnore
 @RestController
 @RequestMapping("/api/v1/user")
 class UserController(
-    private val userService: UserService
+    private val userService: UserService,
+    private val questionService: QuestionService,
 ) {
 
     @ApiOperation("ID/PW 회원가입")
@@ -67,15 +70,78 @@ class UserController(
         return ApiResponse.success(user.nickname!!)
     }
 
+    @ApiOperation("헤더 문구")
+    @GetMapping("/header-text")
+    fun getHeaderText(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+    ): ApiResponse<String> {
+        return ApiResponse.success("헤더 텍스트 예시")
+    }
+
     @ApiOperation("답변완료(본인)")
     @GetMapping("/answered-questions")
-    fun getMyAnsweredQuestions(): ApiResponse<AnsweredQuestionsDto> {
-        return ApiResponse.success(AnsweredQuestionsDto.createMock())
+    fun getMyAnsweredQuestions(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @RequestParam size: Int,
+        @RequestParam(required = false) lastId: ObjectId?,
+    ): ApiResponse<AnsweredQuestionsDto> {
+        return questionService.findAnswerCompleteByToUser(
+            user = user,
+            lastId = lastId,
+            size = size + 1,
+        ).let {
+            ApiResponse.success(
+                AnsweredQuestionsDto.from(
+                    questions = it.questions,
+                    userMapByUserId = it.userMapByUserId,
+                    answerMapByQuestionId = it.answerMapByQuestionId,
+                    requestedSize = size,
+                )
+            )
+        }
     }
 
     @ApiOperation("받은 질문(본인)")
     @GetMapping("/received-questions")
-    fun getMyReceivedQuestions(): ApiResponse<ReceivedQuestionsDto> {
-        return ApiResponse.success(ReceivedQuestionsDto.createMock())
+    fun getMyReceivedQuestions(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @RequestParam size: Int,
+        @RequestParam(required = false) lastId: ObjectId?,
+    ): ApiResponse<ReceivedQuestionsDto> {
+        return questionService.findAnswerWaitingByToUser(
+            user = user,
+            lastId = lastId,
+            size = size + 1,
+        ).let {
+            ApiResponse.success(
+                ReceivedQuestionsDto.from(
+                    questions = it.questions,
+                    userMapByUserId = it.userMapByUserId,
+                    requestedSize = size,
+                )
+            )
+        }
+    }
+
+    @ApiOperation("한 질문(본인)")
+    @GetMapping("/asked-questions")
+    fun getMyAskedQuestions(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @RequestParam size: Int,
+        @RequestParam(required = false) lastId: ObjectId?,
+    ): ApiResponse<AskedQuestionsDto> {
+        return questionService.findByFromUser(
+            user = user,
+            lastId = lastId,
+            size = size + 1,
+        ).let {
+            ApiResponse.success(
+                AskedQuestionsDto.from(
+                    questions = it.questions,
+                    userMapByUserId = it.userMapByUserId,
+                    requestedSize = size,
+                )
+            )
+        }
     }
 }
