@@ -4,6 +4,7 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
 import kr.mashup.bangwidae.asked.controller.dto.CreateWardRequest
+import kr.mashup.bangwidae.asked.controller.dto.ExtendWardPeriodRequest
 import kr.mashup.bangwidae.asked.controller.dto.WardDto
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.WardService
@@ -59,5 +60,21 @@ class WardController(
     ): ApiResponse<Boolean> {
         wardService.deleteWard(user, wardId)
         return ApiResponse.success(true)
+    }
+    
+    @ApiOperation("와드 기간 연장")
+    @PostMapping("{wardId}/extend-period")
+    fun extendWardPeriod(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @PathVariable wardId: ObjectId,
+        @RequestBody extendWardPeriodRequest: ExtendWardPeriodRequest,
+    ): ApiResponse<WardDto> {
+        val ward = wardService.extendWardPeriod(
+            user = user,
+            wardId = wardId,
+            period = extendWardPeriodRequest.period,
+        )
+
+        return ApiResponse.success(WardDto.from(ward))
     }
 }

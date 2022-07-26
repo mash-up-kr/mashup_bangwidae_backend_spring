@@ -33,3 +33,7 @@ data class CreateWardRequest(
     val longitude: Double,
     val latitude: Double
 )
+
+data class ExtendWardPeriodRequest(
+    val period: Int,
+)

@@ -1,13 +1,11 @@
 package kr.mashup.bangwidae.asked.service.post
 
 import kr.mashup.bangwidae.asked.controller.dto.CommentDto
-import kr.mashup.bangwidae.asked.controller.dto.CursorResult
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Comment
 import kr.mashup.bangwidae.asked.model.post.CommentLike
-import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.repository.CommentLikeRepository
 import kr.mashup.bangwidae.asked.repository.CommentRepository
 import kr.mashup.bangwidae.asked.repository.PostRepository
@@ -18,7 +16,6 @@ import kr.mashup.bangwidae.asked.utils.getLongitude
 import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
-import kotlin.math.min
 
 
 @Service
@@ -36,19 +33,15 @@ class CommentService(
 
     fun getCommentsByPostId(
         postId: ObjectId, lastId: ObjectId?, size: Int
-    ): CursorResult<CommentDto> {
+    ): List<CommentDto> {
         val commentList = commentRepository.findByPostIdAndIdBeforeAndDeletedFalseOrderByIdDesc(
             postId,
             lastId ?: ObjectId(),
-            PageRequest.of(0, size + 1)
+            PageRequest.of(0, size)
         )
         val userIdList = commentList.map { it.userId }.distinct()
         val userMap = userRepository.findAllByIdIn(userIdList).associateBy { it.id }
-        return CursorResult(
-            values = commentList.subList(0, min(commentList.size, size))
-                .map { CommentDto.from(userMap[it.userId]!!, it) },
-            hasNext = (commentList.size == size + 1)
-        )
+        return commentList.map { CommentDto.from(userMap[it.userId]!!, it) }
     }
 
     fun write(user: User, postId: ObjectId, comment: Comment): Comment {

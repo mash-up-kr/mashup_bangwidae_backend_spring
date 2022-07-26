@@ -49,6 +49,11 @@ class UserService(
         )
     }
 
+    fun getUserInfo(userId: ObjectId): User {
+        return userRepository.findById(userId)
+            .orElseThrow { DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND) }
+    }
+
     fun updateNickname(user: User, nickname: String): Boolean {
         checkDuplicatedUserByNickname(nickname)
         userRepository.save(

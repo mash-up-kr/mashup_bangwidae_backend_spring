@@ -36,7 +36,19 @@ class WardService(
         if (ward.userId != user.id!!) {
             throw DoriDoriException.of(DoriDoriExceptionType.NOT_ALLOWED_TO_ACCESS)
         }
-
+        
         wardRepository.delete(ward)
+    }
+
+    fun extendWardPeriod(user: User, wardId: ObjectId, period: Int): Ward {
+        val ward = wardRepository.findById(wardId)
+            .orElseThrow { DoriDoriException.of(DoriDoriExceptionType.WARD_NOT_FOUND) }
+
+        if (ward.userId != user.id!!) {
+            throw DoriDoriException.of(DoriDoriExceptionType.NOT_ALLOWED_TO_ACCESS)
+        }
+        return ward.extendPeriod(period).let {
+            wardRepository.save(it)
+        }
     }
 }
