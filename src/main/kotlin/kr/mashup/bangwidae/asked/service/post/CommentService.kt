@@ -7,6 +7,7 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Comment
 import kr.mashup.bangwidae.asked.model.post.CommentLike
+import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.repository.CommentLikeRepository
 import kr.mashup.bangwidae.asked.repository.CommentRepository
 import kr.mashup.bangwidae.asked.repository.PostRepository
@@ -43,6 +44,11 @@ class CommentService(
         val userIdList = commentList.map { it.userId }.distinct()
         val userMap = userRepository.findAllByIdIn(userIdList).associateBy { it.id }
         return commentList.map { CommentDto.from(userMap[it.userId]!!, it) }
+    }
+
+    fun getCommentCountMap(postList: List<Post>): Map<ObjectId, Int> {
+        val commentList = commentRepository.findAllByPostIdIn(postList.mapNotNull { it.id })
+        return commentList.groupingBy { it.postId }.eachCount()
     }
 
     fun write(user: User, postId: ObjectId, comment: Comment): Comment {
