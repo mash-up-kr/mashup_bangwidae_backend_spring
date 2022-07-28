@@ -3,9 +3,10 @@ package kr.mashup.bangwidae.asked.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
-import kr.mashup.bangwidae.asked.controller.dto.CommentDto
+import kr.mashup.bangwidae.asked.controller.dto.CommentResultDto
 import kr.mashup.bangwidae.asked.controller.dto.CommentEditRequest
 import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.service.post.CommentLikeService
 import kr.mashup.bangwidae.asked.service.post.CommentService
 import org.bson.types.ObjectId
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -16,7 +17,8 @@ import springfox.documentation.annotations.ApiIgnore
 @RestController
 @RequestMapping("/api/v1/comments")
 class CommentController(
-    private val commentService: CommentService
+    private val commentService: CommentService,
+    private val commentLikeService: CommentLikeService
 ) {
     @ApiOperation("댓글 수정")
     @PatchMapping("/{commentId}")
@@ -24,13 +26,13 @@ class CommentController(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable commentId: ObjectId,
         @RequestBody commentEditRequest: CommentEditRequest,
-    ): ApiResponse<CommentDto> {
+    ): ApiResponse<CommentResultDto> {
         return commentService.edit(
             commentId = commentId,
             user = user,
             request = commentEditRequest
         ).let {
-            ApiResponse.success(CommentDto.from(user, it))
+            ApiResponse.success(CommentResultDto.from(user, it))
         }
     }
 
@@ -39,12 +41,12 @@ class CommentController(
     fun deleteAnswer(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable commentId: ObjectId,
-    ): ApiResponse<CommentDto> {
+    ): ApiResponse<CommentResultDto> {
         return commentService.delete(
             commentId = commentId,
             user = user,
         ).let {
-            ApiResponse.success(CommentDto.from(user, it))
+            ApiResponse.success(CommentResultDto.from(user, it))
         }
     }
 
@@ -53,7 +55,7 @@ class CommentController(
     fun likeComment(
         @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
     ): ApiResponse<Boolean> {
-        commentService.commentLike(id, user.id!!)
+        commentLikeService.commentLike(id, user.id!!)
         return ApiResponse.success(true)
     }
 
@@ -62,7 +64,7 @@ class CommentController(
     fun unlikeComment(
         @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
     ): ApiResponse<Boolean> {
-        commentService.commentUnlike(id, user.id!!)
+        commentLikeService.commentUnlike(id, user.id!!)
         return ApiResponse.success(true)
     }
 }

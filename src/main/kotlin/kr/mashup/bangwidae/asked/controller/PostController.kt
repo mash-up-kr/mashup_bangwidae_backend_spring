@@ -109,13 +109,13 @@ class PostController(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable postId: ObjectId,
         @RequestBody commentWriteRequest: CommentWriteRequest,
-    ): ApiResponse<CommentDto> {
+    ): ApiResponse<CommentResultDto> {
         return commentService.write(
             user = user,
             postId = postId,
             comment = commentWriteRequest.toEntity(user.id!!, postId)
         ).let {
-            ApiResponse.success(CommentDto.from(user, it))
+            ApiResponse.success(CommentResultDto.from(user, it))
         }
     }
 
@@ -127,7 +127,7 @@ class PostController(
         @RequestParam size: Int,
         @RequestParam(required = false) lastId: ObjectId?
     ): ApiResponse<CursorResult<CommentDto>> {
-        return commentService.getCommentsByPostId(postId, lastId, size + 1)
+        return commentService.getCommentsByPostId(user.id!!, postId, lastId, size + 1)
             .let {
                 ApiResponse.success(CursorResult.from(values = it, requestedSize = size))
             }
