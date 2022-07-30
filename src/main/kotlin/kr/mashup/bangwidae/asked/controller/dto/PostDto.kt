@@ -31,11 +31,7 @@ data class PostResultDto(
         fun from(user: User, post: Post): PostResultDto {
             return PostResultDto(
                 id = post.id!!.toHexString(),
-                user = PostWriter(
-                    id = user.id!!.toHexString(),
-                    tags = user.tags,
-                    nickname = user.nickname!!
-                ),
+                user = if (post.anonymous == true) PostWriter.anonymous(user) else PostWriter.from(user),
                 content = post.content,
                 longitude = post.location.getLongitude(),
                 latitude = post.location.getLatitude(),
@@ -81,11 +77,7 @@ data class PostDto(
         ): PostDto {
             return PostDto(
                 id = post.id!!.toHexString(),
-                user = PostWriter(
-                    id = user.id!!.toHexString(),
-                    tags = user.tags,
-                    nickname = user.nickname!!
-                ),
+                user = if (post.anonymous == true) PostWriter.anonymous(user) else PostWriter.from(user),
                 content = post.content,
                 likeCount = likeCount,
                 userLiked = userLiked,
@@ -103,13 +95,15 @@ data class PostDto(
 data class PostWriteRequest(
     val content: String,
     val longitude: Double,
-    val latitude: Double
+    val latitude: Double,
+    val anonymous: Boolean?
 ) {
     fun toEntity(userId: ObjectId): Post {
         return Post(
             content = content,
             userId = userId,
-            location = GeoUtils.geoJsonPoint(longitude, latitude)
+            location = GeoUtils.geoJsonPoint(longitude, latitude),
+            anonymous = anonymous ?: false
         )
     }
 }
@@ -117,7 +111,8 @@ data class PostWriteRequest(
 data class PostEditRequest(
     val content: String?,
     val longitude: Double?,
-    val latitude: Double?
+    val latitude: Double?,
+    val anonymous: Boolean?
 )
 
 data class PostWriter(
@@ -126,5 +121,31 @@ data class PostWriter(
     @ApiModelProperty(value = "글 작성자 tag list", example = "mbti, entj")
     val tags: List<String> = emptyList(),
     @ApiModelProperty(value = "글 작성자 닉네임", example = "sample nickname")
-    val nickname: String
-)
+    val nickname: String,
+    @ApiModelProperty(value = "글 작성자 프로필 이미지", example = "http://image.com")
+    val profileImageUrl: String?,
+    @ApiModelProperty(value = "익명 여부", example = "true")
+    val anonymous: Boolean,
+) {
+    companion object {
+        fun from(user: User): PostWriter {
+            return PostWriter(
+                id = user.id!!.toHexString(),
+                tags = user.tags,
+                nickname = user.nickname!!,
+                profileImageUrl = user.profileImageUrl,
+                anonymous = false
+            )
+        }
+
+        fun anonymous(user: User): PostWriter {
+            return PostWriter(
+                id = user.id!!.toHexString(),
+                tags = emptyList(),
+                nickname = "익명",
+                profileImageUrl = "default profile image url", //TODO 이미지 이후 변경
+                anonymous = true
+            )
+        }
+    }
+}

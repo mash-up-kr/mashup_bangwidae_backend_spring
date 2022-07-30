@@ -24,6 +24,7 @@ data class Post(
     val location: GeoJsonPoint,
     val representativeAddress: String? = null,
     val region: Region? = null,
+    val anonymous: Boolean? = false,
 
     val deleted: Boolean = false,
     @Version var version: Int? = null,
@@ -35,7 +36,8 @@ data class Post(
             this.copy(
                 content = it.content ?: this.content,
                 location = if (it.longitude != null && it.latitude != null)
-                    GeoUtils.geoJsonPoint(it.longitude, it.latitude) else this.location
+                    GeoUtils.geoJsonPoint(it.longitude, it.latitude) else this.location,
+                anonymous = it.anonymous ?: this.anonymous
             )
         }
     }
