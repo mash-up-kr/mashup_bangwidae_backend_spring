@@ -4,6 +4,7 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.Ward
+import kr.mashup.bangwidae.asked.repository.LevelPolicyRepository
 import kr.mashup.bangwidae.asked.repository.WardRepository
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
@@ -12,12 +13,19 @@ import java.time.LocalDateTime
 
 @Service
 class WardService(
-    private val wardRepository: WardRepository
+    private val wardRepository: WardRepository,
+    private val levelPolicyRepository: LevelPolicyRepository,
 ) {
     fun createWard(user: User, name: String, longitude: Double, latitude: Double): Boolean {
-        // Todo Level 당 와드 검사
+        val userLevelPolicy = levelPolicyRepository.findByLevel(user.level)
+        val userWardCount = wardRepository.countAllByUserId(user.id!!)
+
+        if (userWardCount >= userLevelPolicy!!.wardCount) {
+            throw DoriDoriException.of(DoriDoriExceptionType.WARD_MAX_COUNT)
+        }
+
         val ward = Ward.create(
-            userId = user.id!!,
+            userId = user.id,
             name = name,
             location = GeoUtils.geoJsonPoint(longitude, latitude)
         )
