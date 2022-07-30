@@ -56,7 +56,7 @@ data class AnsweredQuestionsDto(
                     id = question.id!!.toHexString(),
                     content = question.content,
                     representativeAddress = question.representativeAddress,
-                    fromUser = if (question.anonymous == null || question.anonymous) QuestionUserDto.anonymous(fromUser) else QuestionUserDto.from(fromUser),
+                    fromUser = if (question.anonymous == true) QuestionUserDto.anonymous(fromUser) else QuestionUserDto.from(fromUser),
                     toUser = QuestionUserDto.from(toUser),
                     answer = AnswerDto.from(answer, toUser),
                     createdAt = question.createdAt!!,
@@ -130,7 +130,7 @@ data class ReceivedQuestionsDto(
                     id = question.id!!.toHexString(),
                     content = question.content,
                     representativeAddress = question.representativeAddress,
-                    fromUser = if (question.anonymous == null || question.anonymous) QuestionUserDto.anonymous(fromUser) else QuestionUserDto.from(fromUser),
+                    fromUser = if (question.anonymous == true) QuestionUserDto.anonymous(fromUser) else QuestionUserDto.from(fromUser),
                     toUser = QuestionUserDto.from(toUser),
                     createdAt = question.createdAt!!,
                 )
@@ -177,7 +177,7 @@ data class AskedQuestionsDto(
                     id = question.id!!.toHexString(),
                     content = question.content,
                     representativeAddress = question.representativeAddress,
-                    fromUser = if (question.anonymous == null || question.anonymous) QuestionUserDto.anonymous(fromUser) else QuestionUserDto.from(fromUser),
+                    fromUser = if (question.anonymous == true) QuestionUserDto.anonymous(fromUser) else QuestionUserDto.from(fromUser),
                     toUser = QuestionUserDto.from(toUser),
                     createdAt = question.createdAt!!,
                 )
