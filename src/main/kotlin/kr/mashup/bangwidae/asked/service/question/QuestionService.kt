@@ -128,6 +128,7 @@ class QuestionService(
                     fromUserId = user.id!!,
                     toUserId = request.toUserId,
                     content = request.content,
+                    anonymous = request.anonymous,
                     location = GeoUtils.geoJsonPoint(longitude = request.longitude, latitude = request.latitude),
                     representativeAddress = it?.representativeAddress,
                     region = it,
