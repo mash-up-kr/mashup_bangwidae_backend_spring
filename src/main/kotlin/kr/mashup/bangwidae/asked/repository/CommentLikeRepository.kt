@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository
 interface CommentLikeRepository : MongoRepository<CommentLike, ObjectId> {
     fun existsByCommentIdAndUserId(commentId: ObjectId, userId: ObjectId): Boolean
     fun findByCommentIdAndUserId(commentId: ObjectId, userId: ObjectId): CommentLike?
+    fun findAllByCommentIdIn(commentIdList: List<ObjectId>): List<CommentLike>
 }

@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.post.CommentService
+import kr.mashup.bangwidae.asked.service.post.PostLikeService
 import kr.mashup.bangwidae.asked.service.post.PostService
 import org.bson.types.ObjectId
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -16,17 +17,18 @@ import springfox.documentation.annotations.ApiIgnore
 @RequestMapping("/api/v1/posts")
 class PostController(
     private val postService: PostService,
+    private val postLikeService: PostLikeService,
     private val commentService: CommentService
 ) {
     @ApiOperation("포스트 글 작성")
     @PostMapping
     fun writePost(
         @ApiIgnore @AuthenticationPrincipal user: User, @RequestBody postWriteRequest: PostWriteRequest
-    ): ApiResponse<PostDto> {
+    ): ApiResponse<PostResultDto> {
         val post = postWriteRequest.toEntity(user.id!!)
         return postService.write(post)
             .let {
-                ApiResponse.success(PostDto.from(user, it))
+                ApiResponse.success(PostResultDto.from(user, it))
             }
     }
 
@@ -36,13 +38,13 @@ class PostController(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @RequestBody postEditRequest: PostEditRequest,
         @PathVariable id: ObjectId
-    ): ApiResponse<PostDto> {
+    ): ApiResponse<PostResultDto> {
         return postService.edit(
             postId = id,
             user = user,
             request = postEditRequest
         ).let {
-            ApiResponse.success(PostDto.from(user, it))
+            ApiResponse.success(PostResultDto.from(user, it))
         }
     }
 
@@ -60,7 +62,7 @@ class PostController(
     fun likePost(
         @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
     ): ApiResponse<Boolean> {
-        postService.postLike(id, user.id!!)
+        postLikeService.postLike(id, user.id!!)
         return ApiResponse.success(true)
     }
 
@@ -69,20 +71,21 @@ class PostController(
     fun unlikePost(
         @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
     ): ApiResponse<Boolean> {
-        postService.postUnlike(id, user.id!!)
+        postLikeService.postUnlike(id, user.id!!)
         return ApiResponse.success(true)
     }
 
     @ApiOperation("거리 반경 포스트 글 페이징")
     @GetMapping("/near")
     fun getNearPosts(
+        @ApiIgnore @AuthenticationPrincipal user: User,
         @RequestParam longitude: Double,
         @RequestParam latitude: Double,
         @RequestParam meterDistance: Double,
         @RequestParam size: Int,
         @RequestParam(required = false) lastId: ObjectId?
     ): ApiResponse<CursorResult<PostDto>> {
-        return postService.getNearPost(longitude, latitude, meterDistance, lastId, size + 1)
+        return postService.getNearPost(user.id!!, longitude, latitude, meterDistance, lastId, size + 1)
             .let {
                 ApiResponse.success(CursorResult.from(values = it, requestedSize = size))
             }
@@ -91,9 +94,10 @@ class PostController(
     @ApiOperation("포스트 글 조회")
     @GetMapping("/{id}")
     fun getPostById(
+        @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable id: ObjectId
     ): ApiResponse<PostDto> {
-        return postService.getPostById(id)
+        return postService.getPostById(user.id!!, id)
             .let {
                 ApiResponse.success(it)
             }
@@ -105,13 +109,13 @@ class PostController(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable postId: ObjectId,
         @RequestBody commentWriteRequest: CommentWriteRequest,
-    ): ApiResponse<CommentDto> {
+    ): ApiResponse<CommentResultDto> {
         return commentService.write(
             user = user,
             postId = postId,
             comment = commentWriteRequest.toEntity(user.id!!, postId)
         ).let {
-            ApiResponse.success(CommentDto.from(user, it))
+            ApiResponse.success(CommentResultDto.from(user, it))
         }
     }
 
@@ -123,7 +127,7 @@ class PostController(
         @RequestParam size: Int,
         @RequestParam(required = false) lastId: ObjectId?
     ): ApiResponse<CursorResult<CommentDto>> {
-        return commentService.getCommentsByPostId(postId, lastId, size + 1)
+        return commentService.getCommentsByPostId(user.id!!, postId, lastId, size + 1)
             .let {
                 ApiResponse.success(CursorResult.from(values = it, requestedSize = size))
             }

@@ -6,8 +6,6 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Post
-import kr.mashup.bangwidae.asked.model.post.PostLike
-import kr.mashup.bangwidae.asked.repository.PostLikeRepository
 import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.place.PlaceService
@@ -26,7 +24,8 @@ class PostService(
     private val postRepository: PostRepository,
     private val placeService: PlaceService,
     private val userRepository: UserRepository,
-    private val postLikeRepository: PostLikeRepository
+    private val postLikeService: PostLikeService,
+    private val commentService: CommentService
 ) : WithPostAuthorityValidator {
     fun findById(id: ObjectId): Post {
         return postRepository.findByIdAndDeletedFalse(id)
@@ -49,7 +48,7 @@ class PostService(
     }
 
     fun getNearPost(
-        longitude: Double, latitude: Double, meterDistance: Double, lastId: ObjectId?, size: Int
+        userId: ObjectId, longitude: Double, latitude: Double, meterDistance: Double, lastId: ObjectId?, size: Int
     ): List<PostDto> {
         val location = GeoUtils.geoJsonPoint(longitude, latitude)
         val distance = Distance(meterDistance / 1000, Metrics.KILOMETERS)
@@ -59,30 +58,35 @@ class PostService(
             distance,
             PageRequest.of(0, size)
         )
+
         val userMap = userRepository.findAllByIdIn(postList.map { it.userId }).associateBy { it.id }
-        return postList.map { PostDto.from(userMap[it.userId]!!, it) }
+        val likeMap = postLikeService.getLikeMap(postList)
+        val commentCountMap = commentService.getCommentCountMap(postList)
+
+        return postList.map {
+            PostDto.from(
+                user = userMap[it.userId]!!,
+                post = it,
+                likeCount = likeMap[it.id]?.size ?: 0,
+                commentCount = commentCountMap[it.id] ?: 0,
+                userLiked = likeMap[it.id]?.map { like -> like.userId }?.contains(userId) ?: false
+            )
+        }
     }
 
-    fun getPostById(id: ObjectId): PostDto {
+    fun getPostById(userId: ObjectId, id: ObjectId): PostDto {
         val post = findById(id)
         val user = userRepository.findByIdOrNull(post.userId)
             ?: throw DoriDoriException.of(DoriDoriExceptionType.POST_WRITER_USER_NOT_EXIST)
-        return PostDto.from(user, post)
-    }
-
-    fun postLike(postId: ObjectId, userId: ObjectId) {
-        require(postRepository.existsByIdAndDeletedFalse(postId)) {
-            throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
-        }
-        if (!postLikeRepository.existsByPostIdAndUserId(postId, userId)) {
-            postLikeRepository.save(PostLike(userId = userId, postId = postId))
-        }
-    }
-
-    fun postUnlike(postId: ObjectId, userId: ObjectId) {
-        postLikeRepository.findByPostIdAndUserId(postId, userId)?.let {
-            postLikeRepository.delete(it)
-        }
+        val likeMap = postLikeService.getLikeMap(listOf(post))
+        val commentCountMap = commentService.getCommentCountMap(listOf(post))
+        return PostDto.from(
+            user = user,
+            post = post,
+            likeCount = likeMap[post.id]?.size ?: 0,
+            commentCount = commentCountMap[post.id] ?: 0,
+            userLiked = likeMap[post.id]?.map { like -> like.userId }?.contains(userId) ?: false
+        )
     }
 
     private fun updatePlaceInfo(post: Post): Post {
