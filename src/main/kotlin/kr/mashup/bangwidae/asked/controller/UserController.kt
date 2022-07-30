@@ -4,6 +4,7 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.service.HeaderTextType
 import kr.mashup.bangwidae.asked.service.UserService
 import kr.mashup.bangwidae.asked.service.question.QuestionService
 import org.bson.types.ObjectId
@@ -82,8 +83,9 @@ class UserController(
     @GetMapping("/header-text")
     fun getHeaderText(
         @ApiIgnore @AuthenticationPrincipal user: User,
+        @RequestParam type: HeaderTextType,
     ): ApiResponse<String> {
-        return ApiResponse.success("헤더 텍스트 예시")
+        return ApiResponse.success(userService.getUserHeaderText(user, type))
     }
 
     @ApiOperation("답변완료(본인)")

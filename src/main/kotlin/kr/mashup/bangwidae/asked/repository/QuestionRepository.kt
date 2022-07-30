@@ -18,6 +18,11 @@ interface QuestionRepository : MongoRepository<Question, ObjectId> {
         pageRequest: PageRequest,
     ): List<Question>
 
+    fun countByToUserIdAndStatusAndDeletedFalse(
+        toUserId: ObjectId,
+        status: QuestionStatus,
+    ): Long
+
     fun findByFromUserIdAndIdBeforeAndDeletedFalseOrderByCreatedAtDesc(
         fromUserId: ObjectId,
         lastId: ObjectId,

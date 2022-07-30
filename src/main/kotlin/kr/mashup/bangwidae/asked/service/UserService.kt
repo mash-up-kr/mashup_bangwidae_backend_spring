@@ -9,6 +9,7 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.external.aws.S3ImageUploader
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.repository.UserRepository
+import kr.mashup.bangwidae.asked.service.question.QuestionService
 import org.bson.types.ObjectId
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -20,6 +21,7 @@ class UserService(
     private val userRepository: UserRepository,
     private val certMailService: CertMailService,
     private val passwordService: PasswordService,
+    private val questionService: QuestionService,
     private val s3ImageUploader: S3ImageUploader
 ) {
 
@@ -52,6 +54,16 @@ class UserService(
     fun getUserInfo(userId: ObjectId): User {
         return userRepository.findById(userId)
             .orElseThrow { DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND) }
+    }
+
+    fun getUserHeaderText(user: User, type: HeaderTextType): String {
+        return when (type) {
+            HeaderTextType.ANSWER_WAITING_QUESTION_COUNT
+            -> "답변을 기다리는 질문이 ${questionService.countAnswerWaitingByToUser(user)}개 있어요"
+            // TODO 미확인 질문 카운트
+            HeaderTextType.UNREAD_QUESTION_COUNT
+            -> "새로운 질문이 n개 도착했어요"
+        }
     }
 
     fun updateNickname(user: User, nickname: String): Boolean {
@@ -96,4 +108,9 @@ class UserService(
             throw DoriDoriException.of(DoriDoriExceptionType.DUPLICATED_NICKNAME)
         }
     }
+}
+
+enum class HeaderTextType {
+    UNREAD_QUESTION_COUNT,
+    ANSWER_WAITING_QUESTION_COUNT,
 }
