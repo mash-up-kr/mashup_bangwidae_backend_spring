@@ -22,6 +22,8 @@ data class PostResultDto(
     val latitude: Double,
     @ApiModelProperty(value = "대표주소", example = "강남구")
     val representativeAddress: String?,
+    @ApiModelProperty(value = "익명 여부", example = "true")
+    val anonymous: Boolean,
     @ApiModelProperty(value = "생성일", example = "2022-07-14T23:57:33.436")
     val createdAt: LocalDateTime?,
     @ApiModelProperty(value = "수정일", example = "2022-07-14T23:57:33.436")
@@ -31,11 +33,12 @@ data class PostResultDto(
         fun from(user: User, post: Post): PostResultDto {
             return PostResultDto(
                 id = post.id!!.toHexString(),
-                user = if (post.anonymous == true) PostWriter.anonymous(user) else PostWriter.from(user),
+                user = PostWriter.from(post.getWriter(user)),
                 content = post.content,
                 longitude = post.location.getLongitude(),
                 latitude = post.location.getLatitude(),
                 representativeAddress = post.representativeAddress,
+                anonymous = post.anonymous ?: false,
                 createdAt = post.createdAt,
                 updatedAt = post.updatedAt,
             )
@@ -62,6 +65,8 @@ data class PostDto(
     val latitude: Double,
     @ApiModelProperty(value = "대표주소", example = "강남구")
     val representativeAddress: String?,
+    @ApiModelProperty(value = "익명 여부", example = "true")
+    val anonymous: Boolean,
     @ApiModelProperty(value = "생성일", example = "2022-07-14T23:57:33.436")
     val createdAt: LocalDateTime?,
     @ApiModelProperty(value = "수정일", example = "2022-07-14T23:57:33.436")
@@ -77,7 +82,7 @@ data class PostDto(
         ): PostDto {
             return PostDto(
                 id = post.id!!.toHexString(),
-                user = if (post.anonymous == true) PostWriter.anonymous(user) else PostWriter.from(user),
+                user = PostWriter.from(post.getWriter(user)),
                 content = post.content,
                 likeCount = likeCount,
                 userLiked = userLiked,
@@ -85,6 +90,7 @@ data class PostDto(
                 longitude = post.location.getLongitude(),
                 latitude = post.location.getLatitude(),
                 representativeAddress = post.representativeAddress,
+                anonymous = post.anonymous ?: false,
                 createdAt = post.createdAt,
                 updatedAt = post.updatedAt,
             )
@@ -123,9 +129,7 @@ data class PostWriter(
     @ApiModelProperty(value = "글 작성자 닉네임", example = "sample nickname")
     val nickname: String,
     @ApiModelProperty(value = "글 작성자 프로필 이미지", example = "http://image.com")
-    val profileImageUrl: String?,
-    @ApiModelProperty(value = "익명 여부", example = "true")
-    val anonymous: Boolean,
+    val profileImageUrl: String?
 ) {
     companion object {
         fun from(user: User): PostWriter {
@@ -133,18 +137,7 @@ data class PostWriter(
                 id = user.id!!.toHexString(),
                 tags = user.tags,
                 nickname = user.nickname!!,
-                profileImageUrl = user.profileImageUrl,
-                anonymous = false
-            )
-        }
-
-        fun anonymous(user: User): PostWriter {
-            return PostWriter(
-                id = user.id!!.toHexString(),
-                tags = emptyList(),
-                nickname = "익명",
-                profileImageUrl = "default profile image url", //TODO 이미지 이후 변경
-                anonymous = true
+                profileImageUrl = user.profileImageUrl
             )
         }
     }
