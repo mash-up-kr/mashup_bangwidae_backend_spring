@@ -51,6 +51,10 @@ data class User(
         )
     }
 
+    fun getAnonymousUser(): User {
+        return this.copy(nickname = "익명", profileImageUrl = DEFAULT_PROFILE_IMAGE_URL)
+    }
+
     fun levelUp(): User {
         return this.copy(
             level = level + 1
@@ -58,6 +62,9 @@ data class User(
     }
 
     companion object {
+        const val DEFAULT_PROFILE_IMAGE_URL: String =
+            "https://dori-dori-bucket.kr.object.ncloudstorage.com/profile/da26c773-30f4-473e-989b-e2f3fdf825ff%E1%84%80%E1%85%B5%E1%84%87%E1%85%A9%E1%86%AB%20%E1%84%91%E1%85%B3%E1%84%85%E1%85%A9%E1%84%91%E1%85%B5%E1%86%AF.png"
+
         fun createBasicUser(email: String, password: String): User {
             return User(
                 level = 1,

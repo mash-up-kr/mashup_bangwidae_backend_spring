@@ -70,6 +70,14 @@ class UserController(
         return ApiResponse.success(userService.updateProfileImage(user, image))
     }
 
+    @ApiOperation("프로필 이미지 기본값으로 변경")
+    @PostMapping("/profile/image/default")
+    fun setDefaultProfileImage(
+        @ApiIgnore @AuthenticationPrincipal user: User
+    ): ApiResponse<Boolean> {
+        return ApiResponse.success(userService.updateToDefaultProfileImage(user))
+    }
+
     // 우선 principal 동작 테스트 용도
     @ApiOperation("내 정보")
     @GetMapping("/me")

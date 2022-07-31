@@ -33,7 +33,7 @@ data class PostResultDto(
         fun from(user: User, post: Post): PostResultDto {
             return PostResultDto(
                 id = post.id!!.toHexString(),
-                user = PostWriter.from(post.getWriter(user)),
+                user = post.getWriter(user),
                 content = post.content,
                 longitude = post.location.getLongitude(),
                 latitude = post.location.getLatitude(),
@@ -82,7 +82,7 @@ data class PostDto(
         ): PostDto {
             return PostDto(
                 id = post.id!!.toHexString(),
-                user = PostWriter.from(post.getWriter(user)),
+                user = post.getWriter(user),
                 content = post.content,
                 likeCount = likeCount,
                 userLiked = userLiked,

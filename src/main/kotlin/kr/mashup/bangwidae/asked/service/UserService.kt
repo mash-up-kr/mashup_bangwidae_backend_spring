@@ -87,6 +87,11 @@ class UserService(
         return uploadedUrl
     }
 
+    fun updateToDefaultProfileImage(user: User): Boolean {
+        userRepository.save(user.updateProfileImageUrl(User.DEFAULT_PROFILE_IMAGE_URL))
+        return true
+    }
+
     fun findById(id: ObjectId): User {
         return userRepository.findByIdOrNull(id) ?: throw RuntimeException("User {id: $id} Not Found")
     }
