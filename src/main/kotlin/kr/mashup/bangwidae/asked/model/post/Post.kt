@@ -2,6 +2,7 @@ package kr.mashup.bangwidae.asked.model.post
 
 import kr.mashup.bangwidae.asked.controller.dto.PostEditRequest
 import kr.mashup.bangwidae.asked.model.Region
+import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
@@ -24,6 +25,7 @@ data class Post(
     val location: GeoJsonPoint,
     val representativeAddress: String? = null,
     val region: Region? = null,
+    val anonymous: Boolean? = false,
 
     val deleted: Boolean = false,
     @Version var version: Int? = null,
@@ -35,7 +37,8 @@ data class Post(
             this.copy(
                 content = it.content ?: this.content,
                 location = if (it.longitude != null && it.latitude != null)
-                    GeoUtils.geoJsonPoint(it.longitude, it.latitude) else this.location
+                    GeoUtils.geoJsonPoint(it.longitude, it.latitude) else this.location,
+                anonymous = it.anonymous ?: this.anonymous
             )
         }
     }
@@ -44,5 +47,10 @@ data class Post(
         return this.copy(
             deleted = true,
         )
+    }
+
+    fun getWriter(user: User): User {
+        return if (this.anonymous == true) user.copy(nickname = "익명", profileImageUrl = "default profile image url")
+        else user.copy()
     }
 }
