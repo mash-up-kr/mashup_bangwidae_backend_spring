@@ -8,5 +8,6 @@ import java.time.LocalDateTime
 
 @Repository
 interface WardRepository: MongoRepository<Ward, ObjectId> {
+    fun countAllByUserId(userId: ObjectId): Int
     fun findAllByUserIdAndExpiredAtAfter(userId: ObjectId, expiredAt: LocalDateTime): List<Ward>
 }

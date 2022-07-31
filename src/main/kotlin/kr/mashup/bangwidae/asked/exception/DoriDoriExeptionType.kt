@@ -36,4 +36,5 @@ enum class DoriDoriExceptionType(
 
     // WARD
     WARD_NOT_FOUND("와드를 찾을 수 없어요"),
+    WARD_MAX_COUNT("더 이상 와드를 심을 수 없어요"),
 }
