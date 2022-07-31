@@ -50,6 +50,10 @@ data class User(
         )
     }
 
+    fun getAnonymousUser(): User{
+        return this.copy(nickname = "익명", profileImageUrl = "default profile image url")
+    }
+
     companion object {
         fun createBasicUser(email: String, password: String): User {
             return User(
