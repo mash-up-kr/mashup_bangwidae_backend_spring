@@ -16,6 +16,7 @@ data class User(
     val nickname: String? = null,
     val email: String,
     val password: String? = null,
+    val level: Int = 1,
     val providerId: String? = null,
     val loginType: LoginType,
     val description: String? = null,
@@ -52,6 +53,11 @@ data class User(
 
     fun getAnonymousUser(): User {
         return this.copy(nickname = "익명", profileImageUrl = DEFAULT_PROFILE_IMAGE_URL)
+
+    fun levelUp(): User {
+        return this.copy(
+            level = level + 1
+        )
     }
 
     companion object {
@@ -60,6 +66,7 @@ data class User(
 
         fun createBasicUser(email: String, password: String): User {
             return User(
+                level = 1,
                 email = email,
                 password = password,
                 loginType = LoginType.BASIC
