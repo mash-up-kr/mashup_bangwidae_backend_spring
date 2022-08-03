@@ -110,11 +110,7 @@ class UserController(
         ).let {
             ApiResponse.success(
                 AnsweredQuestionsDto.from(
-                    questions = it.questions,
-                    userMapByUserId = it.userMapByUserId,
-                    answerMapByQuestionId = it.answerMapByQuestionId,
-                    answerLikeCountMapByAnswerId = it.answerLikeCountMapByAnswerId,
-                    userAnswerLikeMapByAnswerId = it.userAnswerLikeMapByAnswerId,
+                    questions = it,
                     requestedSize = size,
                 )
             )
@@ -135,8 +131,7 @@ class UserController(
         ).let {
             ApiResponse.success(
                 ReceivedQuestionsDto.from(
-                    questions = it.questions,
-                    userMapByUserId = it.userMapByUserId,
+                    questions = it,
                     requestedSize = size,
                 )
             )
@@ -157,8 +152,7 @@ class UserController(
         ).let {
             ApiResponse.success(
                 AskedQuestionsDto.from(
-                    questions = it.questions,
-                    userMapByUserId = it.userMapByUserId,
+                    questions = it,
                     requestedSize = size,
                 )
             )

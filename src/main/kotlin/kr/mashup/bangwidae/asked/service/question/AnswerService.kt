@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AnswerService(
     private val placeService: PlaceService,
+    private val levelPolicyService: LevelPolicyService,
     private val answerRepository: AnswerRepository,
     private val answerLikeRepository: AnswerLikeRepository,
     private val questionRepository: QuestionRepository,
@@ -45,6 +46,7 @@ class AnswerService(
                 latitude = request.latitude
             )
         }.getOrNull().let {
+            levelPolicyService.levelUpIfConditionSatisfied(user)
             return answerRepository.save(
                 Answer(
                     userId = user.id!!,
