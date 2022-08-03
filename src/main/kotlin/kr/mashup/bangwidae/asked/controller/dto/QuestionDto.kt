@@ -3,6 +3,7 @@ package kr.mashup.bangwidae.asked.controller.dto
 import io.swagger.annotations.ApiModelProperty
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.question.Answer
+import kr.mashup.bangwidae.asked.model.question.AnswerLike
 import kr.mashup.bangwidae.asked.model.question.Question
 import org.bson.types.ObjectId
 import java.time.LocalDateTime
@@ -51,14 +52,21 @@ data class AnsweredQuestionsDto(
         val createdAt: LocalDateTime,
     ) {
         companion object {
-            fun from(question: Question, answer: Answer, fromUser: User, toUser: User): QuestionDto {
+            fun from(
+                question: Question,
+                answer: Answer,
+                fromUser: User,
+                toUser: User,
+                answerLikeCount: Long,
+                answerLiked: Boolean
+            ): QuestionDto {
                 return QuestionDto(
                     id = question.id!!.toHexString(),
                     content = question.content,
                     representativeAddress = question.representativeAddress,
                     fromUser = if (question.anonymous == true) QuestionUserDto.anonymous(fromUser) else QuestionUserDto.from(fromUser),
                     toUser = QuestionUserDto.from(toUser),
-                    answer = AnswerDto.from(answer, toUser),
+                    answer = AnswerDto.from(answer, toUser, answerLikeCount, answerLiked),
                     createdAt = question.createdAt!!,
                 )
             }
@@ -70,18 +78,19 @@ data class AnsweredQuestionsDto(
         val content: String,
         val representativeAddress: String?,
         val user: QuestionUserDto,
-        val likeCount: Int,
+        val likeCount: Long,
+        val userLiked: Boolean,
         val createdAt: LocalDateTime,
     ) {
         companion object {
-            fun from(answer: Answer, answerUser: User): AnswerDto {
+            fun from(answer: Answer, answerUser: User, likeCount: Long, userLiked: Boolean): AnswerDto {
                 return AnswerDto(
                     id = answer.id!!.toHexString(),
                     content = answer.content,
                     representativeAddress = answer.representativeAddress,
                     user = QuestionUserDto.from(answerUser),
-                    // TODO 좋아요 개수 저장
-                    likeCount = 0,
+                    likeCount = likeCount,
+                    userLiked = userLiked,
                     createdAt = answer.createdAt!!,
                 )
             }
@@ -93,6 +102,8 @@ data class AnsweredQuestionsDto(
             questions: List<Question>,
             userMapByUserId: Map<ObjectId, User>,
             answerMapByQuestionId: Map<ObjectId, List<Answer>>,
+            answerLikeCountMapByAnswerId: Map<ObjectId, Long>,
+            userAnswerLikeMapByAnswerId: Map<ObjectId, AnswerLike>,
             requestedSize: Int,
         ): AnsweredQuestionsDto {
             return AnsweredQuestionsDto(
@@ -104,6 +115,8 @@ data class AnsweredQuestionsDto(
                             answer = answer,
                             fromUser = userMapByUserId[it.fromUserId]!!,
                             toUser = userMapByUserId[answer.userId]!!,
+                            answerLikeCount = answerLikeCountMapByAnswerId[answer.id!!] ?: 0,
+                            answerLiked = userAnswerLikeMapByAnswerId[answer.id] != null
                         )
                     },
                 hasNext = questions.size > requestedSize

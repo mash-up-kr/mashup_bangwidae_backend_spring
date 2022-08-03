@@ -35,6 +35,8 @@ class QuestionController(
                     questions = it.questions,
                     userMapByUserId = it.userMapByUserId,
                     answerMapByQuestionId = it.answerMapByQuestionId,
+                    answerLikeCountMapByAnswerId = it.answerLikeCountMapByAnswerId,
+                    userAnswerLikeMapByAnswerId = it.userAnswerLikeMapByAnswerId,
                     requestedSize = size,
                 )
             )

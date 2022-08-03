@@ -5,11 +5,10 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.question.Answer
+import kr.mashup.bangwidae.asked.model.question.AnswerLike
 import kr.mashup.bangwidae.asked.model.question.Question
 import kr.mashup.bangwidae.asked.model.question.QuestionStatus
-import kr.mashup.bangwidae.asked.repository.AnswerRepository
-import kr.mashup.bangwidae.asked.repository.QuestionRepository
-import kr.mashup.bangwidae.asked.repository.UserRepository
+import kr.mashup.bangwidae.asked.repository.*
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
@@ -24,6 +23,8 @@ class QuestionService(
     private val placeService: PlaceService,
     private val questionRepository: QuestionRepository,
     private val answerRepository: AnswerRepository,
+    private val answerLikeRepository: AnswerLikeRepository,
+    private val answerLikeAggregator: AnswerLikeAggregator,
     private val userRepository: UserRepository,
 ) : WithQuestionAuthorityValidator {
     fun findById(questionId: ObjectId): Question {
@@ -39,13 +40,12 @@ class QuestionService(
             pageRequest = PageRequest.of(0, size)
         )
 
-        val userMapByUserId = userRepository
+        val users = userRepository
             .findAllByIdIn(questions.map { it.fromUserId } + user.id)
-            .associateBy { it.id!! }
 
         return QuestionSearchResultImpl(
             questions = questions,
-            userMapByUserId = userMapByUserId,
+            userMapByUserId = users.associateBy { it.id!! },
         )
     }
 
@@ -78,18 +78,24 @@ class QuestionService(
             pageRequest = PageRequest.of(0, size)
         )
 
-        val answerMapByQuestionId = answerRepository
+        val answers = answerRepository
             .findByQuestionIdInAndDeletedFalseOrderByCreatedAtDesc(questions.map { it.id!! })
-            .groupBy { it.questionId }
 
-        val userMapByUserId = userRepository
+        val users = userRepository
             .findAllByIdIn(questions.map { it.fromUserId } + user.id)
-            .associateBy { it.id!! }
+
+        val answerLikeCountMapByAnswerId = answerLikeAggregator
+            .getCountGroupByAnswerId(answers.map { it.id!! })
+
+        val myAnswerLikes = answerLikeRepository
+            .findByAnswerIdInAndUserId(answers.map { it.id!! }, user.id)
 
         return QuestionSearchResultWithAnswerImpl(
             questions = questions,
-            userMapByUserId = userMapByUserId,
-            answerMapByQuestionId = answerMapByQuestionId,
+            userMapByUserId = users.associateBy { it.id!! },
+            answerMapByQuestionId = answers.groupBy { it.questionId },
+            answerLikeCountMapByAnswerId = answerLikeCountMapByAnswerId,
+            userAnswerLikeMapByAnswerId = myAnswerLikes.associateBy { it.answerId }
         )
     }
 
@@ -100,13 +106,12 @@ class QuestionService(
             pageRequest = PageRequest.of(0, size)
         )
 
-        val userMapByUserId = userRepository
+        val users = userRepository
             .findAllByIdIn(questions.map { it.toUserId } + user.id)
-            .associateBy { it.id!! }
 
         return QuestionSearchResultImpl(
             questions = questions,
-            userMapByUserId = userMapByUserId,
+            userMapByUserId = users.associateBy { it.id!! },
         )
     }
 
@@ -179,4 +184,6 @@ data class QuestionSearchResultWithAnswerImpl(
     override val questions: List<Question>,
     override val userMapByUserId: Map<ObjectId, User> = emptyMap(),
     val answerMapByQuestionId: Map<ObjectId, List<Answer>> = emptyMap(),
+    val answerLikeCountMapByAnswerId: Map<ObjectId, Long> = emptyMap(),
+    val userAnswerLikeMapByAnswerId: Map<ObjectId, AnswerLike> = emptyMap(),
 ) : QuestionSearchResult
