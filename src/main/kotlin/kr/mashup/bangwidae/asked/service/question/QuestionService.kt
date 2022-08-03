@@ -4,8 +4,6 @@ import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.question.Answer
-import kr.mashup.bangwidae.asked.model.question.AnswerLike
 import kr.mashup.bangwidae.asked.model.question.Question
 import kr.mashup.bangwidae.asked.model.question.QuestionStatus
 import kr.mashup.bangwidae.asked.repository.*
@@ -32,7 +30,7 @@ class QuestionService(
             ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
     }
 
-    fun findAnswerWaitingByToUser(user: User, lastId: ObjectId?, size: Int): QuestionSearchResultImpl {
+    fun findAnswerWaitingByToUser(user: User, lastId: ObjectId?, size: Int): List<QuestionDomain> {
         val questions = questionRepository.findByToUserIdAndStatusAndIdBeforeAndDeletedFalseOrderByCreatedAtDesc(
             toUserId = user.id!!,
             status = QuestionStatus.ANSWER_WAITING,
@@ -40,13 +38,17 @@ class QuestionService(
             pageRequest = PageRequest.of(0, size)
         )
 
-        val users = userRepository
+        val userMapByUserId = userRepository
             .findAllByIdIn(questions.map { it.fromUserId } + user.id)
+            .associateBy { it.id!! }
 
-        return QuestionSearchResultImpl(
-            questions = questions,
-            userMapByUserId = users.associateBy { it.id!! },
-        )
+        return questions.map {
+            QuestionDomain.from(
+                question = it,
+                fromUser = userMapByUserId[it.fromUserId]!!,
+                toUser = userMapByUserId[it.toUserId]!!,
+            )
+        }
     }
 
     fun countAnswerWaitingByToUser(user: User): Long {
@@ -56,7 +58,7 @@ class QuestionService(
         )
     }
 
-    fun findAnswerCompleteByToUser(userId: ObjectId, lastId: ObjectId?, size: Int): QuestionSearchResultWithAnswerImpl {
+    fun findAnswerCompleteByToUser(userId: ObjectId, lastId: ObjectId?, size: Int): List<QuestionDomain> {
         val user = userRepository.findByIdOrNull(userId)
             ?: throw DoriDoriException.of(
                 type = DoriDoriExceptionType.NOT_EXIST,
@@ -70,7 +72,7 @@ class QuestionService(
         )
     }
 
-    fun findAnswerCompleteByToUser(user: User, lastId: ObjectId?, size: Int): QuestionSearchResultWithAnswerImpl {
+    fun findAnswerCompleteByToUser(user: User, lastId: ObjectId?, size: Int): List<QuestionDomain> {
         val questions = questionRepository.findByToUserIdAndStatusAndIdBeforeAndDeletedFalseOrderByCreatedAtDesc(
             toUserId = user.id!!,
             status = QuestionStatus.ANSWER_COMPLETE,
@@ -80,39 +82,50 @@ class QuestionService(
 
         val answers = answerRepository
             .findByQuestionIdInAndDeletedFalseOrderByCreatedAtDesc(questions.map { it.id!! })
+        val answersMapByQuestionId = answers.groupBy { it.questionId }
 
-        val users = userRepository
+        val userMapByUserId = userRepository
             .findAllByIdIn(questions.map { it.fromUserId } + user.id)
+            .associateBy { it.id!! }
 
         val answerLikeCountMapByAnswerId = answerLikeAggregator
             .getCountGroupByAnswerId(answers.map { it.id!! })
 
-        val myAnswerLikes = answerLikeRepository
+        val myAnswerLikeMapByAnswerId = answerLikeRepository
             .findByAnswerIdInAndUserId(answers.map { it.id!! }, user.id)
+            .associateBy { it.answerId }
 
-        return QuestionSearchResultWithAnswerImpl(
-            questions = questions,
-            userMapByUserId = users.associateBy { it.id!! },
-            answerMapByQuestionId = answers.groupBy { it.questionId },
-            answerLikeCountMapByAnswerId = answerLikeCountMapByAnswerId,
-            userAnswerLikeMapByAnswerId = myAnswerLikes.associateBy { it.answerId }
-        )
+        return questions.map {
+            val answer = answersMapByQuestionId[it.id]!!.first()
+            QuestionDomain.from(
+                question = it,
+                answer = answer,
+                fromUser = userMapByUserId[it.fromUserId]!!,
+                toUser = userMapByUserId[it.toUserId]!!,
+                answerLikeCount = answerLikeCountMapByAnswerId[answer.id!!] ?: 0,
+                answerUserLiked = myAnswerLikeMapByAnswerId[answer.id] != null,
+            )
+        }
     }
 
-    fun findByFromUser(user: User, lastId: ObjectId?, size: Int): QuestionSearchResultImpl {
+    fun findByFromUser(user: User, lastId: ObjectId?, size: Int): List<QuestionDomain> {
         val questions = questionRepository.findByFromUserIdAndIdBeforeAndDeletedFalseOrderByCreatedAtDesc(
             fromUserId = user.id!!,
             lastId = lastId ?: ObjectId(),
             pageRequest = PageRequest.of(0, size)
         )
 
-        val users = userRepository
+        val userMapByUserId = userRepository
             .findAllByIdIn(questions.map { it.toUserId } + user.id)
+            .associateBy { it.id!! }
 
-        return QuestionSearchResultImpl(
-            questions = questions,
-            userMapByUserId = users.associateBy { it.id!! },
-        )
+        return questions.map {
+            QuestionDomain.from(
+                question = it,
+                fromUser = userMapByUserId[it.fromUserId]!!,
+                toUser = userMapByUserId[it.toUserId]!!,
+            )
+        }
     }
 
     fun write(user: User, request: QuestionWriteRequest): Question {
@@ -170,20 +183,3 @@ class QuestionService(
     }
 }
 
-interface QuestionSearchResult {
-    val questions: List<Question>
-    val userMapByUserId: Map<ObjectId, User>
-}
-
-data class QuestionSearchResultImpl(
-    override val questions: List<Question>,
-    override val userMapByUserId: Map<ObjectId, User> = emptyMap(),
-) : QuestionSearchResult
-
-data class QuestionSearchResultWithAnswerImpl(
-    override val questions: List<Question>,
-    override val userMapByUserId: Map<ObjectId, User> = emptyMap(),
-    val answerMapByQuestionId: Map<ObjectId, List<Answer>> = emptyMap(),
-    val answerLikeCountMapByAnswerId: Map<ObjectId, Long> = emptyMap(),
-    val userAnswerLikeMapByAnswerId: Map<ObjectId, AnswerLike> = emptyMap(),
-) : QuestionSearchResult
