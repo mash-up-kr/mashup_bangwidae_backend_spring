@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface PostRepository : MongoRepository<Post, ObjectId> {
+    fun countAllByUserIdAndDeletedFalse(userId: ObjectId): Int
     fun findByLocationNearAndIdBeforeAndDeletedFalseOrderByIdDesc(
         location: GeoJsonPoint,
         lastId: ObjectId,
