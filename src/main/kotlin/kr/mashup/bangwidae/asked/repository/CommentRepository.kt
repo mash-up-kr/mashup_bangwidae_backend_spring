@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface CommentRepository : MongoRepository<Comment, ObjectId> {
+    fun countAllByUserIdAndDeletedFalse(userId: ObjectId): Int
     fun findByIdAndDeletedFalse(id: ObjectId): Comment?
     fun findAllByPostIdIn(postIdList: List<ObjectId>): List<Comment>
     fun existsByIdAndDeletedFalse(id: ObjectId): Boolean

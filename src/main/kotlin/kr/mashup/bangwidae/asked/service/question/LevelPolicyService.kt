@@ -10,21 +10,25 @@ class LevelPolicyService(
     private val wardRepository: WardRepository,
     private val answerRepository: AnswerRepository,
     private val questionRepository: QuestionRepository,
+    private val commentRepository: CommentRepository,
+    private val postRepository: PostRepository,
     private val levelPolicyRepository: LevelPolicyRepository,
 ) {
 
     fun levelUpIfConditionSatisfied(user: User) {
         // 다음 레벨 policy 없으면 만렙임
-        val policy = levelPolicyRepository.findByLevel(user.level + 1)?: return
+        val policy = levelPolicyRepository.findByLevel(user.level + 1) ?: return
 
         val wardCount = wardRepository.countAllByUserId(user.id!!)
-        val answerCount = answerRepository.countAllByUserId(user.id)
-        val questionCount = questionRepository.countAllByFromUserId(user.id)
+        val answerCount = answerRepository.countAllByUserIdAndDeletedFalse(user.id)
+        val questionCount = questionRepository.countAllByFromUserIdAndDeletedFalse(user.id)
+        val commentAnswerCount = commentRepository.countAllByUserIdAndDeletedFalse(user.id)
+        val postQuestionCount = postRepository.countAllByUserIdAndDeletedFalse(user.id)
 
         val satisfiedLevelUp = policy.isSatisfiedLevelUp(
             userWardCount = wardCount,
-            userAnswerCount = answerCount,
-            userQuestionCount = questionCount
+            userAnswerCount = answerCount + commentAnswerCount,
+            userQuestionCount = questionCount + postQuestionCount
         )
 
         if (satisfiedLevelUp) {
