@@ -21,7 +21,7 @@ class QuestionController(
     @ApiOperation("질문/답변 단건 조회")
     @GetMapping("/{questionId}")
     fun getDetailById(
-        @ApiIgnore @AuthenticationPrincipal user: User,
+        @ApiIgnore @AuthenticationPrincipal user: User?,
         @PathVariable questionId: ObjectId,
     ): ApiResponse<QuestionDetailDto> {
         return questionService.findDetailById(
