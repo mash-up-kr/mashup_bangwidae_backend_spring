@@ -26,134 +26,96 @@ class QuestionService(
     private val answerLikeAggregator: AnswerLikeAggregator,
     private val userRepository: UserRepository,
 ) : WithQuestionAuthorityValidator {
-    fun findById(questionId: ObjectId): Question {
+    private fun findById(questionId: ObjectId): Question {
         return questionRepository.findByIdAndDeletedFalse(questionId)
             ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
     }
 
-    fun findDetailById(user: User?, questionId: ObjectId): QuestionDomain {
+    fun findDetailById(authUser: User?, questionId: ObjectId): QuestionDomain {
         val question = findById(questionId)
 
-        val userMapByUserId = userRepository
-            .findAllByIdIn(listOf(question.fromUserId, question.toUserId))
-            .associateBy { it.id!! }
-
-        val answer = answerRepository
-            .findByQuestionIdAndDeletedFalse(question.id!!)
-            .firstOrNull()
-
-        val answerLikeCount = answer?.let {
-            answerLikeAggregator.getCountByAnswerId(answer.id!!)
-        }
-
-        val answerUserLiked = answer?.let { answer ->
-            user?.let { answerLikeRepository.existsByAnswerIdAndUserId(answer.id!!, it.id!!) } ?: false
-        }
-
-        return QuestionDomain.from(
-            question = question,
-            fromUser = userMapByUserId[question.fromUserId]!!,
-            toUser = userMapByUserId[question.toUserId]!!,
-            answer = answer,
-            answerLikeCount = answerLikeCount,
-            answerUserLiked = answerUserLiked,
-        )
+        return listOf(question).toDomain(authUser).first()
     }
 
-    fun findAnswerWaitingByToUser(user: User, lastId: ObjectId?, size: Int): List<QuestionDomain> {
+    fun findAnswerWaitingByToUser(toUser: User, lastId: ObjectId?, size: Int): List<QuestionDomain> {
         val questions = questionRepository.findByToUserIdAndStatusAndIdBeforeAndDeletedFalseOrderByCreatedAtDesc(
-            toUserId = user.id!!,
+            toUserId = toUser.id!!,
             status = QuestionStatus.ANSWER_WAITING,
             lastId = lastId ?: ObjectId(),
             pageRequest = PageRequest.of(0, size)
         )
-
-        val userMapByUserId = userRepository
-            .findAllByIdIn(questions.map { it.fromUserId } + user.id)
-            .associateBy { it.id!! }
-
-        return questions.map {
-            QuestionDomain.from(
-                question = it,
-                fromUser = userMapByUserId[it.fromUserId]!!,
-                toUser = userMapByUserId[it.toUserId]!!,
-            )
-        }
+        return questions.toDomain(toUser)
     }
 
-    fun countAnswerWaitingByToUser(user: User): Long {
+    fun countAnswerWaitingByToUser(toUser: User): Long {
         return questionRepository.countByToUserIdAndStatusAndDeletedFalse(
-            toUserId = user.id!!,
+            toUserId = toUser.id!!,
             status = QuestionStatus.ANSWER_WAITING,
         )
     }
 
-    fun findAnswerCompleteByToUser(userId: ObjectId, lastId: ObjectId?, size: Int): List<QuestionDomain> {
-        val user = userRepository.findByIdOrNull(userId)
+    fun findAnswerCompleteByToUser(authUser: User?, toUserID: ObjectId, lastId: ObjectId?, size: Int): List<QuestionDomain> {
+        val toUser = userRepository.findByIdOrNull(toUserID)
             ?: throw DoriDoriException.of(
                 type = DoriDoriExceptionType.NOT_EXIST,
-                message = "$userId 사용자가 존재하지 않아요",
+                message = "$toUserID 사용자가 존재하지 않아요",
             )
 
         return findAnswerCompleteByToUser(
-            user = user,
+            authUser = authUser,
+            toUser = toUser,
             lastId = lastId,
             size = size,
         )
     }
 
-    fun findAnswerCompleteByToUser(user: User, lastId: ObjectId?, size: Int): List<QuestionDomain> {
+    fun findAnswerCompleteByToUser(authUser: User?, toUser: User, lastId: ObjectId?, size: Int): List<QuestionDomain> {
         val questions = questionRepository.findByToUserIdAndStatusAndIdBeforeAndDeletedFalseOrderByCreatedAtDesc(
-            toUserId = user.id!!,
+            toUserId = toUser.id!!,
             status = QuestionStatus.ANSWER_COMPLETE,
             lastId = lastId ?: ObjectId(),
             pageRequest = PageRequest.of(0, size)
         )
 
-        val answers = answerRepository
-            .findByQuestionIdInAndDeletedFalseOrderByCreatedAtDesc(questions.map { it.id!! })
-        val answersMapByQuestionId = answers.groupBy { it.questionId }
-
-        val userMapByUserId = userRepository
-            .findAllByIdIn(questions.map { it.fromUserId } + user.id)
-            .associateBy { it.id!! }
-
-        val answerLikeCountMapByAnswerId = answerLikeAggregator
-            .getCountGroupByAnswerId(answers.map { it.id!! })
-
-        val myAnswerLikeMapByAnswerId = answerLikeRepository
-            .findByAnswerIdInAndUserId(answers.map { it.id!! }, user.id)
-            .associateBy { it.answerId }
-
-        return questions.map {
-            val answer = answersMapByQuestionId[it.id]!!.first()
-            QuestionDomain.from(
-                question = it,
-                answer = answer,
-                fromUser = userMapByUserId[it.fromUserId]!!,
-                toUser = userMapByUserId[it.toUserId]!!,
-                answerLikeCount = answerLikeCountMapByAnswerId[answer.id!!] ?: 0,
-                answerUserLiked = myAnswerLikeMapByAnswerId[answer.id] != null,
-            )
-        }
+        return questions.toDomain(authUser)
     }
 
-    fun findByFromUser(user: User, lastId: ObjectId?, size: Int): List<QuestionDomain> {
+    fun findByFromUser(fromUser: User, lastId: ObjectId?, size: Int): List<QuestionDomain> {
         val questions = questionRepository.findByFromUserIdAndIdBeforeAndDeletedFalseOrderByCreatedAtDesc(
-            fromUserId = user.id!!,
+            fromUserId = fromUser.id!!,
             lastId = lastId ?: ObjectId(),
             pageRequest = PageRequest.of(0, size)
         )
 
+        return questions.toDomain(fromUser)
+    }
+
+    private fun List<Question>.toDomain(authUser: User?): List<QuestionDomain> {
+        val answers = answerRepository
+            .findByQuestionIdInAndDeletedFalseOrderByCreatedAtDesc(this.map { it.id!! })
+        val answersMapByQuestionId = answers.groupBy { it.questionId }
+
         val userMapByUserId = userRepository
-            .findAllByIdIn(questions.map { it.toUserId } + user.id)
+            .findAllByIdIn((this.map { it.fromUserId } + this.map { it.toUserId }).toSet())
             .associateBy { it.id!! }
 
-        return questions.map {
+        val answerLikeCountMapByAnswerId = answerLikeAggregator.getCountGroupByAnswerId(answers.map { it.id!! })
+
+        val myAnswerLikeMapByAnswerId = authUser?.let {
+            answerLikeRepository
+                .findByAnswerIdInAndUserId(answers.map { it.id!! }, authUser.id!!)
+                .associateBy { it.answerId }
+        } ?: emptyMap()
+
+        return this.map {
+            val answer = answersMapByQuestionId[it.id]?.firstOrNull()
             QuestionDomain.from(
                 question = it,
                 fromUser = userMapByUserId[it.fromUserId]!!,
                 toUser = userMapByUserId[it.toUserId]!!,
+                answer = answer,
+                answerLikeCount = answer?.let { answerLikeCountMapByAnswerId[answer.id!!] ?: 0 },
+                answerUserLiked = answer?.let { myAnswerLikeMapByAnswerId[answer.id] != null },
             )
         }
     }

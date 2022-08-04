@@ -18,7 +18,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
 
 
@@ -48,6 +47,7 @@ class SecurityConfig {
                 "/api/v1/auth/mail/send",
                 "/api/v1/auth/mail/cert",
                 "/api/v1/questions/{questionId}",
+                "/api/v1/questions/answered",
             ).permitAll()
             .antMatchers("/api/**").hasAuthority("ROLE")
         http.csrf().disable()

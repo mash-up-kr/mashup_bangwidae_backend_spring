@@ -104,7 +104,8 @@ class UserController(
         @RequestParam(required = false) lastId: ObjectId?,
     ): ApiResponse<AnsweredQuestionsDto> {
         return questionService.findAnswerCompleteByToUser(
-            user = user,
+            authUser = user,
+            toUser = user,
             lastId = lastId,
             size = size + 1,
         ).let {
@@ -125,7 +126,7 @@ class UserController(
         @RequestParam(required = false) lastId: ObjectId?,
     ): ApiResponse<ReceivedQuestionsDto> {
         return questionService.findAnswerWaitingByToUser(
-            user = user,
+            toUser = user,
             lastId = lastId,
             size = size + 1,
         ).let {
@@ -146,7 +147,7 @@ class UserController(
         @RequestParam(required = false) lastId: ObjectId?,
     ): ApiResponse<AskedQuestionsDto> {
         return questionService.findByFromUser(
-            user = user,
+            fromUser = user,
             lastId = lastId,
             size = size + 1,
         ).let {

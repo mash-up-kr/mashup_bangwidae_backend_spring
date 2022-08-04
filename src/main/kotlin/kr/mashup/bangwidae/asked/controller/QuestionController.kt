@@ -25,7 +25,7 @@ class QuestionController(
         @PathVariable questionId: ObjectId,
     ): ApiResponse<QuestionDetailDto> {
         return questionService.findDetailById(
-            user = user,
+            authUser = user,
             questionId = questionId,
         ).let {
             ApiResponse.success(
@@ -37,12 +37,14 @@ class QuestionController(
     @ApiOperation("답변완료(본인 외 사용자)")
     @GetMapping("/answered")
     fun getMyAnsweredQuestions(
+        @ApiIgnore @AuthenticationPrincipal user: User?,
         @RequestParam userId: ObjectId,
         @RequestParam size: Int,
         @RequestParam(required = false) lastId: ObjectId?,
     ): ApiResponse<AnsweredQuestionsDto> {
         return questionService.findAnswerCompleteByToUser(
-            userId = userId,
+            authUser = user,
+            toUserID = userId,
             lastId = lastId,
             size = size + 1,
         ).let {
