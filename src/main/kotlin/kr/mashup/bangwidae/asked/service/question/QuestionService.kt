@@ -31,6 +31,35 @@ class QuestionService(
             ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
     }
 
+    fun findDetailById(user: User?, questionId: ObjectId): QuestionDomain {
+        val question = findById(questionId)
+
+        val userMapByUserId = userRepository
+            .findAllByIdIn(listOf(question.fromUserId, question.toUserId))
+            .associateBy { it.id!! }
+
+        val answer = answerRepository
+            .findByQuestionIdAndDeletedFalse(question.id!!)
+            .firstOrNull()
+
+        val answerLikeCount = answer?.let {
+            answerLikeAggregator.getCountByAnswerId(answer.id!!)
+        }
+
+        val answerUserLiked = answer?.let { answer ->
+            user?.let { answerLikeRepository.existsByAnswerIdAndUserId(answer.id!!, it.id!!) } ?: false
+        }
+
+        return QuestionDomain.from(
+            question = question,
+            fromUser = userMapByUserId[question.fromUserId]!!,
+            toUser = userMapByUserId[question.toUserId]!!,
+            answer = answer,
+            answerLikeCount = answerLikeCount,
+            answerUserLiked = answerUserLiked,
+        )
+    }
+
     fun findAnswerWaitingByToUser(user: User, lastId: ObjectId?, size: Int): List<QuestionDomain> {
         val questions = questionRepository.findByToUserIdAndStatusAndIdBeforeAndDeletedFalseOrderByCreatedAtDesc(
             toUserId = user.id!!,

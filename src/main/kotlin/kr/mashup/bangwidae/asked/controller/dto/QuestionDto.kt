@@ -37,6 +37,56 @@ data class AnswerEditRequest(
 )
 
 // Response
+data class QuestionDetailDto(
+    val id: String,
+    val content: String,
+    val representativeAddress: String?,
+    val anonymous: Boolean?,
+    val fromUser: QuestionUserDto,
+    val toUser: QuestionUserDto,
+    val answer: AnswerDto?,
+    val createdAt: LocalDateTime,
+) {
+    data class AnswerDto(
+        val id: String,
+        val content: String,
+        val representativeAddress: String?,
+        val user: QuestionUserDto,
+        val likeCount: Long,
+        val userLiked: Boolean,
+        val createdAt: LocalDateTime,
+    ) {
+        companion object {
+            fun from(answer: AnswerDomain): AnswerDto {
+                return AnswerDto(
+                    id = answer.id,
+                    content = answer.content,
+                    representativeAddress = answer.representativeAddress,
+                    user = QuestionUserDto.from(answer.user),
+                    likeCount = answer.likeCount,
+                    userLiked = answer.userLiked,
+                    createdAt = answer.createdAt,
+                )
+            }
+        }
+    }
+
+    companion object {
+        fun from(question: QuestionDomain): QuestionDetailDto {
+            return QuestionDetailDto(
+                id = question.id,
+                content = question.content,
+                representativeAddress = question.representativeAddress,
+                anonymous = question.anonymous,
+                fromUser = QuestionUserDto.from(question.fromUser),
+                toUser = QuestionUserDto.from(question.toUser),
+                answer = question.answer?.let { AnswerDto.from(question.answer) },
+                createdAt = question.createdAt,
+            )
+        }
+    }
+}
+
 data class AnsweredQuestionsDto(
     val questions: List<QuestionDto>,
     val hasNext: Boolean,

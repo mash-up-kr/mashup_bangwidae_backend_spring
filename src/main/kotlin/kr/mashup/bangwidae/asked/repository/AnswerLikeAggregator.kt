@@ -25,6 +25,10 @@ class AnswerLikeAggregator(
             .associateBy { it.answerId }
             .mapValues { it.value.likeCount }
     }
+
+    fun getCountByAnswerId(answerId: ObjectId): Long {
+        return getCountGroupByAnswerId(listOf(answerId))[answerId] ?: 0
+    }
 }
 
 data class AnswerLikeCountGroupByAnswerId(
