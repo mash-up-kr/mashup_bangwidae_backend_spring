@@ -37,6 +37,22 @@ class UserController(
         return ApiResponse.success(UserInfoDto.from(userService.getUserInfo(userId)))
     }
 
+    @ApiOperation("유저 링크 공유")
+    @GetMapping("/{userId}/link-share")
+    fun getUserLinkShareInfo(
+        @ApiIgnore @AuthenticationPrincipal authUser: User?,
+        @PathVariable userId: ObjectId
+    ): ApiResponse<UserLinkShareInfoDto> {
+        val user = userService.getUserInfo(userId)
+        val questions = questionService.findAnswerCompleteByToUser(
+            authUser = authUser,
+            toUserID = userId,
+            lastId = null,
+            size = 2,
+        )
+        return ApiResponse.success(UserLinkShareInfoDto.from(user, questions))
+    }
+
     @ApiOperation("닉네임 설정")
     @PostMapping("/nickname")
     fun createNickname(
