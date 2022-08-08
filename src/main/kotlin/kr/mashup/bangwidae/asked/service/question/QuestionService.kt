@@ -34,7 +34,7 @@ class QuestionService(
     fun findDetailById(authUser: User?, questionId: ObjectId): QuestionDomain {
         val question = findById(questionId)
 
-        return listOf(question).toDomain(authUser).first()
+        return question.toDomain(authUser)
     }
 
     fun findAnswerWaitingByToUser(toUser: User, lastId: ObjectId?, size: Int): List<QuestionDomain> {
@@ -88,6 +88,10 @@ class QuestionService(
         )
 
         return questions.toDomain(fromUser)
+    }
+
+    private fun Question.toDomain(authUser: User?): QuestionDomain {
+        return listOf(this).toDomain(authUser).first()
     }
 
     private fun List<Question>.toDomain(authUser: User?): List<QuestionDomain> {
