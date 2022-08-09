@@ -21,12 +21,6 @@ class PlaceService(
 
         return region
     }
-
-    fun getRepresentativeAddress(longitude: Double, latitude: Double): String {
-        val region = reverseGeocode(longitude, latitude)
-        return region.군구 ?: region.시 ?: region.읍면동 ?: region.리 ?: region.도
-        ?: throw DoriDoriException.of(DoriDoriExceptionType.REPRESENTATIVE_ADDRESS_NOT_EXIST)
-    }
 }
 
 enum class Nationality {
