@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
 import kr.mashup.bangwidae.asked.controller.dto.CommentResultDto
 import kr.mashup.bangwidae.asked.controller.dto.CommentEditRequest
+import kr.mashup.bangwidae.asked.controller.path.ApiPath
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.post.CommentLikeService
 import kr.mashup.bangwidae.asked.service.post.CommentService
@@ -15,13 +16,13 @@ import springfox.documentation.annotations.ApiIgnore
 
 @Api(tags = ["댓글 컨트롤러"])
 @RestController
-@RequestMapping("/api/v1/comments")
+@RequestMapping(ApiPath.ROOT)
 class CommentController(
     private val commentService: CommentService,
     private val commentLikeService: CommentLikeService
 ) {
     @ApiOperation("댓글 수정")
-    @PatchMapping("/{commentId}")
+    @PatchMapping(ApiPath.COMMENT_EDIT)
     fun editCommentContent(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable commentId: ObjectId,
@@ -37,7 +38,7 @@ class CommentController(
     }
 
     @ApiOperation("댓글 삭제")
-    @DeleteMapping("/{commentId}")
+    @DeleteMapping(ApiPath.COMMENT_DELETE)
     fun deleteAnswer(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable commentId: ObjectId,
@@ -51,20 +52,20 @@ class CommentController(
     }
 
     @ApiOperation("댓글 좋아요")
-    @PostMapping("/{id}/like")
+    @PostMapping(ApiPath.COMMENT_LIKE)
     fun likeComment(
-        @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
+        @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable commentId: ObjectId
     ): ApiResponse<Boolean> {
-        commentLikeService.commentLike(id, user.id!!)
+        commentLikeService.commentLike(commentId, user.id!!)
         return ApiResponse.success(true)
     }
 
     @ApiOperation("댓글 좋아요 취소")
-    @DeleteMapping("/{id}/like")
+    @DeleteMapping(ApiPath.COMMENT_CANCEL_LIKE)
     fun unlikeComment(
-        @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
+        @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable commentId: ObjectId
     ): ApiResponse<Boolean> {
-        commentLikeService.commentUnlike(id, user.id!!)
+        commentLikeService.commentUnlike(commentId, user.id!!)
         return ApiResponse.success(true)
     }
 }

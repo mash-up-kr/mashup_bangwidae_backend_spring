@@ -3,18 +3,19 @@ package kr.mashup.bangwidae.asked.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.*
+import kr.mashup.bangwidae.asked.controller.path.ApiPath
 import kr.mashup.bangwidae.asked.service.auth.AuthService
 import org.springframework.web.bind.annotation.*
 
 @Api(tags = ["인증 컨트롤러"])
 @RestController
-@RequestMapping("/api/v1/auth")
+@RequestMapping(ApiPath.ROOT)
 class AuthController(
     private val authService: AuthService
 ) {
 
     @ApiOperation("로그인")
-    @PostMapping("/login")
+    @PostMapping(ApiPath.LOGIN)
     fun login(
         @RequestBody loginRequest: LoginRequest
     ): ApiResponse<LoginResponse> {
@@ -22,7 +23,7 @@ class AuthController(
     }
 
     @ApiOperation("인증메일 발송")
-    @PostMapping("/mail/send")
+    @PostMapping(ApiPath.CERT_MAIL_SEND)
     fun sendCertMail(
         @RequestBody certMailSendRequest: CertMailSendRequest
     ): ApiResponse<Boolean> {
@@ -31,7 +32,7 @@ class AuthController(
     }
 
     @ApiOperation("메일 인증")
-    @PostMapping("/mail/cert")
+    @PostMapping(ApiPath.CERT_MAIL)
     fun sendCertMail(
         @RequestBody certMailRequest: CertMailRequest
     ): ApiResponse<Boolean> {
@@ -40,7 +41,7 @@ class AuthController(
     }
 
     @ApiOperation("토큰 재발급")
-    @PostMapping("/issue/token")
+    @PostMapping(ApiPath.ISSUE_TOKEN)
     fun issueToken(
         @RequestBody issueTokenRequest: IssueTokenRequest
     ): ApiResponse<IssueTokenResponse> {
