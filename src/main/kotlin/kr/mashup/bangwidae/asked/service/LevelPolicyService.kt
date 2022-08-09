@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.service.question
+package kr.mashup.bangwidae.asked.service
 
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.repository.*

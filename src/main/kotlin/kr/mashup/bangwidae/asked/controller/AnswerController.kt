@@ -52,7 +52,7 @@ class AnswerController(
     fun likeAnswer(
         @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
     ): ApiResponse<Boolean> {
-        answerService.answerLike(id, user.id!!)
+        answerService.answerLike(id, user)
         return ApiResponse.success(true)
     }
 

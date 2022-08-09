@@ -10,6 +10,7 @@ import kr.mashup.bangwidae.asked.model.question.AnswerLike
 import kr.mashup.bangwidae.asked.repository.AnswerLikeRepository
 import kr.mashup.bangwidae.asked.repository.AnswerRepository
 import kr.mashup.bangwidae.asked.repository.QuestionRepository
+import kr.mashup.bangwidae.asked.service.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
@@ -46,7 +47,6 @@ class AnswerService(
                 latitude = request.latitude
             )
         }.getOrNull().let {
-            levelPolicyService.levelUpIfConditionSatisfied(user)
             return answerRepository.save(
                 Answer(
                     userId = user.id!!,
@@ -56,7 +56,9 @@ class AnswerService(
                     representativeAddress = it?.representativeAddress,
                     region = it,
                 )
-            )
+            ).also {
+                levelPolicyService.levelUpIfConditionSatisfied(user)
+            }
         }
     }
 
@@ -82,12 +84,14 @@ class AnswerService(
         }
     }
 
-    fun answerLike(answerId: ObjectId, userId: ObjectId) {
+    fun answerLike(answerId: ObjectId, user: User) {
         require(answerRepository.existsByIdAndDeletedFalse(answerId)) {
             throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
         }
-        if (!answerLikeRepository.existsByAnswerIdAndUserId(answerId, userId)) {
-            answerLikeRepository.save(AnswerLike(userId = userId, answerId = answerId))
+        if (!answerLikeRepository.existsByAnswerIdAndUserId(answerId, user.id!!)) {
+            answerLikeRepository.save(AnswerLike(userId = user.id, answerId = answerId)).also {
+                levelPolicyService.levelUpIfConditionSatisfied(user)
+            }
         }
     }
 

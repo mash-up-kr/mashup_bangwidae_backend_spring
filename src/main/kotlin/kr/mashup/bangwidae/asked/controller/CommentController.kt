@@ -55,7 +55,7 @@ class CommentController(
     fun likeComment(
         @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
     ): ApiResponse<Boolean> {
-        commentLikeService.commentLike(id, user.id!!)
+        commentLikeService.commentLike(id, user)
         return ApiResponse.success(true)
     }
 

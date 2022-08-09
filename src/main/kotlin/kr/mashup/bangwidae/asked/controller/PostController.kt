@@ -26,7 +26,7 @@ class PostController(
         @ApiIgnore @AuthenticationPrincipal user: User, @RequestBody postWriteRequest: PostWriteRequest
     ): ApiResponse<PostResultDto> {
         val post = postWriteRequest.toEntity(user.id!!)
-        return postService.write(post)
+        return postService.write(user, post)
             .let {
                 ApiResponse.success(PostResultDto.from(user, it))
             }
@@ -62,7 +62,7 @@ class PostController(
     fun likePost(
         @ApiIgnore @AuthenticationPrincipal user: User, @PathVariable id: ObjectId
     ): ApiResponse<Boolean> {
-        postLikeService.postLike(id, user.id!!)
+        postLikeService.postLike(id, user)
         return ApiResponse.success(true)
     }
 
