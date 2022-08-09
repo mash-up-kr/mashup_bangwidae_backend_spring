@@ -18,25 +18,39 @@ class QuestionController(
     private val questionService: QuestionService,
     private val answerService: AnswerService,
 ) {
+    @ApiOperation("질문/답변 단건 조회")
+    @GetMapping("/{questionId}")
+    fun getDetailById(
+        @ApiIgnore @AuthenticationPrincipal user: User?,
+        @PathVariable questionId: ObjectId,
+    ): ApiResponse<QuestionDetailDto> {
+        return questionService.findDetailById(
+            authUser = user,
+            questionId = questionId,
+        ).let {
+            ApiResponse.success(
+                QuestionDetailDto.from(it)
+            )
+        }
+    }
+
     @ApiOperation("답변완료(본인 외 사용자)")
     @GetMapping("/answered")
     fun getMyAnsweredQuestions(
+        @ApiIgnore @AuthenticationPrincipal user: User?,
         @RequestParam userId: ObjectId,
         @RequestParam size: Int,
         @RequestParam(required = false) lastId: ObjectId?,
     ): ApiResponse<AnsweredQuestionsDto> {
         return questionService.findAnswerCompleteByToUser(
-            userId = userId,
+            authUser = user,
+            toUserID = userId,
             lastId = lastId,
             size = size + 1,
         ).let {
             ApiResponse.success(
                 AnsweredQuestionsDto.from(
-                    questions = it.questions,
-                    userMapByUserId = it.userMapByUserId,
-                    answerMapByQuestionId = it.answerMapByQuestionId,
-                    answerLikeCountMapByAnswerId = it.answerLikeCountMapByAnswerId,
-                    userAnswerLikeMapByAnswerId = it.userAnswerLikeMapByAnswerId,
+                    questions = it,
                     requestedSize = size,
                 )
             )

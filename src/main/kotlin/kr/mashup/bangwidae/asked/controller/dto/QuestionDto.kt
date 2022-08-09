@@ -1,10 +1,9 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
 import io.swagger.annotations.ApiModelProperty
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.question.Answer
-import kr.mashup.bangwidae.asked.model.question.AnswerLike
-import kr.mashup.bangwidae.asked.model.question.Question
+import kr.mashup.bangwidae.asked.service.question.AnswerDomain
+import kr.mashup.bangwidae.asked.service.question.QuestionDomain
+import kr.mashup.bangwidae.asked.service.question.QuestionUserDomain
 import org.bson.types.ObjectId
 import java.time.LocalDateTime
 import kotlin.math.min
@@ -38,6 +37,56 @@ data class AnswerEditRequest(
 )
 
 // Response
+data class QuestionDetailDto(
+    val id: String,
+    val content: String,
+    val representativeAddress: String?,
+    val anonymous: Boolean?,
+    val fromUser: QuestionUserDto,
+    val toUser: QuestionUserDto,
+    val answer: AnswerDto?,
+    val createdAt: LocalDateTime,
+) {
+    data class AnswerDto(
+        val id: String,
+        val content: String,
+        val representativeAddress: String?,
+        val user: QuestionUserDto,
+        val likeCount: Long,
+        val userLiked: Boolean,
+        val createdAt: LocalDateTime,
+    ) {
+        companion object {
+            fun from(answer: AnswerDomain): AnswerDto {
+                return AnswerDto(
+                    id = answer.id,
+                    content = answer.content,
+                    representativeAddress = answer.representativeAddress,
+                    user = QuestionUserDto.from(answer.user),
+                    likeCount = answer.likeCount,
+                    userLiked = answer.userLiked,
+                    createdAt = answer.createdAt,
+                )
+            }
+        }
+    }
+
+    companion object {
+        fun from(question: QuestionDomain): QuestionDetailDto {
+            return QuestionDetailDto(
+                id = question.id,
+                content = question.content,
+                representativeAddress = question.representativeAddress,
+                anonymous = question.anonymous,
+                fromUser = QuestionUserDto.from(question.fromUser),
+                toUser = QuestionUserDto.from(question.toUser),
+                answer = question.answer?.let { AnswerDto.from(question.answer) },
+                createdAt = question.createdAt,
+            )
+        }
+    }
+}
+
 data class AnsweredQuestionsDto(
     val questions: List<QuestionDto>,
     val hasNext: Boolean,
@@ -46,28 +95,23 @@ data class AnsweredQuestionsDto(
         val id: String,
         val content: String,
         val representativeAddress: String?,
+        val anonymous: Boolean?,
         val fromUser: QuestionUserDto,
         val toUser: QuestionUserDto,
         val answer: AnswerDto,
         val createdAt: LocalDateTime,
     ) {
         companion object {
-            fun from(
-                question: Question,
-                answer: Answer,
-                fromUser: User,
-                toUser: User,
-                answerLikeCount: Long,
-                answerLiked: Boolean
-            ): QuestionDto {
+            fun from(question: QuestionDomain): QuestionDto {
                 return QuestionDto(
-                    id = question.id!!.toHexString(),
+                    id = question.id,
                     content = question.content,
                     representativeAddress = question.representativeAddress,
-                    fromUser = if (question.anonymous == true) QuestionUserDto.anonymous(fromUser) else QuestionUserDto.from(fromUser),
-                    toUser = QuestionUserDto.from(toUser),
-                    answer = AnswerDto.from(answer, toUser, answerLikeCount, answerLiked),
-                    createdAt = question.createdAt!!,
+                    anonymous = question.anonymous,
+                    fromUser = QuestionUserDto.from(question.fromUser),
+                    toUser = QuestionUserDto.from(question.toUser),
+                    answer = AnswerDto.from(question.answer!!),
+                    createdAt = question.createdAt,
                 )
             }
         }
@@ -83,15 +127,15 @@ data class AnsweredQuestionsDto(
         val createdAt: LocalDateTime,
     ) {
         companion object {
-            fun from(answer: Answer, answerUser: User, likeCount: Long, userLiked: Boolean): AnswerDto {
+            fun from(answer: AnswerDomain): AnswerDto {
                 return AnswerDto(
-                    id = answer.id!!.toHexString(),
+                    id = answer.id,
                     content = answer.content,
                     representativeAddress = answer.representativeAddress,
-                    user = QuestionUserDto.from(answerUser),
-                    likeCount = likeCount,
-                    userLiked = userLiked,
-                    createdAt = answer.createdAt!!,
+                    user = QuestionUserDto.from(answer.user),
+                    likeCount = answer.likeCount,
+                    userLiked = answer.userLiked,
+                    createdAt = answer.createdAt,
                 )
             }
         }
@@ -99,26 +143,13 @@ data class AnsweredQuestionsDto(
 
     companion object {
         fun from(
-            questions: List<Question>,
-            userMapByUserId: Map<ObjectId, User>,
-            answerMapByQuestionId: Map<ObjectId, List<Answer>>,
-            answerLikeCountMapByAnswerId: Map<ObjectId, Long>,
-            userAnswerLikeMapByAnswerId: Map<ObjectId, AnswerLike>,
+            questions: List<QuestionDomain>,
             requestedSize: Int,
         ): AnsweredQuestionsDto {
             return AnsweredQuestionsDto(
-                questions = questions.subList(0, min(questions.size, requestedSize))
-                    .map {
-                        val answer = answerMapByQuestionId[it.id]!!.first()
-                        QuestionDto.from(
-                            question = it,
-                            answer = answer,
-                            fromUser = userMapByUserId[it.fromUserId]!!,
-                            toUser = userMapByUserId[answer.userId]!!,
-                            answerLikeCount = answerLikeCountMapByAnswerId[answer.id!!] ?: 0,
-                            answerLiked = userAnswerLikeMapByAnswerId[answer.id] != null
-                        )
-                    },
+                questions = questions
+                    .subList(0, min(questions.size, requestedSize))
+                    .map { QuestionDto.from(it) },
                 hasNext = questions.size > requestedSize
             )
         }
@@ -133,19 +164,21 @@ data class ReceivedQuestionsDto(
         val id: String,
         val content: String,
         val representativeAddress: String?,
+        val anonymous: Boolean?,
         val fromUser: QuestionUserDto,
         val toUser: QuestionUserDto,
         val createdAt: LocalDateTime,
     ) {
         companion object {
-            fun from(question: Question, fromUser: User, toUser: User): QuestionDto {
+            fun from(question: QuestionDomain): QuestionDto {
                 return QuestionDto(
-                    id = question.id!!.toHexString(),
+                    id = question.id,
                     content = question.content,
                     representativeAddress = question.representativeAddress,
-                    fromUser = if (question.anonymous == true) QuestionUserDto.anonymous(fromUser) else QuestionUserDto.from(fromUser),
-                    toUser = QuestionUserDto.from(toUser),
-                    createdAt = question.createdAt!!,
+                    anonymous = question.anonymous,
+                    fromUser = QuestionUserDto.from(question.fromUser),
+                    toUser = QuestionUserDto.from(question.toUser),
+                    createdAt = question.createdAt,
                 )
             }
         }
@@ -153,19 +186,13 @@ data class ReceivedQuestionsDto(
 
     companion object {
         fun from(
-            questions: List<Question>,
-            userMapByUserId: Map<ObjectId, User>,
+            questions: List<QuestionDomain>,
             requestedSize: Int,
         ): ReceivedQuestionsDto {
             return ReceivedQuestionsDto(
                 questions = questions.subList(0, min(questions.size, requestedSize))
-                    .map {
-                        QuestionDto.from(
-                            question = it,
-                            fromUser = userMapByUserId[it.fromUserId]!!,
-                            toUser = userMapByUserId[it.toUserId]!!
-                        )
-                    },
+                    .subList(0, min(questions.size, requestedSize))
+                    .map { QuestionDto.from(it) },
                 hasNext = questions.size > requestedSize
             )
         }
@@ -180,19 +207,21 @@ data class AskedQuestionsDto(
         val id: String,
         val content: String,
         val representativeAddress: String?,
+        val anonymous: Boolean?,
         val fromUser: QuestionUserDto,
         val toUser: QuestionUserDto,
         val createdAt: LocalDateTime,
     ) {
         companion object {
-            fun from(question: Question, fromUser: User, toUser: User): QuestionDto {
+            fun from(question: QuestionDomain): QuestionDto {
                 return QuestionDto(
-                    id = question.id!!.toHexString(),
+                    id = question.id,
                     content = question.content,
                     representativeAddress = question.representativeAddress,
-                    fromUser = if (question.anonymous == true) QuestionUserDto.anonymous(fromUser) else QuestionUserDto.from(fromUser),
-                    toUser = QuestionUserDto.from(toUser),
-                    createdAt = question.createdAt!!,
+                    anonymous = question.anonymous,
+                    fromUser = QuestionUserDto.from(question.fromUser),
+                    toUser = QuestionUserDto.from(question.toUser),
+                    createdAt = question.createdAt,
                 )
             }
         }
@@ -200,19 +229,13 @@ data class AskedQuestionsDto(
 
     companion object {
         fun from(
-            questions: List<Question>,
-            userMapByUserId: Map<ObjectId, User>,
+            questions: List<QuestionDomain>,
             requestedSize: Int,
         ): AskedQuestionsDto {
             return AskedQuestionsDto(
                 questions = questions.subList(0, min(questions.size, requestedSize))
-                    .map {
-                        QuestionDto.from(
-                            question = it,
-                            fromUser = userMapByUserId[it.fromUserId]!!,
-                            toUser = userMapByUserId[it.toUserId]!!
-                        )
-                    },
+                    .subList(0, min(questions.size, requestedSize))
+                    .map { QuestionDto.from(it) },
                 hasNext = questions.size > requestedSize
             )
         }
@@ -220,31 +243,18 @@ data class AskedQuestionsDto(
 }
 
 data class QuestionUserDto(
-    val anonymous: Boolean,
     val id: String,
     val nickname: String,
     val tags: List<String>,
     val profileImageUrl: String?,
 ) {
     companion object {
-        fun from(user: User): QuestionUserDto {
+        fun from(user: QuestionUserDomain): QuestionUserDto {
             return QuestionUserDto(
-                anonymous = false,
-                id = user.id!!.toHexString(),
-                nickname = user.nickname!!,
+                id = user.id,
+                nickname = user.nickname,
                 tags = user.tags,
-                profileImageUrl = user.profileImageUrl
-            )
-        }
-
-        fun anonymous(user: User): QuestionUserDto {
-            return QuestionUserDto(
-                anonymous = true,
-                id = user.id!!.toHexString(),
-                nickname = "익명",
-                tags = emptyList(),
-                // TODO 기본 익명 이미지 Url 로 설정
-                profileImageUrl = "default profileImageUrl"
+                profileImageUrl = user.profileImageUrl,
             )
         }
     }

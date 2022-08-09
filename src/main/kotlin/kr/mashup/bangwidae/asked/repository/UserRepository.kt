@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository
 @Repository
 interface UserRepository : MongoRepository<User, ObjectId> {
     fun findByEmail(email: String): User?
-    fun findAllByIdIn(idList: List<ObjectId>): List<User>
+    fun findAllByIdIn(idList: Collection<ObjectId>): List<User>
     fun findByNickname(nickname: String): User?
 }

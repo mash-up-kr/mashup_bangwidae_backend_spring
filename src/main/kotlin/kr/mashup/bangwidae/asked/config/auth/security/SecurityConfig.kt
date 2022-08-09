@@ -18,7 +18,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
 
 
@@ -47,10 +46,9 @@ class SecurityConfig {
                 "/api/v1/place/reverse/geocode",
                 "/api/v1/auth/mail/send",
                 "/api/v1/auth/mail/cert",
-
-                // 테스트를 위해 임시로 허용
-                "/api/v1/user/answered-questions",
-                "/api/v1/user/received-questions",
+                "/api/v1/questions/{questionId}",
+                "/api/v1/questions/answered",
+                "/api/v1/user/{userId}/link-share"
             ).permitAll()
             .antMatchers("/api/**").hasAuthority("ROLE")
         http.csrf().disable()

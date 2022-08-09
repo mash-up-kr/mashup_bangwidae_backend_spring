@@ -37,6 +37,22 @@ class UserController(
         return ApiResponse.success(UserInfoDto.from(userService.getUserInfo(userId)))
     }
 
+    @ApiOperation("유저 링크 공유")
+    @GetMapping("/{userId}/link-share")
+    fun getUserLinkShareInfo(
+        @ApiIgnore @AuthenticationPrincipal authUser: User?,
+        @PathVariable userId: ObjectId
+    ): ApiResponse<UserLinkShareInfoDto> {
+        val user = userService.getUserInfo(userId)
+        val questions = questionService.findAnswerCompleteByToUser(
+            authUser = authUser,
+            toUserID = userId,
+            lastId = null,
+            size = 2,
+        )
+        return ApiResponse.success(UserLinkShareInfoDto.from(user, questions))
+    }
+
     @ApiOperation("닉네임 설정")
     @PostMapping("/nickname")
     fun createNickname(
@@ -104,17 +120,14 @@ class UserController(
         @RequestParam(required = false) lastId: ObjectId?,
     ): ApiResponse<AnsweredQuestionsDto> {
         return questionService.findAnswerCompleteByToUser(
-            user = user,
+            authUser = user,
+            toUser = user,
             lastId = lastId,
             size = size + 1,
         ).let {
             ApiResponse.success(
                 AnsweredQuestionsDto.from(
-                    questions = it.questions,
-                    userMapByUserId = it.userMapByUserId,
-                    answerMapByQuestionId = it.answerMapByQuestionId,
-                    answerLikeCountMapByAnswerId = it.answerLikeCountMapByAnswerId,
-                    userAnswerLikeMapByAnswerId = it.userAnswerLikeMapByAnswerId,
+                    questions = it,
                     requestedSize = size,
                 )
             )
@@ -129,14 +142,13 @@ class UserController(
         @RequestParam(required = false) lastId: ObjectId?,
     ): ApiResponse<ReceivedQuestionsDto> {
         return questionService.findAnswerWaitingByToUser(
-            user = user,
+            toUser = user,
             lastId = lastId,
             size = size + 1,
         ).let {
             ApiResponse.success(
                 ReceivedQuestionsDto.from(
-                    questions = it.questions,
-                    userMapByUserId = it.userMapByUserId,
+                    questions = it,
                     requestedSize = size,
                 )
             )
@@ -151,14 +163,13 @@ class UserController(
         @RequestParam(required = false) lastId: ObjectId?,
     ): ApiResponse<AskedQuestionsDto> {
         return questionService.findByFromUser(
-            user = user,
+            fromUser = user,
             lastId = lastId,
             size = size + 1,
         ).let {
             ApiResponse.success(
                 AskedQuestionsDto.from(
-                    questions = it.questions,
-                    userMapByUserId = it.userMapByUserId,
+                    questions = it,
                     requestedSize = size,
                 )
             )
