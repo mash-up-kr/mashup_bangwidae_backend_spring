@@ -48,6 +48,7 @@ class SecurityConfig {
                 "/api/v1/auth/mail/cert",
                 "/api/v1/questions/{questionId}",
                 "/api/v1/questions/answered",
+                "/api/v1/user/{userId}/link-share"
             ).permitAll()
             .antMatchers("/api/**").hasAuthority("ROLE")
         http.csrf().disable()
