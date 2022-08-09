@@ -88,3 +88,27 @@ data class UpdateProfileRequest(
     val description: String,
     val tags: List<String>,
 )
+
+data class UserSettingsDto(
+    val userId: String,
+    val notification: Boolean,
+    val nightNotification: Boolean,
+    val locationInfo: Boolean,
+) {
+    companion object {
+        fun from(user: User): UserSettingsDto {
+            return UserSettingsDto(
+                userId = user.id!!.toHexString(),
+                notification = user.settings.notification,
+                nightNotification = user.settings.nightNotification,
+                locationInfo = user.settings.locationInfo,
+            )
+        }
+    }
+}
+
+data class EditUserSettingsRequest(
+    val notification: Boolean,
+    val nightNotification: Boolean,
+    val locationInfo: Boolean,
+)

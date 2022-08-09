@@ -175,4 +175,24 @@ class UserController(
             )
         }
     }
+
+    @ApiOperation("유저 설정 정보")
+    @GetMapping("/settings")
+    fun getUserSettings(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+    ): ApiResponse<UserSettingsDto> {
+        return UserSettingsDto.from(user)
+            .let { ApiResponse.success(it) }
+    }
+
+    @ApiOperation("유저 설정 변경")
+    @PutMapping("/settings")
+    fun editUserSettings(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @RequestBody editUserSettingsRequest: EditUserSettingsRequest,
+    ): ApiResponse<UserSettingsDto> {
+        return userService.editUserSettings(user, editUserSettingsRequest)
+            .let { UserSettingsDto.from(it) }
+            .let { ApiResponse.success(it) }
+    }
 }

@@ -23,6 +23,7 @@ data class User(
     val tags: List<String> = emptyList(),
     val profileImageUrl: String? = null,
     val refreshToken: String? = null,
+    val settings: UserSettings = UserSettings(),
 
     @Version var version: Int? = null,
     @CreatedDate var createdAt: LocalDateTime? = null,
@@ -51,6 +52,12 @@ data class User(
         )
     }
 
+    fun updateSettings(userSettings: UserSettings): User {
+        return this.copy(
+            settings = userSettings
+        )
+    }
+
     fun getAnonymousUser(): User {
         return this.copy(nickname = "익명", profileImageUrl = DEFAULT_PROFILE_IMAGE_URL)
     }
@@ -75,6 +82,12 @@ data class User(
         }
     }
 }
+
+data class UserSettings(
+    val notification: Boolean = false,
+    val nightNotification: Boolean = false,
+    val locationInfo: Boolean = false,
+)
 
 @ApiModel
 enum class LoginType {

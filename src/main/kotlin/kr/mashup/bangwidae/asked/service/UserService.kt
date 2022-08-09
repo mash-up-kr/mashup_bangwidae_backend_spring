@@ -2,12 +2,14 @@ package kr.mashup.bangwidae.asked.service
 
 import kr.mashup.bangwidae.asked.config.auth.jwt.JwtService
 import kr.mashup.bangwidae.asked.config.auth.password.PasswordService
+import kr.mashup.bangwidae.asked.controller.dto.EditUserSettingsRequest
 import kr.mashup.bangwidae.asked.controller.dto.JoinUserRequest
 import kr.mashup.bangwidae.asked.controller.dto.JoinUserResponse
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.external.aws.S3ImageUploader
 import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.UserSettings
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.question.QuestionService
 import org.bson.types.ObjectId
@@ -112,6 +114,15 @@ class UserService(
         if (user != null) {
             throw DoriDoriException.of(DoriDoriExceptionType.DUPLICATED_NICKNAME)
         }
+    }
+
+    fun editUserSettings(user: User, editUserSettingsRequest: EditUserSettingsRequest): User {
+        val newSettings = UserSettings(
+            notification = editUserSettingsRequest.notification,
+            nightNotification = editUserSettingsRequest.nightNotification,
+            locationInfo = editUserSettingsRequest.locationInfo,
+        )
+        return userRepository.save(user.updateSettings(newSettings))
     }
 }
 
