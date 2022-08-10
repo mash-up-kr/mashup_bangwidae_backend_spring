@@ -15,6 +15,7 @@ import java.time.LocalDateTime
 class WardService(
     private val wardRepository: WardRepository,
     private val levelPolicyRepository: LevelPolicyRepository,
+    private val levelPolicyService: LevelPolicyService
 ) {
     fun createWard(user: User, name: String, longitude: Double, latitude: Double): Boolean {
         val userLevelPolicy = levelPolicyRepository.findByLevel(user.level)
@@ -30,6 +31,7 @@ class WardService(
             location = GeoUtils.geoJsonPoint(longitude, latitude)
         )
         wardRepository.save(ward)
+        levelPolicyService.levelUpIfConditionSatisfied(user)
         return true
     }
 

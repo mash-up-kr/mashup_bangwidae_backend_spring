@@ -15,7 +15,7 @@ data class LevelPolicy (
     val wardCount: Int,
 ) {
     fun isSatisfiedLevelUp(userWardCount: Int, userAnswerCount: Int, userQuestionCount: Int): Boolean {
-        return userWardCount >= wardCount &&
+        return userWardCount >= wardCountCondition &&
                 userAnswerCount >= answerCountCondition &&
                 userQuestionCount >= questionCountCondition
     }

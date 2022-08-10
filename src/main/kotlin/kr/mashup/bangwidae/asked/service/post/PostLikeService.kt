@@ -2,6 +2,7 @@ package kr.mashup.bangwidae.asked.service.post
 
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
+import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.model.post.PostLike
 import kr.mashup.bangwidae.asked.repository.PostLikeRepository
@@ -12,14 +13,14 @@ import org.springframework.stereotype.Service
 @Service
 class PostLikeService(
     private val postLikeRepository: PostLikeRepository,
-    private val postRepository: PostRepository
+    private val postRepository: PostRepository,
 ) {
-    fun postLike(postId: ObjectId, userId: ObjectId) {
+    fun postLike(postId: ObjectId, user: User) {
         require(postRepository.existsByIdAndDeletedFalse(postId)) {
             throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
         }
-        if (!postLikeRepository.existsByPostIdAndUserId(postId, userId)) {
-            postLikeRepository.save(PostLike(userId = userId, postId = postId))
+        if (!postLikeRepository.existsByPostIdAndUserId(postId, user.id!!)) {
+            postLikeRepository.save(PostLike(userId = user.id, postId = postId))
         }
     }
 

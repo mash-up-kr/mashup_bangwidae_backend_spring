@@ -7,6 +7,7 @@ import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.question.Question
 import kr.mashup.bangwidae.asked.model.question.QuestionStatus
 import kr.mashup.bangwidae.asked.repository.*
+import kr.mashup.bangwidae.asked.service.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
@@ -137,7 +138,6 @@ class QuestionService(
                 latitude = request.latitude
             )
         }.getOrNull().let {
-            levelPolicyService.levelUpIfConditionSatisfied(user)
             return questionRepository.save(
                 Question(
                     fromUserId = user.id!!,
@@ -148,7 +148,9 @@ class QuestionService(
                     representativeAddress = it?.representativeAddress,
                     region = it,
                 )
-            )
+            ).also {
+                levelPolicyService.levelUpIfConditionSatisfied(user)
+            }
         }
     }
 

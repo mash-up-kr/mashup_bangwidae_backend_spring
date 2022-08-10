@@ -2,6 +2,7 @@ package kr.mashup.bangwidae.asked.service.post
 
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
+import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Comment
 import kr.mashup.bangwidae.asked.model.post.CommentLike
 import kr.mashup.bangwidae.asked.repository.CommentLikeRepository
@@ -12,14 +13,14 @@ import org.springframework.stereotype.Service
 @Service
 class CommentLikeService(
     private val commentLikeRepository: CommentLikeRepository,
-    private val commentRepository: CommentRepository
+    private val commentRepository: CommentRepository,
 ) {
-    fun commentLike(commentId: ObjectId, userId: ObjectId) {
+    fun commentLike(commentId: ObjectId, user: User) {
         require(commentRepository.existsByIdAndDeletedFalse(commentId)) {
             throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
         }
-        if (!commentLikeRepository.existsByCommentIdAndUserId(commentId, userId)) {
-            commentLikeRepository.save(CommentLike(userId = userId, commentId = commentId))
+        if (!commentLikeRepository.existsByCommentIdAndUserId(commentId, user.id!!)) {
+            commentLikeRepository.save(CommentLike(userId = user.id, commentId = commentId))
         }
     }
 

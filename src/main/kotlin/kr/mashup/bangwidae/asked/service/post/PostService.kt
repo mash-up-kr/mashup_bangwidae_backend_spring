@@ -8,6 +8,7 @@ import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
+import kr.mashup.bangwidae.asked.service.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import kr.mashup.bangwidae.asked.utils.getLatitude
@@ -25,15 +26,18 @@ class PostService(
     private val placeService: PlaceService,
     private val userRepository: UserRepository,
     private val postLikeService: PostLikeService,
-    private val commentService: CommentService
+    private val commentService: CommentService,
+    private val levelPolicyService: LevelPolicyService
 ) : WithPostAuthorityValidator {
     fun findById(id: ObjectId): Post {
         return postRepository.findByIdAndDeletedFalse(id)
             ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
     }
 
-    fun write(post: Post): Post {
-        return postRepository.save(updatePlaceInfo(post))
+    fun write(user: User, post: Post): Post {
+        return postRepository.save(updatePlaceInfo(post)).also {
+            levelPolicyService.levelUpIfConditionSatisfied(user)
+        }
     }
 
     fun edit(user: User, postId: ObjectId, request: PostEditRequest): Post {
