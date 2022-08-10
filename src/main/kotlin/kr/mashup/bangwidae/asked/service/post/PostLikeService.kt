@@ -7,7 +7,6 @@ import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.model.post.PostLike
 import kr.mashup.bangwidae.asked.repository.PostLikeRepository
 import kr.mashup.bangwidae.asked.repository.PostRepository
-import kr.mashup.bangwidae.asked.service.LevelPolicyService
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 
@@ -15,16 +14,13 @@ import org.springframework.stereotype.Service
 class PostLikeService(
     private val postLikeRepository: PostLikeRepository,
     private val postRepository: PostRepository,
-    private val levelPolicyService: LevelPolicyService,
 ) {
     fun postLike(postId: ObjectId, user: User) {
         require(postRepository.existsByIdAndDeletedFalse(postId)) {
             throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
         }
         if (!postLikeRepository.existsByPostIdAndUserId(postId, user.id!!)) {
-            postLikeRepository.save(PostLike(userId = user.id, postId = postId)).also {
-                levelPolicyService.levelUpIfConditionSatisfied(user)
-            }
+            postLikeRepository.save(PostLike(userId = user.id, postId = postId))
         }
     }
 

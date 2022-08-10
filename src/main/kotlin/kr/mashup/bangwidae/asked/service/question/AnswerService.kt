@@ -89,9 +89,7 @@ class AnswerService(
             throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
         }
         if (!answerLikeRepository.existsByAnswerIdAndUserId(answerId, user.id!!)) {
-            answerLikeRepository.save(AnswerLike(userId = user.id, answerId = answerId)).also {
-                levelPolicyService.levelUpIfConditionSatisfied(user)
-            }
+            answerLikeRepository.save(AnswerLike(userId = user.id, answerId = answerId))
         }
     }
 

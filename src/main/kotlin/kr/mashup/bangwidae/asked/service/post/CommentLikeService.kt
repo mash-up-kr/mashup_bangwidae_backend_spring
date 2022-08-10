@@ -7,7 +7,6 @@ import kr.mashup.bangwidae.asked.model.post.Comment
 import kr.mashup.bangwidae.asked.model.post.CommentLike
 import kr.mashup.bangwidae.asked.repository.CommentLikeRepository
 import kr.mashup.bangwidae.asked.repository.CommentRepository
-import kr.mashup.bangwidae.asked.service.LevelPolicyService
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 
@@ -15,16 +14,13 @@ import org.springframework.stereotype.Service
 class CommentLikeService(
     private val commentLikeRepository: CommentLikeRepository,
     private val commentRepository: CommentRepository,
-    private val levelPolicyService: LevelPolicyService,
 ) {
     fun commentLike(commentId: ObjectId, user: User) {
         require(commentRepository.existsByIdAndDeletedFalse(commentId)) {
             throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
         }
         if (!commentLikeRepository.existsByCommentIdAndUserId(commentId, user.id!!)) {
-            commentLikeRepository.save(CommentLike(userId = user.id, commentId = commentId)).also {
-                levelPolicyService.levelUpIfConditionSatisfied(user)
-            }
+            commentLikeRepository.save(CommentLike(userId = user.id, commentId = commentId))
         }
     }
 
