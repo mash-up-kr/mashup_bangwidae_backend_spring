@@ -6,16 +6,16 @@ import kr.mashup.bangwidae.asked.service.question.QuestionDomain
 
 data class UserInfoDto(
     val userId: String,
-    val nickname: String,
-    val profileDescription: String,
+    val nickname: String?,
+    val profileDescription: String?,
     val tags: List<String>,
 ) {
     companion object {
         fun from(user: User): UserInfoDto {
             return UserInfoDto(
                 userId = user.id!!.toHexString(),
-                nickname = user.nickname!!,
-                profileDescription = user.description!!,
+                nickname = user.nickname,
+                profileDescription = user.description,
                 tags = user.tags,
             )
         }
