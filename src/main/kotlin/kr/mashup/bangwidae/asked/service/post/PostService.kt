@@ -97,7 +97,6 @@ class PostService(
         val longitude = post.location.getLongitude()
         val latitude = post.location.getLatitude()
         val region = placeService.reverseGeocode(longitude, latitude)
-        val representativeAddress = placeService.getRepresentativeAddress(longitude, latitude)
-        return post.copy(representativeAddress = representativeAddress, region = region)
+        return post.copy(representativeAddress = region.representativeAddress, region = region)
     }
 }
