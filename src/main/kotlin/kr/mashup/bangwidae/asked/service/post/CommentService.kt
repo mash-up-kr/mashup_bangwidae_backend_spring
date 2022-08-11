@@ -8,7 +8,6 @@ import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Comment
 import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.repository.CommentRepository
-import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service
 @Service
 class CommentService(
     private val commentRepository: CommentRepository,
-    private val postRepository: PostRepository,
     private val userRepository: UserRepository,
     private val placeService: PlaceService,
     private val commentLikeService: CommentLikeService,
@@ -59,10 +57,7 @@ class CommentService(
         return commentList.groupingBy { it.postId }.eachCount()
     }
 
-    fun write(user: User, postId: ObjectId, comment: Comment): Comment {
-        postRepository.findByIdAndDeletedFalse(postId)
-            ?.also { it.validateToComment(user) }
-            ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+    fun write(user: User, comment: Comment): Comment {
         return commentRepository.save(updatePlaceInfo(comment)).also {
             levelPolicyService.levelUpIfConditionSatisfied(user)
         }
