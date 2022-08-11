@@ -78,7 +78,7 @@ data class QuestionUserDomain(
             id = user.id!!.toString(),
             nickname = user.nickname!!,
             tags = user.tags,
-            profileImageUrl = user.profileImageUrl,
+            profileImageUrl = user.getUserProfileImageUrl(),
             level = user.level
         )
     }
