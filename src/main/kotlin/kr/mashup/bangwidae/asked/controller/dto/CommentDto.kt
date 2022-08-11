@@ -119,7 +119,7 @@ data class CommentWriter(
                 id = user.id!!.toHexString(),
                 tags = user.tags,
                 nickname = user.nickname!!,
-                profileImageUrl = user.profileImageUrl,
+                profileImageUrl = user.getUserProfileImageUrl(),
                 level = user.level
             )
         }
