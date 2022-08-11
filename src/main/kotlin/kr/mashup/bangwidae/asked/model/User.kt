@@ -59,7 +59,7 @@ data class User(
     }
 
     fun getAnonymousUser(): User {
-        return this.copy(nickname = "익명", profileImageUrl = DEFAULT_PROFILE_IMAGE_URL)
+        return this.copy(nickname = "익명", profileImageUrl = DEFAULT_PROFILE_IMAGE_URL, level = 1)
     }
 
     fun levelUp(): User {
