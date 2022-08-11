@@ -14,6 +14,7 @@ data class CommentWriteRequest(
     val longitude: Double,
     @ApiModelProperty(value = "위도", example = "36.4")
     val latitude: Double,
+    @ApiModelProperty(value = "익명 여부", example = "true || null || false")
     val anonymous: Boolean?
 ) {
     fun toEntity(userId: ObjectId, postId: ObjectId): Comment {
