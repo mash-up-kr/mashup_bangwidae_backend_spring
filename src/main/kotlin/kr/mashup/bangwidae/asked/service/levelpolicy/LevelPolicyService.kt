@@ -45,6 +45,7 @@ class LevelPolicyService(
         val commentAnswerCount = commentRepository.countAllByUserIdAndDeletedFalse(user.id)
         val postQuestionCount = postRepository.countAllByUserIdAndDeletedFalse(user.id)
         return UserAchievement(
+            userLevel = user.level,
             userWardCount = wardCount,
             userAnswerCount = answerCount + commentAnswerCount,
             userQuestionCount = questionCount + postQuestionCount
