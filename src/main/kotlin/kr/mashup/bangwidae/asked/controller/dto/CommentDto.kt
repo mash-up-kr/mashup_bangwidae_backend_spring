@@ -108,15 +108,18 @@ data class CommentWriter(
     @ApiModelProperty(value = "User 닉네임", example = "noname")
     val nickname: String,
     @ApiModelProperty(value = "글 작성자 프로필 이미지", example = "http://image.com")
-    val profileImageUrl: String?
+    val profileImageUrl: String?,
+    @ApiModelProperty(value = "User 레벨", example = "13")
+    val level: Int
 ) {
     companion object {
-        fun from(user: User) : CommentWriter {
+        fun from(user: User): CommentWriter {
             return CommentWriter(
                 id = user.id!!.toHexString(),
                 tags = user.tags,
                 nickname = user.nickname!!,
-                profileImageUrl = user.profileImageUrl
+                profileImageUrl = user.profileImageUrl,
+                level = user.level
             )
         }
     }
