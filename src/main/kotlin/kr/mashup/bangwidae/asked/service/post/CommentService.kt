@@ -32,7 +32,7 @@ class CommentService(
     }
 
     fun getCommentsByPostId(
-        userId: ObjectId, postId: ObjectId, lastId: ObjectId?, size: Int
+        user: User?, postId: ObjectId, lastId: ObjectId?, size: Int
     ): List<CommentDto> {
         val commentList = commentRepository.findByPostIdAndIdBeforeAndDeletedFalseOrderByIdDesc(
             postId,
@@ -42,12 +42,13 @@ class CommentService(
         val userIdList = commentList.map { it.userId }.distinct()
         val userMap = userRepository.findAllByIdIn(userIdList).associateBy { it.id }
         val likeMap = commentLikeService.getLikeMap(commentList)
-        return commentList.map {
+        return commentList.map { comment ->
             CommentDto.from(
-                user = userMap[it.userId]!!,
-                comment = it,
-                likeCount = likeMap[it.id]?.size ?: 0,
-                userLiked = likeMap[it.id]?.map { like -> like.userId }?.contains(userId) ?: false
+                user = userMap[comment.userId]!!,
+                comment = comment,
+                likeCount = likeMap[comment.id]?.size ?: 0,
+                userLiked = if (user == null) false
+                else likeMap[comment.id]?.map { like -> like.userId }?.contains(user.id) ?: false
             )
         }
     }

@@ -52,7 +52,7 @@ class PostService(
     }
 
     fun getNearPost(
-        userId: ObjectId, longitude: Double, latitude: Double, meterDistance: Double, lastId: ObjectId?, size: Int
+        user: User?, longitude: Double, latitude: Double, meterDistance: Double, lastId: ObjectId?, size: Int
     ): List<PostDto> {
         val location = GeoUtils.geoJsonPoint(longitude, latitude)
         val distance = Distance(meterDistance / 1000, Metrics.KILOMETERS)
@@ -67,29 +67,31 @@ class PostService(
         val likeMap = postLikeService.getLikeMap(postList)
         val commentCountMap = commentService.getCommentCountMap(postList)
 
-        return postList.map {
+        return postList.map { post ->
             PostDto.from(
-                user = userMap[it.userId]!!,
-                post = it,
-                likeCount = likeMap[it.id]?.size ?: 0,
-                commentCount = commentCountMap[it.id] ?: 0,
-                userLiked = likeMap[it.id]?.map { like -> like.userId }?.contains(userId) ?: false
+                user = userMap[post.userId]!!,
+                post = post,
+                likeCount = likeMap[post.id]?.size ?: 0,
+                commentCount = commentCountMap[post.id] ?: 0,
+                userLiked = if (user == null) false
+                else likeMap[post.id]?.map { like -> like.userId }?.contains(user.id) ?: false
             )
         }
     }
 
-    fun getPostById(userId: ObjectId, id: ObjectId): PostDto {
+    fun getPostById(user: User?, id: ObjectId): PostDto {
         val post = findById(id)
-        val user = userRepository.findByIdOrNull(post.userId)
+        val writer = userRepository.findByIdOrNull(post.userId)
             ?: throw DoriDoriException.of(DoriDoriExceptionType.POST_WRITER_USER_NOT_EXIST)
         val likeMap = postLikeService.getLikeMap(listOf(post))
         val commentCountMap = commentService.getCommentCountMap(listOf(post))
         return PostDto.from(
-            user = user,
+            user = writer,
             post = post,
             likeCount = likeMap[post.id]?.size ?: 0,
             commentCount = commentCountMap[post.id] ?: 0,
-            userLiked = likeMap[post.id]?.map { like -> like.userId }?.contains(userId) ?: false
+            userLiked = if (user == null) false
+            else likeMap[post.id]?.map { like -> like.userId }?.contains(user.id) ?: false
         )
     }
 

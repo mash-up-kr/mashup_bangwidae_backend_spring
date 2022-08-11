@@ -78,26 +78,26 @@ class PostController(
     @ApiOperation("거리 반경 포스트 글 페이징")
     @GetMapping("/near")
     fun getNearPosts(
-        @ApiIgnore @AuthenticationPrincipal user: User,
+        @ApiIgnore @AuthenticationPrincipal user: User?,
         @RequestParam longitude: Double,
         @RequestParam latitude: Double,
         @RequestParam meterDistance: Double,
         @RequestParam size: Int,
         @RequestParam(required = false) lastId: ObjectId?
     ): ApiResponse<CursorResult<PostDto>> {
-        return postService.getNearPost(user.id!!, longitude, latitude, meterDistance, lastId, size + 1)
+        return postService.getNearPost(user, longitude, latitude, meterDistance, lastId, size + 1)
             .let {
                 ApiResponse.success(CursorResult.from(values = it, requestedSize = size))
             }
     }
 
     @ApiOperation("포스트 글 조회")
-    @GetMapping("/{id}")
+    @GetMapping("/{postId}")
     fun getPostById(
-        @ApiIgnore @AuthenticationPrincipal user: User,
-        @PathVariable id: ObjectId
+        @ApiIgnore @AuthenticationPrincipal user: User?,
+        @PathVariable postId: ObjectId
     ): ApiResponse<PostDto> {
-        return postService.getPostById(user.id!!, id)
+        return postService.getPostById(user, postId)
             .let {
                 ApiResponse.success(it)
             }
@@ -115,15 +115,15 @@ class PostController(
         }
     }
 
-    @ApiOperation("댓글 조희 페이징")
+    @ApiOperation("댓글 조회 페이징")
     @GetMapping("/{postId}/comment")
     fun getComments(
-        @ApiIgnore @AuthenticationPrincipal user: User,
+        @ApiIgnore @AuthenticationPrincipal user: User?,
         @PathVariable postId: ObjectId,
         @RequestParam size: Int,
         @RequestParam(required = false) lastId: ObjectId?
     ): ApiResponse<CursorResult<CommentDto>> {
-        return commentService.getCommentsByPostId(user.id!!, postId, lastId, size + 1)
+        return commentService.getCommentsByPostId(user, postId, lastId, size + 1)
             .let {
                 ApiResponse.success(CursorResult.from(values = it, requestedSize = size))
             }
