@@ -247,6 +247,7 @@ data class QuestionUserDto(
     val nickname: String,
     val tags: List<String>,
     val profileImageUrl: String?,
+    val level: Int
 ) {
     companion object {
         fun from(user: QuestionUserDomain): QuestionUserDto {
@@ -255,6 +256,7 @@ data class QuestionUserDto(
                 nickname = user.nickname,
                 tags = user.tags,
                 profileImageUrl = user.profileImageUrl,
+                level = user.level
             )
         }
     }
