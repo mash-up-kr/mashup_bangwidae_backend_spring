@@ -10,7 +10,7 @@ import kr.mashup.bangwidae.asked.model.question.AnswerLike
 import kr.mashup.bangwidae.asked.repository.AnswerLikeRepository
 import kr.mashup.bangwidae.asked.repository.AnswerRepository
 import kr.mashup.bangwidae.asked.repository.QuestionRepository
-import kr.mashup.bangwidae.asked.service.LevelPolicyService
+import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
