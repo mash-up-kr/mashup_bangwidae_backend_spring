@@ -6,6 +6,7 @@ import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.Ward
 import kr.mashup.bangwidae.asked.repository.LevelPolicyRepository
 import kr.mashup.bangwidae.asked.repository.WardRepository
+import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service

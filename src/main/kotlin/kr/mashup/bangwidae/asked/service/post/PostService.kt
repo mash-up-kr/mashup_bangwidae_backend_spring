@@ -8,7 +8,7 @@ import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
-import kr.mashup.bangwidae.asked.service.LevelPolicyService
+import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import kr.mashup.bangwidae.asked.utils.getLatitude

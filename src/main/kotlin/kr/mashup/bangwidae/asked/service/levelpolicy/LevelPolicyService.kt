@@ -1,5 +1,8 @@
-package kr.mashup.bangwidae.asked.service
+package kr.mashup.bangwidae.asked.service.levelpolicy
 
+import kr.mashup.bangwidae.asked.exception.DoriDoriException
+import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
+import kr.mashup.bangwidae.asked.model.LevelPolicy
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.repository.*
 import org.springframework.stereotype.Service
@@ -19,20 +22,32 @@ class LevelPolicyService(
         // 다음 레벨 policy 없으면 만렙임
         val policy = levelPolicyRepository.findByLevel(user.level + 1) ?: return
 
-        val wardCount = wardRepository.countAllByUserId(user.id!!)
-        val answerCount = answerRepository.countAllByUserIdAndDeletedFalse(user.id)
-        val questionCount = questionRepository.countAllByFromUserIdAndDeletedFalse(user.id)
-        val commentAnswerCount = commentRepository.countAllByUserIdAndDeletedFalse(user.id)
-        val postQuestionCount = postRepository.countAllByUserIdAndDeletedFalse(user.id)
-
+        val userAchievement = getUserAchievement(user)
         val satisfiedLevelUp = policy.isSatisfiedLevelUp(
-            userWardCount = wardCount,
-            userAnswerCount = answerCount + commentAnswerCount,
-            userQuestionCount = questionCount + postQuestionCount
+            userWardCount = userAchievement.userWardCount,
+            userAnswerCount = userAchievement.userAnswerCount,
+            userQuestionCount = userAchievement.userQuestionCount
         )
 
         if (satisfiedLevelUp) {
             userRepository.save(user.levelUp())
         }
+    }
+
+    fun getLevelPolicy(level: Int): LevelPolicy {
+        return levelPolicyRepository.findByLevel(level) ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+    }
+
+    fun getUserAchievement(user: User): UserAchievement {
+        val wardCount = wardRepository.countAllByUserId(user.id!!)
+        val answerCount = answerRepository.countAllByUserIdAndDeletedFalse(user.id)
+        val questionCount = questionRepository.countAllByFromUserIdAndDeletedFalse(user.id)
+        val commentAnswerCount = commentRepository.countAllByUserIdAndDeletedFalse(user.id)
+        val postQuestionCount = postRepository.countAllByUserIdAndDeletedFalse(user.id)
+        return UserAchievement(
+            userWardCount = wardCount,
+            userAnswerCount = answerCount + commentAnswerCount,
+            userQuestionCount = questionCount + postQuestionCount
+        )
     }
 }
