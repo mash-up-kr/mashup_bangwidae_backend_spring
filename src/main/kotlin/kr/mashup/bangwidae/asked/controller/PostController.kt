@@ -110,11 +110,7 @@ class PostController(
         @PathVariable postId: ObjectId,
         @RequestBody commentWriteRequest: CommentWriteRequest,
     ): ApiResponse<CommentResultDto> {
-        return commentService.write(
-            user = user,
-            postId = postId,
-            comment = commentWriteRequest.toEntity(user.id!!, postId)
-        ).let {
+        return commentService.write(user = user, comment = commentWriteRequest.toEntity(user.id!!, postId)).let {
             ApiResponse.success(CommentResultDto.from(user, it))
         }
     }
