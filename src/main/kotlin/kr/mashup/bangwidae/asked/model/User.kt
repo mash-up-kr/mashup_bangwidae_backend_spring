@@ -62,9 +62,8 @@ data class User(
         return this.copy(nickname = "익명", profileImageUrl = DEFAULT_PROFILE_IMAGE_URL, level = 1)
     }
 
-    fun getUserProfileImageUrl(): String {
-        return profileImageUrl ?: DEFAULT_PROFILE_IMAGE_URL
-    }
+    val userProfileImageUrl: String
+        get() = profileImageUrl ?: DEFAULT_PROFILE_IMAGE_URL
 
     fun levelUp(): User {
         return this.copy(
