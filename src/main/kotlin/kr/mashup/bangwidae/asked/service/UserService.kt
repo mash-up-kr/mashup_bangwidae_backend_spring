@@ -16,6 +16,7 @@ import org.bson.types.ObjectId
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserService(
@@ -24,7 +25,8 @@ class UserService(
     private val certMailService: CertMailService,
     private val passwordService: PasswordService,
     private val questionService: QuestionService,
-    private val s3ImageUploader: S3ImageUploader
+    private val s3ImageUploader: S3ImageUploader,
+    private val wardService: WardService
 ) {
 
     fun joinUser(joinUserRequest: JoinUserRequest): JoinUserResponse {
@@ -76,10 +78,10 @@ class UserService(
         return true
     }
 
-    fun updateProfile(user: User, description: String, tags: List<String>): Boolean {
-        userRepository.save(
-            user.updateProfile(description, tags)
-        )
+    @Transactional
+    fun updateProfile(user: User, description: String, tags: List<String>, representativeWardId: ObjectId?): Boolean {
+        userRepository.save(user.updateProfile(description, tags))
+        wardService.updateRepresentativeWard(user, representativeWardId)
         return true
     }
 

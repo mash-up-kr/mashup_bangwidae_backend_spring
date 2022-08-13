@@ -21,6 +21,7 @@ data class Ward(
     val expiredAt: LocalDateTime,
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     val location: GeoJsonPoint,
+    val isRepresentative: Boolean? = false,
     @Version var version: Int? = null,
     @CreatedDate var createdAt: LocalDateTime? = null,
     @LastModifiedDate var updatedAt: LocalDateTime? = null

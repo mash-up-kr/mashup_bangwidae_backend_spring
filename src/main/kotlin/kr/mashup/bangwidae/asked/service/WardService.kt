@@ -40,6 +40,10 @@ class WardService(
         return wardRepository.findAllByUserIdAndExpiredAtAfter(user.id!!, LocalDateTime.now())
     }
 
+    fun getMyRepresentativeWard(user: User): Ward? {
+        return getMyWards(user).firstOrNull { it.isRepresentative == true }
+    }
+
     fun deleteWard(user: User, wardId: ObjectId) {
         val ward = wardRepository.findById(wardId)
             .orElseThrow { DoriDoriException.of(DoriDoriExceptionType.WARD_NOT_FOUND) }
@@ -61,5 +65,9 @@ class WardService(
         return ward.extendPeriod(period).let {
             wardRepository.save(it)
         }
+    }
+
+    fun updateRepresentativeWard(user: User, wardId: ObjectId?) {
+        wardRepository.saveAll(getMyWards(user).map {it.copy(isRepresentative = (it.id == wardId))})
     }
 }
