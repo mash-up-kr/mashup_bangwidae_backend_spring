@@ -7,7 +7,9 @@ import org.springframework.stereotype.Repository
 import java.time.LocalDateTime
 
 @Repository
-interface WardRepository: MongoRepository<Ward, ObjectId> {
+interface WardRepository : MongoRepository<Ward, ObjectId> {
     fun countAllByUserId(userId: ObjectId): Int
     fun findAllByUserIdAndExpiredAtAfter(userId: ObjectId, expiredAt: LocalDateTime): List<Ward>
+    fun findWardByUserIdAndExpiredAtAfterAndIsRepresentativeTrue(userId: ObjectId, expiredAt: LocalDateTime): Ward?
+    fun findWardByIdAndExpiredAtAfter(wardId: ObjectId, expiredAt: LocalDateTime): Ward?
 }

@@ -40,10 +40,6 @@ class WardService(
         return wardRepository.findAllByUserIdAndExpiredAtAfter(user.id!!, LocalDateTime.now())
     }
 
-    fun getMyRepresentativeWard(user: User): Ward? {
-        return getMyWards(user).firstOrNull { it.isRepresentative == true }
-    }
-
     fun deleteWard(user: User, wardId: ObjectId) {
         val ward = wardRepository.findById(wardId)
             .orElseThrow { DoriDoriException.of(DoriDoriExceptionType.WARD_NOT_FOUND) }
@@ -51,7 +47,7 @@ class WardService(
         if (ward.userId != user.id!!) {
             throw DoriDoriException.of(DoriDoriExceptionType.NOT_ALLOWED_TO_ACCESS)
         }
-        
+
         wardRepository.delete(ward)
     }
 
@@ -67,7 +63,16 @@ class WardService(
         }
     }
 
-    fun updateRepresentativeWard(user: User, wardId: ObjectId?) {
-        wardRepository.saveAll(getMyWards(user).map {it.copy(isRepresentative = (it.id == wardId))})
+    fun getMyRepresentativeWard(user: User): Ward? {
+        return wardRepository.findWardByUserIdAndExpiredAtAfterAndIsRepresentativeTrue(user.id!!, LocalDateTime.now())
+    }
+
+    fun updateRepresentativeWard(user: User, representativeWardId: ObjectId?) {
+        getMyRepresentativeWard(user)?.let { wardRepository.save(it.copy(isRepresentative = false)) }
+        if (representativeWardId != null) {
+            wardRepository.findWardByIdAndExpiredAtAfter(representativeWardId, LocalDateTime.now())?.let {
+                wardRepository.save(it.copy(isRepresentative = true))
+            }
+        }
     }
 }
