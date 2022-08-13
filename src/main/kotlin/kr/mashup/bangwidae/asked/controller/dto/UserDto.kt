@@ -57,7 +57,7 @@ data class UserLinkShareInfoDto(
     ) {
         companion object {
             fun from(question: QuestionDomain) = QuestionAndAnswerDto(
-                questionId = question.id,
+                questionId = question.id.toHexString(),
                 questionContent = question.content,
                 answerContent = question.answer!!.content,
             )

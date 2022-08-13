@@ -23,5 +23,3 @@ data class Notification(
     @CreatedDate var createdAt: LocalDateTime? = null,
     @LastModifiedDate var updatedAt: LocalDateTime? = null
 )
-
-
