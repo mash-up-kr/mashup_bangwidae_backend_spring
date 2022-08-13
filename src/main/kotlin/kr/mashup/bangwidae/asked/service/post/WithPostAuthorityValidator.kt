@@ -6,12 +6,6 @@ import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Post
 
 interface WithPostAuthorityValidator {
-    fun Post.validateToComment(user: User) {
-        if (userId != user.id) {
-            throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)
-        }
-    }
-
     fun Post.validateToUpdate(user: User) {
         if (userId != user.id) {
             throw DoriDoriException.of(DoriDoriExceptionType.POST_NOT_ALLOWED_FOR_USER)

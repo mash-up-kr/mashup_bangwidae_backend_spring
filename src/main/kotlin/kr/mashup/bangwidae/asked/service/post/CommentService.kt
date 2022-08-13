@@ -8,7 +8,6 @@ import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Comment
 import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.repository.CommentRepository
-import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
@@ -22,7 +21,6 @@ import org.springframework.stereotype.Service
 @Service
 class CommentService(
     private val commentRepository: CommentRepository,
-    private val postRepository: PostRepository,
     private val userRepository: UserRepository,
     private val placeService: PlaceService,
     private val commentLikeService: CommentLikeService,
@@ -34,7 +32,7 @@ class CommentService(
     }
 
     fun getCommentsByPostId(
-        userId: ObjectId, postId: ObjectId, lastId: ObjectId?, size: Int
+        user: User?, postId: ObjectId, lastId: ObjectId?, size: Int
     ): List<CommentDto> {
         val commentList = commentRepository.findByPostIdAndIdBeforeAndDeletedFalseOrderByIdDesc(
             postId,
@@ -44,12 +42,13 @@ class CommentService(
         val userIdList = commentList.map { it.userId }.distinct()
         val userMap = userRepository.findAllByIdIn(userIdList).associateBy { it.id }
         val likeMap = commentLikeService.getLikeMap(commentList)
-        return commentList.map {
+        return commentList.map { comment ->
             CommentDto.from(
-                user = userMap[it.userId]!!,
-                comment = it,
-                likeCount = likeMap[it.id]?.size ?: 0,
-                userLiked = likeMap[it.id]?.map { like -> like.userId }?.contains(userId) ?: false
+                user = userMap[comment.userId]!!,
+                comment = comment,
+                likeCount = likeMap[comment.id]?.size ?: 0,
+                userLiked = if (user == null) false
+                else likeMap[comment.id]?.map { like -> like.userId }?.contains(user.id) ?: false
             )
         }
     }
@@ -59,10 +58,7 @@ class CommentService(
         return commentList.groupingBy { it.postId }.eachCount()
     }
 
-    fun write(user: User, postId: ObjectId, comment: Comment): Comment {
-        postRepository.findByIdAndDeletedFalse(postId)
-            ?.also { it.validateToComment(user) }
-            ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+    fun write(user: User, comment: Comment): Comment {
         return commentRepository.save(updatePlaceInfo(comment)).also {
             levelPolicyService.levelUpIfConditionSatisfied(user)
         }

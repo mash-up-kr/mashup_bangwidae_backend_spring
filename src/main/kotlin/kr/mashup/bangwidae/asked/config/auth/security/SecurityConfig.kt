@@ -50,6 +50,9 @@ class SecurityConfig {
                 "/api/v1/questions/answered",
                 "/api/v1/user/{userId}/link-share",
                 "/api/v1/level-policy/{level}"
+                "/api/v1/posts/near",
+                "/api/v1/posts/{postId}",
+                "/api/v1/posts/{postId}/comment"
             ).permitAll()
             .antMatchers("/api/**").hasAuthority("ROLE")
         http.csrf().disable()

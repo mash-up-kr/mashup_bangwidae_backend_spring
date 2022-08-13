@@ -129,7 +129,9 @@ data class PostWriter(
     @ApiModelProperty(value = "글 작성자 닉네임", example = "sample nickname")
     val nickname: String,
     @ApiModelProperty(value = "글 작성자 프로필 이미지", example = "http://image.com")
-    val profileImageUrl: String?
+    val profileImageUrl: String?,
+    @ApiModelProperty(value = "User 레벨", example = "13")
+    val level: Int
 ) {
     companion object {
         fun from(user: User): PostWriter {
@@ -137,7 +139,8 @@ data class PostWriter(
                 id = user.id!!.toHexString(),
                 tags = user.tags,
                 nickname = user.nickname!!,
-                profileImageUrl = user.profileImageUrl
+                profileImageUrl = user.profileImageUrl,
+                level = user.level
             )
         }
     }
