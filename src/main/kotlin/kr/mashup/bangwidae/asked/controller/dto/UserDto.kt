@@ -18,7 +18,7 @@ data class UserInfoDto(
                 nickname = user.nickname,
                 profileDescription = user.description,
                 tags = user.tags,
-                profileImageUrl = user.getUserProfileImageUrl(),
+                profileImageUrl = user.userProfileImageUrl,
                 level = user.level
             )
         }
@@ -44,7 +44,7 @@ data class UserLinkShareInfoDto(
                 nickname = user.nickname!!,
                 profileDescription = user.description ?: "",
                 tags = user.tags,
-                profileImageUrl = user.getUserProfileImageUrl(),
+                profileImageUrl = user.userProfileImageUrl,
                 level = user.level,
             )
         }
