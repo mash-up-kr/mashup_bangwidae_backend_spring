@@ -139,7 +139,7 @@ data class PostWriter(
                 id = user.id!!.toHexString(),
                 tags = user.tags,
                 nickname = user.nickname!!,
-                profileImageUrl = user.profileImageUrl,
+                profileImageUrl = user.userProfileImageUrl,
                 level = user.level
             )
         }
