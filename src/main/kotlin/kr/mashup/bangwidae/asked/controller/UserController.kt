@@ -36,9 +36,7 @@ class UserController(
     fun getUserInfo(
         @PathVariable userId: ObjectId
     ): ApiResponse<UserInfoDto> {
-        val user = userService.getUserInfo(userId)
-        val representativeWard = wardService.getMyRepresentativeWard(user)
-        return ApiResponse.success(UserInfoDto.from(userService.getUserInfo(userId), representativeWard?.name))
+        return ApiResponse.success(userService.getUserInfo(userId))
     }
 
     @ApiOperation("유저 링크 공유")
@@ -47,7 +45,7 @@ class UserController(
         @ApiIgnore @AuthenticationPrincipal authUser: User?,
         @PathVariable userId: ObjectId
     ): ApiResponse<UserLinkShareInfoDto> {
-        val user = userService.getUserInfo(userId)
+        val user = userService.findById(userId)
         val questions = questionService.findAnswerCompleteByToUser(
             authUser = authUser,
             toUserID = userId,

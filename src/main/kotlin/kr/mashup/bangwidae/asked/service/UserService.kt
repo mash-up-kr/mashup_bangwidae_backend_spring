@@ -5,6 +5,7 @@ import kr.mashup.bangwidae.asked.config.auth.password.PasswordService
 import kr.mashup.bangwidae.asked.controller.dto.EditUserSettingsRequest
 import kr.mashup.bangwidae.asked.controller.dto.JoinUserRequest
 import kr.mashup.bangwidae.asked.controller.dto.JoinUserResponse
+import kr.mashup.bangwidae.asked.controller.dto.UserInfoDto
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.external.aws.S3ImageUploader
@@ -55,9 +56,11 @@ class UserService(
         )
     }
 
-    fun getUserInfo(userId: ObjectId): User {
-        return userRepository.findById(userId)
+    fun getUserInfo(userId: ObjectId): UserInfoDto {
+        val user = userRepository.findById(userId)
             .orElseThrow { DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND) }
+        val representativeWard = wardService.getMyRepresentativeWard(user)
+        return UserInfoDto.from(user, representativeWard?.name)
     }
 
     fun getUserHeaderText(user: User, type: HeaderTextType): String {
