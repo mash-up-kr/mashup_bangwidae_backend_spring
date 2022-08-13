@@ -7,6 +7,8 @@ import kr.mashup.bangwidae.asked.service.UserService
 import kr.mashup.bangwidae.asked.service.post.CommentService
 import kr.mashup.bangwidae.asked.service.post.PostService
 import kr.mashup.bangwidae.asked.utils.StringUtils
+import kr.mashup.bangwidae.asked.utils.UrlSchemeParameter
+import kr.mashup.bangwidae.asked.utils.UrlSchemeUtils
 import org.springframework.stereotype.Component
 
 @Component
@@ -14,6 +16,7 @@ class PostCommentedNotificationGenerator(
     private val postService: PostService,
     private val commentService: CommentService,
     private val userService: UserService,
+    private val urlSchemeProperties: UrlSchemeProperties,
 ) : NotificationGenerator {
     override fun support(spec: NotificationSpec): Boolean {
         return spec is PostCommentedNotificationSpec
@@ -31,7 +34,11 @@ class PostCommentedNotificationGenerator(
                     type = NotificationType.POST_COMMENTED,
                     userId = post.userId,
                     title = "질문: ${StringUtils.ellipsis(post.content, 10)}",
-                    content = "${commentUserNickname}의 답변이 도착했어요!"
+                    content = "${commentUserNickname}의 답변이 도착했어요!",
+                    urlScheme = UrlSchemeUtils.generate(
+                        urlSchemeProperties.postDetail,
+                        UrlSchemeParameter("postId", post.id.toString())
+                    )
                 )
             )
         } else {

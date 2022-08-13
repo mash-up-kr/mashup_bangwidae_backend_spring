@@ -5,11 +5,15 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.Notification
 import kr.mashup.bangwidae.asked.service.question.QuestionService
 import kr.mashup.bangwidae.asked.utils.StringUtils
+import kr.mashup.bangwidae.asked.utils.UrlSchemeParameter
+import kr.mashup.bangwidae.asked.utils.UrlSchemeUtils
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
 class QuestionReceivedNotificationGenerator(
     private val questionService: QuestionService,
+    private val urlSchemeProperties: UrlSchemeProperties,
 ) : NotificationGenerator {
     override fun support(spec: NotificationSpec): Boolean {
         return spec is QuestionReceivedNotificationSpec
@@ -24,7 +28,11 @@ class QuestionReceivedNotificationGenerator(
                     type = NotificationType.QUESTION_RECEIVED,
                     userId = question.toUser.id,
                     title = "질문: ${StringUtils.ellipsis(question.content, 10)}",
-                    content = "${question.fromUser.nickname}의 질문을 확인해보세요."
+                    content = "${question.fromUser.nickname}의 질문을 확인해보세요.",
+                    urlScheme = UrlSchemeUtils.generate(
+                        urlSchemeProperties.questionDetail,
+                        UrlSchemeParameter("questionId", question.id.toString())
+                    )
                 )
             )
         } else {
