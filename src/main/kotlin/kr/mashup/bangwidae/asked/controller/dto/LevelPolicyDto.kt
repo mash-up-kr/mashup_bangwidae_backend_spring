@@ -7,7 +7,7 @@ data class LevelPolicyDto (
     val wardCountCondition: Int,
     val answerCountCondition: Int,
     val questionCountCondition: Int,
-    val wardCount: Int,
+    val maxWardCount: Int,
     val imageUrl: String
 ) {
     companion object {
@@ -17,7 +17,7 @@ data class LevelPolicyDto (
                 wardCountCondition = levelPolicy.wardCountCondition,
                 answerCountCondition = levelPolicy.answerCountCondition,
                 questionCountCondition = levelPolicy.questionCountCondition,
-                wardCount = levelPolicy.wardCount,
+                maxWardCount = levelPolicy.maxWardCount,
                 imageUrl = levelPolicy.imageUrl
             )
         }
