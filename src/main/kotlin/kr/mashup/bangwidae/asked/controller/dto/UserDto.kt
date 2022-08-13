@@ -1,7 +1,6 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
 import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.User.Companion.DEFAULT_PROFILE_IMAGE_URL
 import kr.mashup.bangwidae.asked.service.question.QuestionDomain
 import org.bson.types.ObjectId
 
@@ -10,7 +9,9 @@ data class UserInfoDto(
     val nickname: String?,
     val profileDescription: String?,
     val tags: List<String>,
-    val representativeWardName: String?
+    val representativeWardName: String?,
+    val level: Int,
+    val profileImageUrl: String?
 ) {
     companion object {
         fun from(user: User, representativeWardName: String?): UserInfoDto {
@@ -19,7 +20,9 @@ data class UserInfoDto(
                 nickname = user.nickname,
                 profileDescription = user.description,
                 tags = user.tags,
-                representativeWardName = representativeWardName
+                representativeWardName = representativeWardName,
+                profileImageUrl = user.userProfileImageUrl,
+                level = user.level
             )
         }
     }
@@ -44,7 +47,7 @@ data class UserLinkShareInfoDto(
                 nickname = user.nickname!!,
                 profileDescription = user.description ?: "",
                 tags = user.tags,
-                profileImageUrl = user.profileImageUrl ?: DEFAULT_PROFILE_IMAGE_URL,
+                profileImageUrl = user.userProfileImageUrl,
                 level = user.level,
             )
         }
