@@ -22,7 +22,7 @@ class WardService(
         val userLevelPolicy = levelPolicyRepository.findByLevel(user.level)
         val userWardCount = wardRepository.countAllByUserId(user.id!!)
 
-        if (userWardCount >= userLevelPolicy!!.wardCount) {
+        if (userWardCount >= userLevelPolicy!!.maxWardCount) {
             throw DoriDoriException.of(DoriDoriExceptionType.WARD_MAX_COUNT)
         }
 
