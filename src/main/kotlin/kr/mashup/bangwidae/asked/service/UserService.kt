@@ -9,8 +9,8 @@ import kr.mashup.bangwidae.asked.controller.dto.UserInfoDto
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.external.aws.S3ImageUploader
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.UserSettings
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.UserSettings
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.question.QuestionService
 import org.bson.types.ObjectId

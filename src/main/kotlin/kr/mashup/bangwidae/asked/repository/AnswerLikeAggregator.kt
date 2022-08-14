@@ -1,6 +1,6 @@
 package kr.mashup.bangwidae.asked.repository
 
-import kr.mashup.bangwidae.asked.model.question.AnswerLike
+import kr.mashup.bangwidae.asked.model.document.question.AnswerLike
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.MongoTemplate

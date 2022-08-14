@@ -1,7 +1,7 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.service.question.QuestionDomain
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.domain.QuestionDomain
 import org.bson.types.ObjectId
 
 data class UserInfoDto(

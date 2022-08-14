@@ -2,7 +2,7 @@ package kr.mashup.bangwidae.asked.service
 
 import kr.mashup.bangwidae.asked.mockGangnamPost
 import kr.mashup.bangwidae.asked.mockSinnonhyeonPost
-import kr.mashup.bangwidae.asked.model.post.Post
+import kr.mashup.bangwidae.asked.model.document.post.Post
 import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.place.PlaceService

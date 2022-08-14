@@ -1,50 +1,12 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
 import io.swagger.annotations.ApiModelProperty
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.post.Post
+import kr.mashup.bangwidae.asked.model.document.post.Post
+import kr.mashup.bangwidae.asked.model.domain.PostDomain
+import kr.mashup.bangwidae.asked.model.domain.PostUserDomain
 import kr.mashup.bangwidae.asked.utils.GeoUtils
-import kr.mashup.bangwidae.asked.utils.getLatitude
-import kr.mashup.bangwidae.asked.utils.getLongitude
 import org.bson.types.ObjectId
 import java.time.LocalDateTime
-
-data class PostResultDto(
-    @ApiModelProperty(value = "포스트 글 id", example = "62d81cd92336cf4bb5b6c6ab")
-    val id: String,
-    @ApiModelProperty(value = "포스트 글 작성자", example = "")
-    val user: PostWriter,
-    @ApiModelProperty(value = "포스트 글 내용", example = "글")
-    val content: String = "",
-    @ApiModelProperty(value = "경도", example = "136.4")
-    val longitude: Double,
-    @ApiModelProperty(value = "위도", example = "36.4")
-    val latitude: Double,
-    @ApiModelProperty(value = "대표주소", example = "강남구")
-    val representativeAddress: String?,
-    @ApiModelProperty(value = "익명 여부", example = "true")
-    val anonymous: Boolean,
-    @ApiModelProperty(value = "생성일", example = "2022-07-14T23:57:33.436")
-    val createdAt: LocalDateTime?,
-    @ApiModelProperty(value = "수정일", example = "2022-07-14T23:57:33.436")
-    val updatedAt: LocalDateTime?
-) {
-    companion object {
-        fun from(user: User, post: Post): PostResultDto {
-            return PostResultDto(
-                id = post.id!!.toHexString(),
-                user = post.getWriter(user),
-                content = post.content,
-                longitude = post.location.getLongitude(),
-                latitude = post.location.getLatitude(),
-                representativeAddress = post.representativeAddress,
-                anonymous = post.anonymous ?: false,
-                createdAt = post.createdAt,
-                updatedAt = post.updatedAt,
-            )
-        }
-    }
-}
 
 data class PostDto(
     @ApiModelProperty(value = "포스트 글 id", example = "62d81cd92336cf4bb5b6c6ab")
@@ -73,28 +35,21 @@ data class PostDto(
     val updatedAt: LocalDateTime?
 ) {
     companion object {
-        fun from(
-            user: User,
-            post: Post,
-            likeCount: Int,
-            commentCount: Int,
-            userLiked: Boolean
-        ): PostDto {
-            return PostDto(
-                id = post.id!!.toHexString(),
-                user = post.getWriter(user),
+        fun from(post: PostDomain) =
+            PostDto(
+                id = post.id.toHexString(),
+                user = PostWriter.from(post.user),
                 content = post.content,
-                likeCount = likeCount,
-                userLiked = userLiked,
-                commentCount = commentCount,
-                longitude = post.location.getLongitude(),
-                latitude = post.location.getLatitude(),
+                likeCount = post.likeCount,
+                userLiked = post.userLiked,
+                commentCount = post.commentCount,
+                longitude = post.longitude,
+                latitude = post.latitude,
                 representativeAddress = post.representativeAddress,
-                anonymous = post.anonymous ?: false,
+                anonymous = post.anonymous,
                 createdAt = post.createdAt,
                 updatedAt = post.updatedAt,
             )
-        }
     }
 }
 
@@ -134,12 +89,12 @@ data class PostWriter(
     val level: Int
 ) {
     companion object {
-        fun from(user: User): PostWriter {
+        fun from(user: PostUserDomain): PostWriter {
             return PostWriter(
-                id = user.id!!.toHexString(),
+                id = user.id.toHexString(),
                 tags = user.tags,
-                nickname = user.nickname!!,
-                profileImageUrl = user.userProfileImageUrl,
+                nickname = user.nickname,
+                profileImageUrl = user.profileImageUrl,
                 level = user.level
             )
         }

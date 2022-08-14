@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
 import kr.mashup.bangwidae.asked.controller.dto.LevelPolicyDto
 import kr.mashup.bangwidae.asked.controller.dto.UserAchievementDto
-import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.document.User
 import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping

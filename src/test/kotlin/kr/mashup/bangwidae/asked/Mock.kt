@@ -1,8 +1,8 @@
 package kr.mashup.bangwidae.asked
 
-import kr.mashup.bangwidae.asked.model.LoginType
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.post.Post
+import kr.mashup.bangwidae.asked.model.document.LoginType
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.post.Post
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
 

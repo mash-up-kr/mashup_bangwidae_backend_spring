@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.model
+package kr.mashup.bangwidae.asked.model.document
 
 import kr.mashup.bangwidae.asked.service.notification.NotificationType
 import org.bson.types.ObjectId

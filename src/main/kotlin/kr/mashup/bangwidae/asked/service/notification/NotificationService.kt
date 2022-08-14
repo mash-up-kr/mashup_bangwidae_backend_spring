@@ -1,6 +1,6 @@
 package kr.mashup.bangwidae.asked.service.notification
 
-import kr.mashup.bangwidae.asked.model.Notification
+import kr.mashup.bangwidae.asked.model.document.Notification
 import kr.mashup.bangwidae.asked.repository.NotificationRepository
 import org.springframework.stereotype.Service
 

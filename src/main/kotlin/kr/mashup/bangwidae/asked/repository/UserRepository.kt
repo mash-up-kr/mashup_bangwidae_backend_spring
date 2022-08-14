@@ -1,6 +1,6 @@
 package kr.mashup.bangwidae.asked.repository
 
-import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.document.User
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository

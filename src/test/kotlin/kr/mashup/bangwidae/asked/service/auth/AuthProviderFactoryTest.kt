@@ -6,7 +6,7 @@ import io.kotest.matchers.types.beInstanceOf
 import io.mockk.mockk
 import kr.mashup.bangwidae.asked.external.auth.AppleOauthProvider
 import kr.mashup.bangwidae.asked.external.auth.KakaoOauthProvider
-import kr.mashup.bangwidae.asked.model.LoginType
+import kr.mashup.bangwidae.asked.model.document.LoginType
 
 internal class AuthProviderFactoryTest: DescribeSpec({
     describe("AuthProviderFactory 에서") {

@@ -4,7 +4,7 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.external.auth.AppleOauthProvider
 import kr.mashup.bangwidae.asked.external.auth.KakaoOauthProvider
-import kr.mashup.bangwidae.asked.model.LoginType
+import kr.mashup.bangwidae.asked.model.document.LoginType
 import org.springframework.stereotype.Component
 
 @Component
