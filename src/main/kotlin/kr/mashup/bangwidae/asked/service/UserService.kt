@@ -100,7 +100,7 @@ class UserService(
     }
 
     fun findById(id: ObjectId): User {
-        return userRepository.findByIdOrNull(id) ?: throw RuntimeException("User {id: $id} Not Found")
+        return userRepository.findByIdOrNull(id) ?: throw DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND)
     }
 
     fun findByEmail(email: String): User? {

@@ -3,10 +3,11 @@ package kr.mashup.bangwidae.asked.service.question
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.question.Answer
 import kr.mashup.bangwidae.asked.model.question.Question
+import org.bson.types.ObjectId
 import java.time.LocalDateTime
 
 data class QuestionDomain(
-    val id: String,
+    val id: ObjectId,
     val content: String,
     val representativeAddress: String?,
     val anonymous: Boolean?,
@@ -24,7 +25,7 @@ data class QuestionDomain(
             answerLikeCount: Long? = null,
             answerUserLiked: Boolean? = null,
         ) = QuestionDomain(
-            id = question.id!!.toHexString(),
+            id = question.id!!,
             content = question.content,
             representativeAddress = question.representativeAddress,
             anonymous = question.anonymous,
@@ -45,7 +46,7 @@ data class QuestionDomain(
 }
 
 data class AnswerDomain(
-    val id: String,
+    val id: ObjectId,
     val content: String,
     val representativeAddress: String?,
     val user: QuestionUserDomain,
@@ -55,7 +56,7 @@ data class AnswerDomain(
 ) {
     companion object {
         fun from(answer: Answer, user: User, likeCount: Long, userLiked: Boolean) = AnswerDomain(
-            id = answer.id!!.toHexString(),
+            id = answer.id!!,
             content = answer.content,
             representativeAddress = answer.representativeAddress,
             user = QuestionUserDomain.from(user),
@@ -67,7 +68,7 @@ data class AnswerDomain(
 }
 
 data class QuestionUserDomain(
-    val id: String,
+    val id: ObjectId,
     val nickname: String,
     val tags: List<String>,
     val profileImageUrl: String?,
@@ -75,7 +76,7 @@ data class QuestionUserDomain(
 ) {
     companion object {
         fun from(user: User) = QuestionUserDomain(
-            id = user.id!!.toString(),
+            id = user.id!!,
             nickname = user.nickname!!,
             tags = user.tags,
             profileImageUrl = user.userProfileImageUrl,
