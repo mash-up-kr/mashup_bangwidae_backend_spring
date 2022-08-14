@@ -4,10 +4,11 @@ import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.utils.getLatitude
 import kr.mashup.bangwidae.asked.utils.getLongitude
+import org.bson.types.ObjectId
 import java.time.LocalDateTime
 
 data class PostDomain(
-    val id: String,
+    val id: ObjectId,
     val user: PostUserDomain,
     val content: String,
     val likeCount: Int,
@@ -22,7 +23,7 @@ data class PostDomain(
 ) {
     companion object {
         fun from(user: User, post: Post, likeCount: Int, commentCount: Int, userLiked: Boolean) = PostDomain(
-            id = post.id!!.toHexString(),
+            id = post.id!!,
             content = post.content,
             representativeAddress = post.representativeAddress,
             longitude = post.location.getLongitude(),
@@ -40,7 +41,7 @@ data class PostDomain(
 }
 
 data class PostUserDomain(
-    val id: String,
+    val id: ObjectId,
     val tags: List<String>,
     val nickname: String,
     val profileImageUrl: String,
@@ -48,7 +49,7 @@ data class PostUserDomain(
 ) {
     companion object {
         fun from(user: User) = PostUserDomain(
-            id = user.id!!.toHexString(),
+            id = user.id!!,
             nickname = user.nickname!!,
             tags = user.tags,
             profileImageUrl = user.userProfileImageUrl,

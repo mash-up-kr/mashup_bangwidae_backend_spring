@@ -37,7 +37,7 @@ data class PostDto(
     companion object {
         fun from(post: PostDomain) =
             PostDto(
-                id = post.id,
+                id = post.id.toHexString(),
                 user = PostWriter.from(post.user),
                 content = post.content,
                 likeCount = post.likeCount,
@@ -91,7 +91,7 @@ data class PostWriter(
     companion object {
         fun from(user: PostUserDomain): PostWriter {
             return PostWriter(
-                id = user.id,
+                id = user.id.toHexString(),
                 tags = user.tags,
                 nickname = user.nickname,
                 profileImageUrl = user.profileImageUrl,

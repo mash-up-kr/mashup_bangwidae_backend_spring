@@ -60,7 +60,7 @@ data class CommentDto(
     companion object {
         fun from(comment: CommentDomain): CommentDto {
             return CommentDto(
-                id = comment.id,
+                id = comment.id.toHexString(),
                 user = CommentWriter.from(comment.user),
                 content = comment.content,
                 likeCount = comment.likeCount,
@@ -89,7 +89,7 @@ data class CommentWriter(
     companion object {
         fun from(user: CommentUserDomain): CommentWriter {
             return CommentWriter(
-                id = user.id,
+                id = user.id.toHexString(),
                 tags = user.tags,
                 nickname = user.nickname,
                 profileImageUrl = user.profileImageUrl,

@@ -59,7 +59,7 @@ data class QuestionDetailDto(
         companion object {
             fun from(answer: AnswerDomain): AnswerDto {
                 return AnswerDto(
-                    id = answer.id,
+                    id = answer.id.toHexString(),
                     content = answer.content,
                     representativeAddress = answer.representativeAddress,
                     user = QuestionUserDto.from(answer.user),
@@ -74,7 +74,7 @@ data class QuestionDetailDto(
     companion object {
         fun from(question: QuestionDomain): QuestionDetailDto {
             return QuestionDetailDto(
-                id = question.id,
+                id = question.id.toHexString(),
                 content = question.content,
                 representativeAddress = question.representativeAddress,
                 anonymous = question.anonymous,
@@ -104,7 +104,7 @@ data class AnsweredQuestionsDto(
         companion object {
             fun from(question: QuestionDomain): QuestionDto {
                 return QuestionDto(
-                    id = question.id,
+                    id = question.id.toHexString(),
                     content = question.content,
                     representativeAddress = question.representativeAddress,
                     anonymous = question.anonymous,
@@ -129,7 +129,7 @@ data class AnsweredQuestionsDto(
         companion object {
             fun from(answer: AnswerDomain): AnswerDto {
                 return AnswerDto(
-                    id = answer.id,
+                    id = answer.id.toHexString(),
                     content = answer.content,
                     representativeAddress = answer.representativeAddress,
                     user = QuestionUserDto.from(answer.user),
@@ -172,7 +172,7 @@ data class ReceivedQuestionsDto(
         companion object {
             fun from(question: QuestionDomain): QuestionDto {
                 return QuestionDto(
-                    id = question.id,
+                    id = question.id.toHexString(),
                     content = question.content,
                     representativeAddress = question.representativeAddress,
                     anonymous = question.anonymous,
@@ -215,7 +215,7 @@ data class AskedQuestionsDto(
         companion object {
             fun from(question: QuestionDomain): QuestionDto {
                 return QuestionDto(
-                    id = question.id,
+                    id = question.id.toHexString(),
                     content = question.content,
                     representativeAddress = question.representativeAddress,
                     anonymous = question.anonymous,
@@ -252,7 +252,7 @@ data class QuestionUserDto(
     companion object {
         fun from(user: QuestionUserDomain): QuestionUserDto {
             return QuestionUserDto(
-                id = user.id,
+                id = user.id.toHexString(),
                 nickname = user.nickname,
                 tags = user.tags,
                 profileImageUrl = user.profileImageUrl,

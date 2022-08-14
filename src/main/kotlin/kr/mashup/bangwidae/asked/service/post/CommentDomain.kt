@@ -2,10 +2,11 @@ package kr.mashup.bangwidae.asked.service.post
 
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Comment
+import org.bson.types.ObjectId
 import java.time.LocalDateTime
 
 data class CommentDomain(
-    val id: String,
+    val id: ObjectId,
     val user: CommentUserDomain,
     val content: String,
     val likeCount: Int,
@@ -17,7 +18,7 @@ data class CommentDomain(
 ) {
     companion object {
         fun from(user: User, comment: Comment, likeCount: Int, userLiked: Boolean) = CommentDomain(
-            id = comment.id!!.toHexString(),
+            id = comment.id!!,
             content = comment.content,
             representativeAddress = comment.region?.representativeAddress,
             anonymous = comment.anonymous ?: false,
@@ -32,7 +33,7 @@ data class CommentDomain(
 }
 
 data class CommentUserDomain(
-    val id: String,
+    val id: ObjectId,
     val tags: List<String>,
     val nickname: String,
     val profileImageUrl: String,
@@ -40,7 +41,7 @@ data class CommentUserDomain(
 ) {
     companion object {
         fun from(user: User) = CommentUserDomain(
-            id = user.id!!.toHexString(),
+            id = user.id!!,
             nickname = user.nickname!!,
             tags = user.tags,
             profileImageUrl = user.userProfileImageUrl,
