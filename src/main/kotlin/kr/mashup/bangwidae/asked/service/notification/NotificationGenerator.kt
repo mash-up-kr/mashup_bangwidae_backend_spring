@@ -1,27 +1,9 @@
 package kr.mashup.bangwidae.asked.service.notification
 
 import kr.mashup.bangwidae.asked.model.Notification
-import org.bson.types.ObjectId
-
-sealed interface NotificationSpec
+import kr.mashup.bangwidae.asked.service.event.NotificationEvent
 
 interface NotificationGenerator {
-    fun support(spec: NotificationSpec): Boolean
-    fun generate(spec: NotificationSpec): List<Notification>
+    fun support(event: NotificationEvent): Boolean
+    fun generate(event: NotificationEvent): List<Notification>
 }
-
-data class QuestionAnsweredNotificationSpec(
-    val answerId: ObjectId,
-) : NotificationSpec
-
-data class QuestionReceivedNotificationSpec(
-    val questionId: ObjectId,
-) : NotificationSpec
-
-data class PostCommentedNotificationSpec(
-    val commentId: ObjectId,
-) : NotificationSpec
-
-data class LevelUpNotificationSpec(
-    val userId: ObjectId,
-) : NotificationSpec

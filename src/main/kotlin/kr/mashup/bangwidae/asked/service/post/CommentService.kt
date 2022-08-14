@@ -9,11 +9,13 @@ import kr.mashup.bangwidae.asked.model.post.Comment
 import kr.mashup.bangwidae.asked.model.post.Post
 import kr.mashup.bangwidae.asked.repository.CommentRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
+import kr.mashup.bangwidae.asked.service.event.CommentWriteEvent
 import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.getLatitude
 import kr.mashup.bangwidae.asked.utils.getLongitude
 import org.bson.types.ObjectId
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
@@ -24,7 +26,8 @@ class CommentService(
     private val userRepository: UserRepository,
     private val placeService: PlaceService,
     private val commentLikeService: CommentLikeService,
-    private val levelPolicyService: LevelPolicyService
+    private val levelPolicyService: LevelPolicyService,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) : WithPostAuthorityValidator, WithCommentAuthorityValidator {
     fun findById(commentId: ObjectId): Comment {
         return commentRepository.findByIdAndDeletedFalse(commentId)
@@ -61,6 +64,8 @@ class CommentService(
     fun write(user: User, comment: Comment): Comment {
         return commentRepository.save(updatePlaceInfo(comment)).also {
             levelPolicyService.levelUpIfConditionSatisfied(user)
+        }.also {
+            applicationEventPublisher.publishEvent(CommentWriteEvent(it.id!!))
         }
     }
 

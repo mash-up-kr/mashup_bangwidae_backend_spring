@@ -3,6 +3,8 @@ package kr.mashup.bangwidae.asked.service.notification
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.Notification
+import kr.mashup.bangwidae.asked.service.event.AnswerWriteEvent
+import kr.mashup.bangwidae.asked.service.event.NotificationEvent
 import kr.mashup.bangwidae.asked.service.question.AnswerService
 import kr.mashup.bangwidae.asked.service.question.QuestionService
 import kr.mashup.bangwidae.asked.utils.StringUtils
@@ -16,13 +18,13 @@ class QuestionAnsweredNotificationGenerator(
     private val answerService: AnswerService,
     private val urlSchemeProperties: UrlSchemeProperties,
 ) : NotificationGenerator {
-    override fun support(spec: NotificationSpec): Boolean {
-        return spec is QuestionAnsweredNotificationSpec
+    override fun support(event: NotificationEvent): Boolean {
+        return event is AnswerWriteEvent
     }
 
-    override fun generate(spec: NotificationSpec): List<Notification> {
-        if (spec is QuestionAnsweredNotificationSpec) {
-            val answer = answerService.findById(spec.answerId)
+    override fun generate(event: NotificationEvent): List<Notification> {
+        if (event is AnswerWriteEvent) {
+            val answer = answerService.findById(event.answerId)
             val question = questionService.findDetailById(null, answer.questionId)
 
             return listOf(

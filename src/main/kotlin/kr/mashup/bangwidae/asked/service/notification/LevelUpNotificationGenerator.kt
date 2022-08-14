@@ -4,6 +4,8 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.Notification
 import kr.mashup.bangwidae.asked.service.UserService
+import kr.mashup.bangwidae.asked.service.event.LevelUpEvent
+import kr.mashup.bangwidae.asked.service.event.NotificationEvent
 import org.springframework.stereotype.Component
 
 @Component
@@ -11,13 +13,13 @@ class LevelUpNotificationGenerator(
     private val userService: UserService,
     private val urlSchemeProperties: UrlSchemeProperties,
 ) : NotificationGenerator {
-    override fun support(spec: NotificationSpec): Boolean {
-        return spec is LevelUpNotificationSpec
+    override fun support(event: NotificationEvent): Boolean {
+        return event is LevelUpEvent
     }
 
-    override fun generate(spec: NotificationSpec): List<Notification> {
-        if (spec is LevelUpNotificationSpec) {
-            val user = userService.findById(spec.userId)
+    override fun generate(event: NotificationEvent): List<Notification> {
+        if (event is LevelUpEvent) {
+            val user = userService.findById(event.userId)
 
             return listOf(
                 Notification(
