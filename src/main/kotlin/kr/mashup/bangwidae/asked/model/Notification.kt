@@ -1,6 +1,6 @@
 package kr.mashup.bangwidae.asked.model
 
-import kr.mashup.bangwidae.asked.service.alarm.NotificationType
+import kr.mashup.bangwidae.asked.service.notification.NotificationType
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id

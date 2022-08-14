@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.service.alarm
+package kr.mashup.bangwidae.asked.service.notification
 
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
@@ -26,7 +26,7 @@ class PostCommentedNotificationGenerator(
         if (spec is PostCommentedNotificationSpec) {
             val comment = commentService.findById(spec.commentId)
             val commentUserNickname =
-                if (comment.anonymous == true) "익명" else userService.getUserInfo(comment.userId).nickname
+                if (comment.anonymous == true) "익명" else userService.findById(comment.userId).nickname
             val post = postService.findById(comment.postId)
 
             return listOf(

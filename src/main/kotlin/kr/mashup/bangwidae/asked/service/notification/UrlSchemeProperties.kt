@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.service.alarm
+package kr.mashup.bangwidae.asked.service.notification
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding

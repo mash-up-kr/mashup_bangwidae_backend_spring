@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.service.alarm
+package kr.mashup.bangwidae.asked.service.notification
 
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
@@ -7,7 +7,6 @@ import kr.mashup.bangwidae.asked.service.question.QuestionService
 import kr.mashup.bangwidae.asked.utils.StringUtils
 import kr.mashup.bangwidae.asked.utils.UrlSchemeParameter
 import kr.mashup.bangwidae.asked.utils.UrlSchemeUtils
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component

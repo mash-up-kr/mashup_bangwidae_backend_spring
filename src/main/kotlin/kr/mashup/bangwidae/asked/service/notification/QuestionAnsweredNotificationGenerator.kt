@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.service.alarm
+package kr.mashup.bangwidae.asked.service.notification
 
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType

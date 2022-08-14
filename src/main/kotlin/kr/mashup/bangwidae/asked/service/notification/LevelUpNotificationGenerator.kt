@@ -1,11 +1,9 @@
-package kr.mashup.bangwidae.asked.service.alarm
+package kr.mashup.bangwidae.asked.service.notification
 
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.Notification
 import kr.mashup.bangwidae.asked.service.UserService
-import kr.mashup.bangwidae.asked.utils.UrlSchemeParameter
-import kr.mashup.bangwidae.asked.utils.UrlSchemeUtils
 import org.springframework.stereotype.Component
 
 @Component
@@ -19,7 +17,7 @@ class LevelUpNotificationGenerator(
 
     override fun generate(spec: NotificationSpec): List<Notification> {
         if (spec is LevelUpNotificationSpec) {
-            val user = userService.getUserInfo(spec.userId)
+            val user = userService.findById(spec.userId)
 
             return listOf(
                 Notification(
