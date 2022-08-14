@@ -3,7 +3,7 @@ package kr.mashup.bangwidae.asked.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
-import kr.mashup.bangwidae.asked.controller.dto.CommentResultDto
+import kr.mashup.bangwidae.asked.controller.dto.CommentDto
 import kr.mashup.bangwidae.asked.controller.dto.CommentEditRequest
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.post.CommentLikeService
@@ -26,13 +26,13 @@ class CommentController(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable commentId: ObjectId,
         @RequestBody commentEditRequest: CommentEditRequest,
-    ): ApiResponse<CommentResultDto> {
+    ): ApiResponse<CommentDto> {
         return commentService.edit(
             commentId = commentId,
             user = user,
             request = commentEditRequest
         ).let {
-            ApiResponse.success(CommentResultDto.from(user, it))
+            ApiResponse.success(CommentDto.from(it))
         }
     }
 
@@ -41,12 +41,12 @@ class CommentController(
     fun deleteAnswer(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable commentId: ObjectId,
-    ): ApiResponse<CommentResultDto> {
+    ): ApiResponse<Boolean> {
         return commentService.delete(
             commentId = commentId,
             user = user,
         ).let {
-            ApiResponse.success(CommentResultDto.from(user, it))
+            ApiResponse.success(true)
         }
     }
 

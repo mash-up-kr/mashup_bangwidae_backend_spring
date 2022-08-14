@@ -1,8 +1,9 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
 import io.swagger.annotations.ApiModelProperty
-import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.model.post.Comment
+import kr.mashup.bangwidae.asked.service.post.CommentDomain
+import kr.mashup.bangwidae.asked.service.post.CommentUserDomain
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
 import java.time.LocalDateTime
@@ -57,43 +58,15 @@ data class CommentDto(
     val updatedAt: LocalDateTime?
 ) {
     companion object {
-        fun from(user: User, comment: Comment, likeCount: Int, userLiked: Boolean): CommentDto {
+        fun from(comment: CommentDomain): CommentDto {
             return CommentDto(
-                id = comment.id!!.toHexString(),
-                user = comment.getWriter(user),
+                id = comment.id,
+                user = CommentWriter.from(comment.user),
                 content = comment.content,
-                likeCount = likeCount,
-                userLiked = userLiked,
-                representativeAddress = comment.region?.representativeAddress,
-                anonymous = comment.anonymous ?: false,
-                createdAt = comment.createdAt,
-                updatedAt = comment.updatedAt
-            )
-        }
-    }
-}
-
-data class CommentResultDto(
-    @ApiModelProperty(value = "댓글 id", example = "62c6f1ede8802854c463b5f5")
-    val id: String,
-    @ApiModelProperty(value = "댓글 작성자 User")
-    val user: CommentWriter,
-    @ApiModelProperty(value = "댓글 내용", example = "댓글 내용 string")
-    val content: String,
-    @ApiModelProperty(value = "대표 주소", example = "분당구")
-    val representativeAddress: String?,
-    @ApiModelProperty(value = "생성일", example = "2022-07-14T23:57:33.436")
-    val createdAt: LocalDateTime?,
-    @ApiModelProperty(value = "수정일", example = "2022-07-14T23:57:33.436")
-    val updatedAt: LocalDateTime?
-) {
-    companion object {
-        fun from(user: User, comment: Comment): CommentResultDto {
-            return CommentResultDto(
-                id = comment.id!!.toHexString(),
-                user = comment.getWriter(user),
-                content = comment.content,
-                representativeAddress = comment.region?.representativeAddress,
+                likeCount = comment.likeCount,
+                userLiked = comment.userLiked,
+                representativeAddress = comment.representativeAddress,
+                anonymous = comment.anonymous,
                 createdAt = comment.createdAt,
                 updatedAt = comment.updatedAt
             )
@@ -114,12 +87,12 @@ data class CommentWriter(
     val level: Int
 ) {
     companion object {
-        fun from(user: User): CommentWriter {
+        fun from(user: CommentUserDomain): CommentWriter {
             return CommentWriter(
-                id = user.id!!.toHexString(),
+                id = user.id,
                 tags = user.tags,
-                nickname = user.nickname!!,
-                profileImageUrl = user.userProfileImageUrl,
+                nickname = user.nickname,
+                profileImageUrl = user.profileImageUrl,
                 level = user.level
             )
         }
