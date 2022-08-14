@@ -3,8 +3,9 @@ package kr.mashup.bangwidae.asked.service.post
 import kr.mashup.bangwidae.asked.controller.dto.PostEditRequest
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.post.Post
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.post.Post
+import kr.mashup.bangwidae.asked.model.domain.PostDomain
 import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService

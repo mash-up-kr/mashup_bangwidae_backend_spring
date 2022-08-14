@@ -2,9 +2,9 @@ package kr.mashup.bangwidae.asked.service.post
 
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.post.Comment
-import kr.mashup.bangwidae.asked.model.post.CommentLike
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.post.Comment
+import kr.mashup.bangwidae.asked.model.document.post.CommentLike
 import kr.mashup.bangwidae.asked.repository.CommentLikeRepository
 import kr.mashup.bangwidae.asked.repository.CommentRepository
 import org.bson.types.ObjectId

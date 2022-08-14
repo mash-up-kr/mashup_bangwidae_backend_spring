@@ -1,7 +1,7 @@
-package kr.mashup.bangwidae.asked.service.post
+package kr.mashup.bangwidae.asked.model.domain
 
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.post.Post
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.post.Post
 import kr.mashup.bangwidae.asked.utils.getLatitude
 import kr.mashup.bangwidae.asked.utils.getLongitude
 import org.bson.types.ObjectId

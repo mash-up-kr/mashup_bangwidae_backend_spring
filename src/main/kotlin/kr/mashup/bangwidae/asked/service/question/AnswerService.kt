@@ -4,9 +4,9 @@ import kr.mashup.bangwidae.asked.controller.dto.AnswerEditRequest
 import kr.mashup.bangwidae.asked.controller.dto.AnswerWriteRequest
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.question.Answer
-import kr.mashup.bangwidae.asked.model.question.AnswerLike
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.question.Answer
+import kr.mashup.bangwidae.asked.model.document.question.AnswerLike
 import kr.mashup.bangwidae.asked.repository.AnswerLikeRepository
 import kr.mashup.bangwidae.asked.repository.AnswerRepository
 import kr.mashup.bangwidae.asked.repository.QuestionRepository

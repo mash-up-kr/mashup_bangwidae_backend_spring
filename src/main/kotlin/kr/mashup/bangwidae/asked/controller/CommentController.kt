@@ -5,7 +5,7 @@ import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
 import kr.mashup.bangwidae.asked.controller.dto.CommentDto
 import kr.mashup.bangwidae.asked.controller.dto.CommentEditRequest
-import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.document.User
 import kr.mashup.bangwidae.asked.service.post.CommentLikeService
 import kr.mashup.bangwidae.asked.service.post.CommentService
 import org.bson.types.ObjectId

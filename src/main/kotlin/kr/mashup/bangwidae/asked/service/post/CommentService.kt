@@ -3,9 +3,10 @@ package kr.mashup.bangwidae.asked.service.post
 import kr.mashup.bangwidae.asked.controller.dto.CommentEditRequest
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.post.Comment
-import kr.mashup.bangwidae.asked.model.post.Post
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.post.Comment
+import kr.mashup.bangwidae.asked.model.document.post.Post
+import kr.mashup.bangwidae.asked.model.domain.CommentDomain
 import kr.mashup.bangwidae.asked.repository.CommentRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService

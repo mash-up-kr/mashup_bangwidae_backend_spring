@@ -2,7 +2,7 @@ package kr.mashup.bangwidae.asked.service.notification
 
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
-import kr.mashup.bangwidae.asked.model.Notification
+import kr.mashup.bangwidae.asked.model.document.Notification
 import kr.mashup.bangwidae.asked.service.UserService
 import org.springframework.stereotype.Component
 

@@ -3,7 +3,7 @@ package kr.mashup.bangwidae.asked.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.*
-import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.document.User
 import kr.mashup.bangwidae.asked.service.post.CommentService
 import kr.mashup.bangwidae.asked.service.post.PostLikeService
 import kr.mashup.bangwidae.asked.service.post.PostService

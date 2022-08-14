@@ -1,7 +1,7 @@
 package kr.mashup.bangwidae.asked.repository
 
-import kr.mashup.bangwidae.asked.model.question.Question
-import kr.mashup.bangwidae.asked.model.question.QuestionStatus
+import kr.mashup.bangwidae.asked.model.document.question.Question
+import kr.mashup.bangwidae.asked.model.document.question.QuestionStatus
 import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.mongodb.repository.MongoRepository

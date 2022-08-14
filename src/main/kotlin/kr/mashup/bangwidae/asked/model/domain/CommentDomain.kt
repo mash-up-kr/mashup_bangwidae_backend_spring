@@ -1,7 +1,7 @@
-package kr.mashup.bangwidae.asked.service.post
+package kr.mashup.bangwidae.asked.model.domain
 
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.post.Comment
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.post.Comment
 import org.bson.types.ObjectId
 import java.time.LocalDateTime
 

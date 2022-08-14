@@ -1,7 +1,7 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
 import io.swagger.annotations.ApiModelProperty
-import kr.mashup.bangwidae.asked.model.LoginType
+import kr.mashup.bangwidae.asked.model.document.LoginType
 
 // TODO: 하나의 login api로 BASIC, OAUTH 다 커버할지 나눌지?
 data class LoginRequest(

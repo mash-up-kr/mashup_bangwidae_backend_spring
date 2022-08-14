@@ -6,7 +6,7 @@ import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
 import kr.mashup.bangwidae.asked.controller.dto.CreateWardRequest
 import kr.mashup.bangwidae.asked.controller.dto.ExtendWardPeriodRequest
 import kr.mashup.bangwidae.asked.controller.dto.WardDto
-import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.document.User
 import kr.mashup.bangwidae.asked.service.WardService
 import org.bson.types.ObjectId
 import org.springframework.security.core.annotation.AuthenticationPrincipal

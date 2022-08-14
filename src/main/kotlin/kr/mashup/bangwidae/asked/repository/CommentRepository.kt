@@ -1,6 +1,6 @@
 package kr.mashup.bangwidae.asked.repository
 
-import kr.mashup.bangwidae.asked.model.post.Comment
+import kr.mashup.bangwidae.asked.model.document.post.Comment
 import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.mongodb.repository.MongoRepository

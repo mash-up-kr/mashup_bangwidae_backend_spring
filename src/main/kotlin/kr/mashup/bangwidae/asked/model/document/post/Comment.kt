@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.model.post
+package kr.mashup.bangwidae.asked.model.document.post
 
 import kr.mashup.bangwidae.asked.controller.dto.CommentEditRequest
 import kr.mashup.bangwidae.asked.model.Region

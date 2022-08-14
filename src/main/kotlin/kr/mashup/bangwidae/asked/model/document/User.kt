@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.model
+package kr.mashup.bangwidae.asked.model.document
 
 import io.swagger.annotations.ApiModel
 import org.bson.types.ObjectId

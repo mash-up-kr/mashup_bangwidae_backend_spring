@@ -1,6 +1,6 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
-import kr.mashup.bangwidae.asked.model.LevelPolicy
+import kr.mashup.bangwidae.asked.model.document.LevelPolicy
 
 data class LevelPolicyDto (
     val level: Int,

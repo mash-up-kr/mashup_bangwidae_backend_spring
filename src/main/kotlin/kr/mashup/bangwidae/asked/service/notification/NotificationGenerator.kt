@@ -1,6 +1,6 @@
 package kr.mashup.bangwidae.asked.service.notification
 
-import kr.mashup.bangwidae.asked.model.Notification
+import kr.mashup.bangwidae.asked.model.document.Notification
 import org.bson.types.ObjectId
 
 sealed interface NotificationSpec

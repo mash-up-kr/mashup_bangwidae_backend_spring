@@ -1,9 +1,9 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
 import io.swagger.annotations.ApiModelProperty
-import kr.mashup.bangwidae.asked.model.post.Comment
-import kr.mashup.bangwidae.asked.service.post.CommentDomain
-import kr.mashup.bangwidae.asked.service.post.CommentUserDomain
+import kr.mashup.bangwidae.asked.model.document.post.Comment
+import kr.mashup.bangwidae.asked.model.domain.CommentDomain
+import kr.mashup.bangwidae.asked.model.domain.CommentUserDomain
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
 import java.time.LocalDateTime

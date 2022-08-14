@@ -1,6 +1,6 @@
 package kr.mashup.bangwidae.asked.repository
 
-import kr.mashup.bangwidae.asked.model.post.Post
+import kr.mashup.bangwidae.asked.model.document.post.Post
 import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.geo.Distance
