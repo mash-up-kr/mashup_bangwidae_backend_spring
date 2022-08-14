@@ -1,6 +1,5 @@
 package kr.mashup.bangwidae.asked.service.post
 
-import kr.mashup.bangwidae.asked.controller.dto.PostDto
 import kr.mashup.bangwidae.asked.controller.dto.PostEditRequest
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
@@ -17,7 +16,6 @@ import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.geo.Distance
 import org.springframework.data.geo.Metrics
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
 @Service
@@ -34,16 +32,16 @@ class PostService(
             ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
     }
 
-    fun write(user: User, post: Post): Post {
+    fun write(user: User, post: Post): PostDomain {
         return postRepository.save(updatePlaceInfo(post)).also {
             levelPolicyService.levelUpIfConditionSatisfied(user)
-        }
+        }.toDomain(user)
     }
 
-    fun edit(user: User, postId: ObjectId, request: PostEditRequest): Post {
+    fun edit(user: User, postId: ObjectId, request: PostEditRequest): PostDomain {
         val post = findById(postId)
             .also { it.validateToUpdate(user) }
-        return postRepository.save(updatePlaceInfo(post.update(request)))
+        return postRepository.save(updatePlaceInfo(post.update(request))).toDomain(user)
     }
 
     fun delete(user: User, postId: ObjectId) {
@@ -53,7 +51,7 @@ class PostService(
 
     fun getNearPost(
         user: User?, longitude: Double, latitude: Double, meterDistance: Double, lastId: ObjectId?, size: Int
-    ): List<PostDto> {
+    ): List<PostDomain> {
         val location = GeoUtils.geoJsonPoint(longitude, latitude)
         val distance = Distance(meterDistance / 1000, Metrics.KILOMETERS)
         val postList = postRepository.findByLocationNearAndIdBeforeAndDeletedFalseOrderByIdDesc(
@@ -63,36 +61,12 @@ class PostService(
             PageRequest.of(0, size)
         )
 
-        val userMap = userRepository.findAllByIdIn(postList.map { it.userId }).associateBy { it.id }
-        val likeMap = postLikeService.getLikeMap(postList)
-        val commentCountMap = commentService.getCommentCountMap(postList)
-
-        return postList.map { post ->
-            PostDto.from(
-                user = userMap[post.userId]!!,
-                post = post,
-                likeCount = likeMap[post.id]?.size ?: 0,
-                commentCount = commentCountMap[post.id] ?: 0,
-                userLiked = if (user == null) false
-                else likeMap[post.id]?.map { like -> like.userId }?.contains(user.id) ?: false
-            )
-        }
+        return postList.toDomain(user)
     }
 
-    fun getPostById(user: User?, id: ObjectId): PostDto {
+    fun getPostById(user: User?, id: ObjectId): PostDomain {
         val post = findById(id)
-        val writer = userRepository.findByIdOrNull(post.userId)
-            ?: throw DoriDoriException.of(DoriDoriExceptionType.POST_WRITER_USER_NOT_EXIST)
-        val likeMap = postLikeService.getLikeMap(listOf(post))
-        val commentCountMap = commentService.getCommentCountMap(listOf(post))
-        return PostDto.from(
-            user = writer,
-            post = post,
-            likeCount = likeMap[post.id]?.size ?: 0,
-            commentCount = commentCountMap[post.id] ?: 0,
-            userLiked = if (user == null) false
-            else likeMap[post.id]?.map { like -> like.userId }?.contains(user.id) ?: false
-        )
+        return post.toDomain(user)
     }
 
     private fun updatePlaceInfo(post: Post): Post {
@@ -102,23 +76,32 @@ class PostService(
         return post.copy(representativeAddress = region.representativeAddress, region = region)
     }
 
-    fun findByFromUser(user: User, lastId: ObjectId?, size: Int): List<PostDto> {
+    fun findByFromUser(user: User, lastId: ObjectId?, size: Int): List<PostDomain> {
         val postList = postRepository.findByUserIdAndIdBeforeAndDeletedFalseOrderByIdDesc(
             userId = user.id!!,
             lastId = lastId ?: ObjectId(),
             pageRequest = PageRequest.of(0, size)
         )
-        val userMap = userRepository.findAllByIdIn(postList.map { it.userId }).associateBy { it.id }
-        val likeMap = postLikeService.getLikeMap(postList)
-        val commentCountMap = commentService.getCommentCountMap(postList)
 
-        return postList.map { post ->
-            PostDto.from(
+        return postList.toDomain(user)
+    }
+
+    private fun Post.toDomain(user: User?): PostDomain {
+        return listOf(this).toDomain(user).first()
+    }
+
+    private fun List<Post>.toDomain(user: User?): List<PostDomain> {
+        val userMap = userRepository.findAllByIdIn(this.map { it.userId }.toSet()).associateBy { it.id!! }
+        val likeMap = postLikeService.getLikeMap(this)
+        val commentCountMap = commentService.getCommentCountMap(this)
+        return this.map { post ->
+            PostDomain.from(
                 user = userMap[post.userId]!!,
                 post = post,
                 likeCount = likeMap[post.id]?.size ?: 0,
                 commentCount = commentCountMap[post.id] ?: 0,
-                userLiked = likeMap[post.id]?.map { like -> like.userId }?.contains(user.id) ?: false
+                userLiked = if (user == null) false
+                else likeMap[post.id]?.map { like -> like.userId }?.contains(user.id) ?: false
             )
         }
     }

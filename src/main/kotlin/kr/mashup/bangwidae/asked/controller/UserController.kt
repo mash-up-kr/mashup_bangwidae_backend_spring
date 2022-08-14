@@ -190,7 +190,14 @@ class UserController(
         @RequestParam(required = false) lastId: ObjectId?,
     ): ApiResponse<CursorResult<PostDto>> {
         return postService.findByFromUser(user = user, lastId = lastId, size = size + 1)
-            .let { ApiResponse.success(CursorResult.from(values = it, requestedSize = size)) }
+            .let { postList ->
+                ApiResponse.success(
+                    CursorResult.from(
+                        values = postList.map { PostDto.from(it) },
+                        requestedSize = size
+                    )
+                )
+            }
     }
 
     @ApiOperation("유저 설정 정보")

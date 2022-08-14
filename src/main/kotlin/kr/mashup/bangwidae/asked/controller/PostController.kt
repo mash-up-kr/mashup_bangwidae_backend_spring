@@ -24,11 +24,11 @@ class PostController(
     @PostMapping
     fun writePost(
         @ApiIgnore @AuthenticationPrincipal user: User, @RequestBody postWriteRequest: PostWriteRequest
-    ): ApiResponse<PostResultDto> {
+    ): ApiResponse<PostDto> {
         val post = postWriteRequest.toEntity(user.id!!)
         return postService.write(user, post)
             .let {
-                ApiResponse.success(PostResultDto.from(user, it))
+                ApiResponse.success(PostDto.from(it))
             }
     }
 
@@ -38,13 +38,13 @@ class PostController(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @RequestBody postEditRequest: PostEditRequest,
         @PathVariable id: ObjectId
-    ): ApiResponse<PostResultDto> {
+    ): ApiResponse<PostDto> {
         return postService.edit(
             postId = id,
             user = user,
             request = postEditRequest
         ).let {
-            ApiResponse.success(PostResultDto.from(user, it))
+            ApiResponse.success(PostDto.from(it))
         }
     }
 
@@ -86,8 +86,13 @@ class PostController(
         @RequestParam(required = false) lastId: ObjectId?
     ): ApiResponse<CursorResult<PostDto>> {
         return postService.getNearPost(user, longitude, latitude, meterDistance, lastId, size + 1)
-            .let {
-                ApiResponse.success(CursorResult.from(values = it, requestedSize = size))
+            .let { postList ->
+                ApiResponse.success(
+                    CursorResult.from(
+                        values = postList.map { PostDto.from(it) },
+                        requestedSize = size
+                    )
+                )
             }
     }
 
@@ -99,7 +104,7 @@ class PostController(
     ): ApiResponse<PostDto> {
         return postService.getPostById(user, postId)
             .let {
-                ApiResponse.success(it)
+                ApiResponse.success(PostDto.from(it))
             }
     }
 
