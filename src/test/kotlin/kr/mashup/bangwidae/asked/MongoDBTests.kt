@@ -1,6 +1,6 @@
 package kr.mashup.bangwidae.asked
 
-import kr.mashup.bangwidae.asked.model.post.Post
+import kr.mashup.bangwidae.asked.model.document.post.Post
 import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import org.assertj.core.api.Assertions.assertThat

@@ -3,9 +3,10 @@ package kr.mashup.bangwidae.asked.service.question
 import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.question.Question
-import kr.mashup.bangwidae.asked.model.question.QuestionStatus
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.question.Question
+import kr.mashup.bangwidae.asked.model.document.question.QuestionStatus
+import kr.mashup.bangwidae.asked.model.domain.QuestionDomain
 import kr.mashup.bangwidae.asked.repository.*
 import kr.mashup.bangwidae.asked.service.event.QuestionWriteEvent
 import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService

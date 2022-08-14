@@ -1,9 +1,9 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
 import io.swagger.annotations.ApiModelProperty
-import kr.mashup.bangwidae.asked.service.question.AnswerDomain
-import kr.mashup.bangwidae.asked.service.question.QuestionDomain
-import kr.mashup.bangwidae.asked.service.question.QuestionUserDomain
+import kr.mashup.bangwidae.asked.model.domain.AnswerDomain
+import kr.mashup.bangwidae.asked.model.domain.QuestionDomain
+import kr.mashup.bangwidae.asked.model.domain.QuestionUserDomain
 import org.bson.types.ObjectId
 import java.time.LocalDateTime
 import kotlin.math.min

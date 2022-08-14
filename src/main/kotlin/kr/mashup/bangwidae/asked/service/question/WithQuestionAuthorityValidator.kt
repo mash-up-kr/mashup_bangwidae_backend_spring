@@ -2,8 +2,8 @@ package kr.mashup.bangwidae.asked.service.question
 
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.question.Question
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.question.Question
 
 interface WithQuestionAuthorityValidator {
     fun Question.validateToUpdate(user: User) {

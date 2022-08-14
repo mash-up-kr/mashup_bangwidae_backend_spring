@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.model.post
+package kr.mashup.bangwidae.asked.model.document.post
 
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id

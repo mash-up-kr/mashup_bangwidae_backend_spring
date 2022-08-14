@@ -2,8 +2,8 @@ package kr.mashup.bangwidae.asked.service
 
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.Ward
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.Ward
 import kr.mashup.bangwidae.asked.repository.LevelPolicyRepository
 import kr.mashup.bangwidae.asked.repository.WardRepository
 import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService

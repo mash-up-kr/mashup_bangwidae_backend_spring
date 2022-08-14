@@ -1,8 +1,8 @@
-package kr.mashup.bangwidae.asked.service.question
+package kr.mashup.bangwidae.asked.model.domain
 
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.question.Answer
-import kr.mashup.bangwidae.asked.model.question.Question
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.question.Answer
+import kr.mashup.bangwidae.asked.model.document.question.Question
 import org.bson.types.ObjectId
 import java.time.LocalDateTime
 

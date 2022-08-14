@@ -2,7 +2,7 @@ package kr.mashup.bangwidae.asked.service
 
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
-import kr.mashup.bangwidae.asked.model.CertMail
+import kr.mashup.bangwidae.asked.model.document.CertMail
 import kr.mashup.bangwidae.asked.repository.CertMailRepository
 import org.springframework.stereotype.Service
 import java.time.LocalDateTime

@@ -1,6 +1,6 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
-import kr.mashup.bangwidae.asked.model.Ward
+import kr.mashup.bangwidae.asked.model.document.Ward
 import kr.mashup.bangwidae.asked.utils.getLatitude
 import kr.mashup.bangwidae.asked.utils.getLongitude
 import java.time.LocalDateTime

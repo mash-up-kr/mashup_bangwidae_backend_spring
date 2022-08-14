@@ -2,8 +2,8 @@ package kr.mashup.bangwidae.asked.service.levelpolicy
 
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
-import kr.mashup.bangwidae.asked.model.LevelPolicy
-import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.document.LevelPolicy
+import kr.mashup.bangwidae.asked.model.document.User
 import kr.mashup.bangwidae.asked.repository.*
 import kr.mashup.bangwidae.asked.service.event.LevelUpEvent
 import org.springframework.context.ApplicationEventPublisher

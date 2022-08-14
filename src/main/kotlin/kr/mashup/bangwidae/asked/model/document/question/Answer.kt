@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.model.question
+package kr.mashup.bangwidae.asked.model.document.question
 
 import kr.mashup.bangwidae.asked.model.Region
 import org.bson.types.ObjectId
@@ -12,14 +12,13 @@ import org.springframework.data.mongodb.core.index.GeoSpatialIndexed
 import org.springframework.data.mongodb.core.mapping.Document
 import java.time.LocalDateTime
 
-@Document("question")
-data class Question(
+@Document("answer")
+data class Answer(
     @Id
     val id: ObjectId? = null,
-    val toUserId: ObjectId,
-    val fromUserId: ObjectId,
+    val userId: ObjectId,
+    val questionId: ObjectId,
     val content: String,
-    val status: QuestionStatus = QuestionStatus.ANSWER_WAITING,
 
     // TODO location 기존 데이터 마이그레이션 후 not-null 로 수정
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
@@ -27,52 +26,21 @@ data class Question(
     val representativeAddress: String? = null,
     val region: Region? = null,
 
-    // TODO anonymous 기존 데이터 마이그레이션 후 not-null 로 수정
-    val anonymous: Boolean? = false,
     val deleted: Boolean = false,
-    @Version var version: Int? = null,
+    @Version
+    var version: Int? = null,
     @CreatedDate var createdAt: LocalDateTime? = null,
     @LastModifiedDate var updatedAt: LocalDateTime? = null,
 ) {
-    fun updateContent(content: String): Question {
+    fun updateContent(content: String): Answer {
         return this.copy(
             content = content,
         )
     }
 
-    fun deny(): Question {
-        return this.copy(
-            status = QuestionStatus.QUESTION_DENY,
-        )
-    }
-
-    fun delete(): Question {
+    fun delete(): Answer {
         return this.copy(
             deleted = true,
         )
     }
-
-    fun answer(): Question {
-        return this.copy(
-            status = QuestionStatus.ANSWER_COMPLETE,
-        )
-    }
-
-    fun waiting(): Question {
-        return this.copy(
-            status = QuestionStatus.ANSWER_WAITING,
-        )
-    }
-}
-
-enum class QuestionStatus {
-    // 답변 대기
-    ANSWER_WAITING,
-
-    // 답변 완료
-    ANSWER_COMPLETE,
-
-    // 질문 거절
-    QUESTION_DENY,
-    ;
 }
