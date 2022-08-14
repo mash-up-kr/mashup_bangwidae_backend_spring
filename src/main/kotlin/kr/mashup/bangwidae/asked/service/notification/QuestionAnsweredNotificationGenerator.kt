@@ -33,7 +33,7 @@ class QuestionAnsweredNotificationGenerator(
                     content = "${question.toUser.nickname}의 답변이 도착했어요!",
                     urlScheme = UrlSchemeUtils.generate(
                         urlSchemeProperties.questionDetail,
-                        UrlSchemeParameter("questionId", question.id.toString())
+                        UrlSchemeParameter("questionId", question.id.toHexString())
                     )
                 )
             )

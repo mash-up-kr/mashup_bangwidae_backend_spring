@@ -37,7 +37,7 @@ class PostCommentedNotificationGenerator(
                     content = "${commentUserNickname}의 답변이 도착했어요!",
                     urlScheme = UrlSchemeUtils.generate(
                         urlSchemeProperties.postDetail,
-                        UrlSchemeParameter("postId", post.id.toString())
+                        UrlSchemeParameter("postId", post.id!!.toHexString())
                     )
                 )
             )

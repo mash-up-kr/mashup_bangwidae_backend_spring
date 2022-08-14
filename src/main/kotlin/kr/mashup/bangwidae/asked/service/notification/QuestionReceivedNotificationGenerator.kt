@@ -30,7 +30,7 @@ class QuestionReceivedNotificationGenerator(
                     content = "${question.fromUser.nickname}의 질문을 확인해보세요.",
                     urlScheme = UrlSchemeUtils.generate(
                         urlSchemeProperties.questionDetail,
-                        UrlSchemeParameter("questionId", question.id.toString())
+                        UrlSchemeParameter("questionId", question.id.toHexString())
                     )
                 )
             )
