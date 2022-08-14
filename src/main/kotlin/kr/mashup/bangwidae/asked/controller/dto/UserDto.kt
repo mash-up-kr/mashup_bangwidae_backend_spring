@@ -2,22 +2,25 @@ package kr.mashup.bangwidae.asked.controller.dto
 
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.question.QuestionDomain
+import org.bson.types.ObjectId
 
 data class UserInfoDto(
     val userId: String,
     val nickname: String?,
     val profileDescription: String?,
     val tags: List<String>,
+    val representativeWardName: String?,
     val level: Int,
     val profileImageUrl: String?
 ) {
     companion object {
-        fun from(user: User): UserInfoDto {
+        fun from(user: User, representativeWardName: String?): UserInfoDto {
             return UserInfoDto(
                 userId = user.id!!.toHexString(),
                 nickname = user.nickname,
                 profileDescription = user.description,
                 tags = user.tags,
+                representativeWardName = representativeWardName,
                 profileImageUrl = user.userProfileImageUrl,
                 level = user.level
             )
@@ -27,7 +30,7 @@ data class UserInfoDto(
 
 data class UserLinkShareInfoDto(
     val user: UserInfoDto,
-    val representativeWardName: String,
+    val representativeWardName: String?,
     val questions: List<QuestionAndAnswerDto>,
 ) {
     data class UserInfoDto(
@@ -65,9 +68,9 @@ data class UserLinkShareInfoDto(
     }
 
     companion object {
-        fun from(user: User, questions: List<QuestionDomain>) = UserLinkShareInfoDto(
+        fun from(user: User, questions: List<QuestionDomain>, representativeWardName: String?) = UserLinkShareInfoDto(
             user = UserInfoDto.from(user),
-            representativeWardName = "todo - 우리집",
+            representativeWardName = representativeWardName,
             questions = questions.map { QuestionAndAnswerDto.from(it) },
         )
     }
@@ -90,6 +93,7 @@ data class UpdateNicknameRequest(
 data class UpdateProfileRequest(
     val description: String,
     val tags: List<String>,
+    val representativeWardId: ObjectId?
 )
 
 data class UserSettingsDto(

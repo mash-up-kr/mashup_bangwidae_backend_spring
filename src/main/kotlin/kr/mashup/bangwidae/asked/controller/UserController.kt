@@ -6,6 +6,7 @@ import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.HeaderTextType
 import kr.mashup.bangwidae.asked.service.UserService
+import kr.mashup.bangwidae.asked.service.WardService
 import kr.mashup.bangwidae.asked.service.question.QuestionService
 import org.bson.types.ObjectId
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -19,6 +20,7 @@ import springfox.documentation.annotations.ApiIgnore
 class UserController(
     private val userService: UserService,
     private val questionService: QuestionService,
+    private val wardService: WardService
 ) {
 
     @ApiOperation("ID/PW 회원가입")
@@ -34,7 +36,7 @@ class UserController(
     fun getUserInfo(
         @PathVariable userId: ObjectId
     ): ApiResponse<UserInfoDto> {
-        return ApiResponse.success(UserInfoDto.from(userService.getUserInfo(userId)))
+        return ApiResponse.success(userService.getUserInfo(userId))
     }
 
     @ApiOperation("유저 링크 공유")
@@ -43,14 +45,15 @@ class UserController(
         @ApiIgnore @AuthenticationPrincipal authUser: User?,
         @PathVariable userId: ObjectId
     ): ApiResponse<UserLinkShareInfoDto> {
-        val user = userService.getUserInfo(userId)
+        val user = userService.findById(userId)
         val questions = questionService.findAnswerCompleteByToUser(
             authUser = authUser,
             toUserID = userId,
             lastId = null,
             size = 2,
         )
-        return ApiResponse.success(UserLinkShareInfoDto.from(user, questions))
+        val representativeWard = wardService.getMyRepresentativeWard(user)
+        return ApiResponse.success(UserLinkShareInfoDto.from(user, questions, representativeWard?.name))
     }
 
     @ApiOperation("닉네임 설정")
@@ -72,7 +75,8 @@ class UserController(
             userService.updateProfile(
                 user,
                 updateProfileRequest.description,
-                updateProfileRequest.tags
+                updateProfileRequest.tags,
+                updateProfileRequest.representativeWardId
             )
         )
     }
@@ -94,13 +98,13 @@ class UserController(
         return ApiResponse.success(userService.updateToDefaultProfileImage(user))
     }
 
-    // 우선 principal 동작 테스트 용도
     @ApiOperation("내 정보")
     @GetMapping("/me")
     fun getMyInfo(
         @ApiIgnore @AuthenticationPrincipal user: User
-    ): ApiResponse<String> {
-        return ApiResponse.success(user.nickname!!)
+    ): ApiResponse<UserInfoDto> {
+        val representativeWard = wardService.getMyRepresentativeWard(user)
+        return ApiResponse.success(UserInfoDto.from(user, representativeWard?.name))
     }
 
     @ApiOperation("헤더 문구")
