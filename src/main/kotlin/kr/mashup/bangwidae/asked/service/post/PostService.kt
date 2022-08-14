@@ -101,4 +101,25 @@ class PostService(
         val region = placeService.reverseGeocode(longitude, latitude)
         return post.copy(representativeAddress = region.representativeAddress, region = region)
     }
+
+    fun findByFromUser(user: User, lastId: ObjectId?, size: Int): List<PostDto> {
+        val postList = postRepository.findByUserIdAndIdBeforeAndDeletedFalseOrderByIdDesc(
+            userId = user.id!!,
+            lastId = lastId ?: ObjectId(),
+            pageRequest = PageRequest.of(0, size)
+        )
+        val userMap = userRepository.findAllByIdIn(postList.map { it.userId }).associateBy { it.id }
+        val likeMap = postLikeService.getLikeMap(postList)
+        val commentCountMap = commentService.getCommentCountMap(postList)
+
+        return postList.map { post ->
+            PostDto.from(
+                user = userMap[post.userId]!!,
+                post = post,
+                likeCount = likeMap[post.id]?.size ?: 0,
+                commentCount = commentCountMap[post.id] ?: 0,
+                userLiked = likeMap[post.id]?.map { like -> like.userId }?.contains(user.id) ?: false
+            )
+        }
+    }
 }

@@ -7,6 +7,7 @@ import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.service.HeaderTextType
 import kr.mashup.bangwidae.asked.service.UserService
 import kr.mashup.bangwidae.asked.service.WardService
+import kr.mashup.bangwidae.asked.service.post.PostService
 import kr.mashup.bangwidae.asked.service.question.QuestionService
 import org.bson.types.ObjectId
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -20,7 +21,8 @@ import springfox.documentation.annotations.ApiIgnore
 class UserController(
     private val userService: UserService,
     private val questionService: QuestionService,
-    private val wardService: WardService
+    private val wardService: WardService,
+    private val postService: PostService
 ) {
 
     @ApiOperation("ID/PW 회원가입")
@@ -178,6 +180,17 @@ class UserController(
                 )
             )
         }
+    }
+
+    @ApiOperation("한 질문(본인, Post)")
+    @GetMapping("/asked-posts")
+    fun getMyAskedPosts(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @RequestParam size: Int,
+        @RequestParam(required = false) lastId: ObjectId?,
+    ): ApiResponse<CursorResult<PostDto>> {
+        return postService.findByFromUser(user = user, lastId = lastId, size = size + 1)
+            .let { ApiResponse.success(CursorResult.from(values = it, requestedSize = size)) }
     }
 
     @ApiOperation("유저 설정 정보")
