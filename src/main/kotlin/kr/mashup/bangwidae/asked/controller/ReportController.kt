@@ -25,7 +25,7 @@ class ReportController(
         @PathVariable targetId: ObjectId,
         @PathVariable type: String
     ): ApiResponse<Boolean> {
-        return reportService.report(reportDto.toEntity(type, targetId))
+        return reportService.report(reportDto.toEntity(user, type, targetId))
             .let { ApiResponse.success(true) }
     }
 }
