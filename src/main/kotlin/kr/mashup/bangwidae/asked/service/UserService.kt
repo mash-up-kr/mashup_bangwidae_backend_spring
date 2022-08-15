@@ -60,7 +60,7 @@ class UserService(
         val user = userRepository.findById(userId)
             .orElseThrow { DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND) }
         val representativeWard = wardService.getMyRepresentativeWard(user)
-        return UserInfoDto.from(user, representativeWard?.name)
+        return UserInfoDto.from(user, representativeWard)
     }
 
     fun getUserHeaderText(user: User, type: HeaderTextType): String {

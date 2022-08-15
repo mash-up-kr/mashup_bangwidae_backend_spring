@@ -55,7 +55,7 @@ class UserController(
             size = 2,
         )
         val representativeWard = wardService.getMyRepresentativeWard(user)
-        return ApiResponse.success(UserLinkShareInfoDto.from(user, questions, representativeWard?.name))
+        return ApiResponse.success(UserLinkShareInfoDto.from(user, questions, representativeWard))
     }
 
     @ApiOperation("닉네임 설정")
@@ -106,7 +106,7 @@ class UserController(
         @ApiIgnore @AuthenticationPrincipal user: User
     ): ApiResponse<UserInfoDto> {
         val representativeWard = wardService.getMyRepresentativeWard(user)
-        return ApiResponse.success(UserInfoDto.from(user, representativeWard?.name))
+        return ApiResponse.success(UserInfoDto.from(user, representativeWard))
     }
 
     @ApiOperation("헤더 문구")
