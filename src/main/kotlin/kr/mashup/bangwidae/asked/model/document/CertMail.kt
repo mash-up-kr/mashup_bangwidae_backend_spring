@@ -20,6 +20,10 @@ data class CertMail(
         return this.certificationNumber == number
     }
 
+    fun isExpired(): Boolean {
+        return LocalDateTime.now().isAfter(expiredTs)
+    }
+
     companion object{
         fun of(email: String, certificationNumber: String): CertMail {
             return CertMail(
