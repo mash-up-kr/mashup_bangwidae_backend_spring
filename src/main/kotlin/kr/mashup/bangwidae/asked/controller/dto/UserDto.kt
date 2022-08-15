@@ -1,6 +1,7 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
 import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.Ward
 import kr.mashup.bangwidae.asked.model.domain.QuestionDomain
 import org.bson.types.ObjectId
 
@@ -9,18 +10,18 @@ data class UserInfoDto(
     val nickname: String?,
     val profileDescription: String?,
     val tags: List<String>,
-    val representativeWardName: String?,
+    val representativeWard: WardDto?,
     val level: Int,
     val profileImageUrl: String?
 ) {
     companion object {
-        fun from(user: User, representativeWardName: String?): UserInfoDto {
+        fun from(user: User, representativeWard: Ward?): UserInfoDto {
             return UserInfoDto(
                 userId = user.id!!.toHexString(),
                 nickname = user.nickname,
                 profileDescription = user.description,
                 tags = user.tags,
-                representativeWardName = representativeWardName,
+                representativeWard = representativeWard?.let { WardDto.from(it) },
                 profileImageUrl = user.userProfileImageUrl,
                 level = user.level
             )
@@ -30,7 +31,7 @@ data class UserInfoDto(
 
 data class UserLinkShareInfoDto(
     val user: UserInfoDto,
-    val representativeWardName: String?,
+    val representativeWard: WardDto?,
     val questions: List<QuestionAndAnswerDto>,
 ) {
     data class UserInfoDto(
@@ -68,9 +69,9 @@ data class UserLinkShareInfoDto(
     }
 
     companion object {
-        fun from(user: User, questions: List<QuestionDomain>, representativeWardName: String?) = UserLinkShareInfoDto(
+        fun from(user: User, questions: List<QuestionDomain>, representativeWard: Ward?) = UserLinkShareInfoDto(
             user = UserInfoDto.from(user),
-            representativeWardName = representativeWardName,
+            representativeWard = representativeWard?.let { WardDto.from(it) },
             questions = questions.map { QuestionAndAnswerDto.from(it) },
         )
     }
