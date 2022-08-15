@@ -21,13 +21,15 @@ import org.springframework.transaction.annotation.Transactional
 
 @Service
 class UserService(
-    private val jwtService: JwtService,
     private val userRepository: UserRepository,
+
+    private val jwtService: JwtService,
+    private val wardService: WardService,
+    private val termsService: TermsService,
     private val certMailService: CertMailService,
     private val passwordService: PasswordService,
     private val questionService: QuestionService,
     private val s3ImageUploader: S3ImageUploader,
-    private val wardService: WardService
 ) {
 
     fun joinUser(joinUserRequest: JoinUserRequest): JoinUserResponse {
@@ -45,6 +47,8 @@ class UserService(
                 password = encodedPassword
             )
         )
+
+        termsService.agreeTerms(user, joinUserRequest.termsIds)
 
         val refreshToken = jwtService.createRefreshToken(user.id!!.toHexString())
         userRepository.save(

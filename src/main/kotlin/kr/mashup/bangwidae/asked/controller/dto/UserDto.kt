@@ -79,7 +79,8 @@ data class UserLinkShareInfoDto(
 
 data class JoinUserRequest(
     val email: String,
-    val password: String
+    val password: String,
+    val termsIds: List<ObjectId>,
 )
 
 data class JoinUserResponse(
