@@ -15,6 +15,7 @@ enum class DoriDoriExceptionType(
     PERMISSION_DENIED("권한이 없어요"),
     DUPLICATED_USER("이미 가입된 이메일 이에요"),
     CERTIFICATE_FAILED("인증번호가 일치하지 않아요"),
+    CERT_MAIL_EXPIRED("인증메일 유효기간이 만료되었어요"),
     NOT_CERTIFICATED_EMAIL("이메일 인증이 되지 않았어요"),
     LOGIN_FAILED("로그인에 실패했어요"),
     INVALID_PASSWORD("비밀번호가 틀렸어요"),

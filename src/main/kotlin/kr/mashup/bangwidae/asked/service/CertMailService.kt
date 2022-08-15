@@ -24,6 +24,10 @@ class CertMailService(
             throw DoriDoriException.of(DoriDoriExceptionType.CERTIFICATE_FAILED)
         }
 
+        if (certMail.isExpired()) {
+            throw DoriDoriException.of(DoriDoriExceptionType.CERT_MAIL_EXPIRED)
+        }
+
         certMail.certificationTs = LocalDateTime.now()
         certMail.isCertificated = true
         certMailRepository.save(certMail)
