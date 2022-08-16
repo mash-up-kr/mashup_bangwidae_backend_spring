@@ -8,10 +8,12 @@ import kr.mashup.bangwidae.asked.model.document.question.Question
 import kr.mashup.bangwidae.asked.model.document.question.QuestionStatus
 import kr.mashup.bangwidae.asked.model.domain.QuestionDomain
 import kr.mashup.bangwidae.asked.repository.*
+import kr.mashup.bangwidae.asked.service.event.QuestionWriteEvent
 import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
@@ -27,6 +29,7 @@ class QuestionService(
     private val answerLikeRepository: AnswerLikeRepository,
     private val answerLikeAggregator: AnswerLikeAggregator,
     private val userRepository: UserRepository,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) : WithQuestionAuthorityValidator {
     private fun findById(questionId: ObjectId): Question {
         return questionRepository.findByIdAndDeletedFalse(questionId)
@@ -151,6 +154,8 @@ class QuestionService(
                 )
             ).also {
                 levelPolicyService.levelUpIfConditionSatisfied(user)
+            }.also {
+                applicationEventPublisher.publishEvent(QuestionWriteEvent(it.id!!))
             }
         }
     }

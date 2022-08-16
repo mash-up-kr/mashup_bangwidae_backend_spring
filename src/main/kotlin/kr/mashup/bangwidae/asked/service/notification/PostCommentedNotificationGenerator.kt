@@ -4,6 +4,8 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.document.Notification
 import kr.mashup.bangwidae.asked.service.UserService
+import kr.mashup.bangwidae.asked.service.event.CommentWriteEvent
+import kr.mashup.bangwidae.asked.service.event.NotificationEvent
 import kr.mashup.bangwidae.asked.service.post.CommentService
 import kr.mashup.bangwidae.asked.service.post.PostService
 import kr.mashup.bangwidae.asked.utils.StringUtils
@@ -18,16 +20,17 @@ class PostCommentedNotificationGenerator(
     private val userService: UserService,
     private val urlSchemeProperties: UrlSchemeProperties,
 ) : NotificationGenerator {
-    override fun support(spec: NotificationSpec): Boolean {
-        return spec is PostCommentedNotificationSpec
+    override fun support(event: NotificationEvent): Boolean {
+        return event is CommentWriteEvent
     }
 
-    override fun generate(spec: NotificationSpec): List<Notification> {
-        if (spec is PostCommentedNotificationSpec) {
-            val comment = commentService.findById(spec.commentId)
+    override fun generate(event: NotificationEvent): List<Notification> {
+        if (event is CommentWriteEvent) {
+            val comment = commentService.findById(event.commentId)
+            val post = postService.findById(comment.postId)
+            if (comment.userId == post.userId) return emptyList()
             val commentUserNickname =
                 if (comment.anonymous == true) "익명" else userService.findById(comment.userId).nickname
-            val post = postService.findById(comment.postId)
 
             return listOf(
                 Notification(

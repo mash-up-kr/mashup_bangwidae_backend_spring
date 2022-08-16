@@ -5,6 +5,8 @@ import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.document.LevelPolicy
 import kr.mashup.bangwidae.asked.model.document.User
 import kr.mashup.bangwidae.asked.repository.*
+import kr.mashup.bangwidae.asked.service.event.LevelUpEvent
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
 
 @Service
@@ -16,6 +18,7 @@ class LevelPolicyService(
     private val commentRepository: CommentRepository,
     private val postRepository: PostRepository,
     private val levelPolicyRepository: LevelPolicyRepository,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) {
 
     fun levelUpIfConditionSatisfied(user: User) {
@@ -31,6 +34,7 @@ class LevelPolicyService(
 
         if (satisfiedLevelUp) {
             userRepository.save(user.levelUp())
+            applicationEventPublisher.publishEvent(LevelUpEvent(user.id!!))
         }
     }
 
