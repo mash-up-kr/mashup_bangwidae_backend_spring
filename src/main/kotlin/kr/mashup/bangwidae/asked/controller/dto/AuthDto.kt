@@ -18,6 +18,8 @@ data class LoginResponse(
     val accessToken: String,
     @ApiModelProperty(value = "리프레시 토큰", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.~~~")
     val refreshToken: String,
+    @ApiModelProperty(value = "유저 Id", example = "62c7d4518b57fb5432bfb0d9")
+    val userId: String
 )
 
 data class CertMailSendRequest(

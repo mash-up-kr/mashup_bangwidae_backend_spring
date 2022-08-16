@@ -50,7 +50,8 @@ class AuthService(
 
         return LoginResponse(
             accessToken = jwtService.createAccessToken(user.id.toHexString()),
-            refreshToken = refreshToken
+            refreshToken = refreshToken,
+            userId = user.id.toHexString()
         )
     }
 
