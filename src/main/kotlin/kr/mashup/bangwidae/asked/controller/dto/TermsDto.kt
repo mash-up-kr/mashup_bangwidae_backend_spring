@@ -7,6 +7,7 @@ data class TermsDto(
     val id: ObjectId,
     val title: String,
     val content: String,
+    val necessary: Boolean,
 ) {
     companion object {
         fun from(terms: Terms): TermsDto {
@@ -14,6 +15,7 @@ data class TermsDto(
                 id = terms.id!!,
                 title = terms.title,
                 content = terms.content,
+                necessary = terms.isNecessary,
             )
         }
     }
