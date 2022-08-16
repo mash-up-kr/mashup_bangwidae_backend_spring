@@ -22,4 +22,8 @@ data class Notification(
     @Version var version: Int? = null,
     @CreatedDate var createdAt: LocalDateTime? = null,
     @LastModifiedDate var updatedAt: LocalDateTime? = null
-)
+) {
+    fun read(): Notification {
+        return this.copy(read = true)
+    }
+}
