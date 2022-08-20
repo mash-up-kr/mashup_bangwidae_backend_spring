@@ -20,8 +20,8 @@ class QaController(
     @ApiOperation("QA 용 회원가입(비밀번호 validation 과 이메일 인증 없이)")
     @PostMapping("/user/join")
     fun joinUser(
-        @RequestBody joinUserRequest: QaJoinUserRequest
+        @RequestBody qaJoinUserRequest: QaJoinUserRequest
     ): ApiResponse<JoinUserResponse> {
-        return ApiResponse.success(qaService.joinUser(joinUserRequest))
+        return ApiResponse.success(qaService.joinUser(qaJoinUserRequest))
     }
 }
