@@ -27,9 +27,9 @@ class QaService(
                 email = joinUserRequest.email,
                 password = encodedPassword
             ).copy(
-                nickname = joinUserRequest.nickname,
-                description = joinUserRequest.description,
-                tags = joinUserRequest.tags ?: emptyList()
+                nickname = joinUserRequest.nickname ?: "test nickname",
+                description = joinUserRequest.description ?: "test description",
+                tags = joinUserRequest.tags ?: listOf("testTag1", "testTag2")
             )
         )
 
