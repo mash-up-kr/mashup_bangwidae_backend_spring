@@ -85,7 +85,8 @@ data class JoinUserRequest(
 
 data class JoinUserResponse(
     val accessToken: String,
-    val refreshToken: String
+    val refreshToken: String,
+    val userId: String
 )
 
 data class UpdateNicknameRequest(
