@@ -57,6 +57,7 @@ class UserService(
         return JoinUserResponse(
             accessToken = jwtService.createAccessToken(user.id.toHexString()),
             refreshToken = refreshToken,
+            userId = user.id.toHexString()
         )
     }
 
