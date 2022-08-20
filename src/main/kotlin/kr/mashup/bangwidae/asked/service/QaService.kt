@@ -26,6 +26,10 @@ class QaService(
             User.createBasicUser(
                 email = joinUserRequest.email,
                 password = encodedPassword
+            ).copy(
+                nickname = joinUserRequest.nickname,
+                description = joinUserRequest.description,
+                tags = joinUserRequest.tags ?: emptyList()
             )
         )
 
