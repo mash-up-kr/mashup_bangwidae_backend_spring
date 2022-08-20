@@ -19,7 +19,7 @@ interface WithQuestionAuthorityValidator {
     }
 
     fun Question.validateToDeny(user: User) {
-        if (fromUserId != user.id) {
+        if (toUserId != user.id) {
             throw DoriDoriException.of(DoriDoriExceptionType.NOT_ALLOWED_TO_ACCESS)
         }
     }
