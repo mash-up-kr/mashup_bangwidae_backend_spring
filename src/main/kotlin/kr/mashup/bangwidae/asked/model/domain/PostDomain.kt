@@ -28,10 +28,10 @@ data class PostDomain(
             representativeAddress = post.representativeAddress,
             longitude = post.location.getLongitude(),
             latitude = post.location.getLatitude(),
-            anonymous = post.anonymous ?: false,
+            anonymous = post.anonymous,
             createdAt = post.createdAt,
             updatedAt = post.updatedAt,
-            user = if (post.anonymous == true) PostUserDomain.from(user.getAnonymousUser())
+            user = if (post.anonymous) PostUserDomain.from(user.getAnonymousUser())
             else PostUserDomain.from(user),
             likeCount = likeCount,
             commentCount = commentCount,

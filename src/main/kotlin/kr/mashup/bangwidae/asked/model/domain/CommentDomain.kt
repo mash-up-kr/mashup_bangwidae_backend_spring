@@ -21,10 +21,10 @@ data class CommentDomain(
             id = comment.id!!,
             content = comment.content,
             representativeAddress = comment.region?.representativeAddress,
-            anonymous = comment.anonymous ?: false,
+            anonymous = comment.anonymous,
             createdAt = comment.createdAt,
             updatedAt = comment.updatedAt,
-            user = if (comment.anonymous == true) CommentUserDomain.from(user.getAnonymousUser())
+            user = if (comment.anonymous) CommentUserDomain.from(user.getAnonymousUser())
             else CommentUserDomain.from(user),
             likeCount = likeCount,
             userLiked = userLiked,

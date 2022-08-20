@@ -44,14 +44,14 @@ data class PostWriteRequest(
     val content: String,
     val longitude: Double,
     val latitude: Double,
-    val anonymous: Boolean?
+    val anonymous: Boolean
 ) {
     fun toEntity(userId: ObjectId): Post {
         return Post(
             content = content,
             userId = userId,
             location = GeoUtils.geoJsonPoint(longitude, latitude),
-            anonymous = anonymous ?: false
+            anonymous = anonymous
         )
     }
 }
