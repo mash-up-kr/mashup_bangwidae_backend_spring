@@ -1,5 +1,6 @@
 package kr.mashup.bangwidae.asked.controller
 
+import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
 import kr.mashup.bangwidae.asked.controller.dto.CursorResult
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
+@Api(tags = ["공지 컨트롤러"])
 @RestController
 @RequestMapping("/api/v1/notice")
 class NoticeController(
