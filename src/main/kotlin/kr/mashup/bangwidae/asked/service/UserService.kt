@@ -22,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class UserService(
     private val userRepository: UserRepository,
-
     private val jwtService: JwtService,
     private val wardService: WardService,
     private val termsService: TermsService,
@@ -33,6 +32,7 @@ class UserService(
 ) {
 
     fun joinUser(joinUserRequest: JoinUserRequest): JoinUserResponse {
+        checkDuplicatedUserByEmail(joinUserRequest.email)
         val cert = certMailService.findByEmail(joinUserRequest.email)
         if (!cert.isCertificated) {
             throw DoriDoriException.of(DoriDoriExceptionType.NOT_CERTIFICATED_EMAIL)
