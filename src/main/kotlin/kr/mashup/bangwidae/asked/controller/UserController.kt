@@ -219,4 +219,12 @@ class UserController(
             .let { UserSettingsDto.from(it) }
             .let { ApiResponse.success(it) }
     }
+
+    @ApiOperation("유저 탈퇴")
+    @DeleteMapping
+    fun leaveUser(
+        @ApiIgnore @AuthenticationPrincipal user: User
+    ): ApiResponse<Boolean> {
+        return ApiResponse.success(true)
+    }
 }
