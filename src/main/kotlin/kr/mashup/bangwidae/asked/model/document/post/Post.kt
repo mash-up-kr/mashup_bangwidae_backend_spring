@@ -24,7 +24,7 @@ data class Post(
     val location: GeoJsonPoint,
     val representativeAddress: String? = null,
     val region: Region? = null,
-    val anonymous: Boolean? = false,
+    val anonymous: Boolean,
 
     val deleted: Boolean = false,
     @Version var version: Int? = null,

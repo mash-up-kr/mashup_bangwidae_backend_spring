@@ -15,8 +15,6 @@ data class Report(
     val reporterUserId: ObjectId,
     val type: ReportType,
     val targetId: ObjectId,
-    val reason: String,
-    val content: String?,
 
     @Version var version: Int? = null,
     @CreatedDate var createdAt: LocalDateTime? = null,

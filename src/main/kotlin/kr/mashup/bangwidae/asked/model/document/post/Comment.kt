@@ -21,7 +21,7 @@ data class Comment(
     val content: String,
     val location: GeoJsonPoint,
     val region: Region? = null,
-    val anonymous: Boolean? = false,
+    val anonymous: Boolean,
 
     val deleted: Boolean = false,
     @Version
@@ -32,7 +32,7 @@ data class Comment(
     fun update(commentEditRequest: CommentEditRequest): Comment {
         return commentEditRequest.let {
             this.copy(
-                content = it.content,
+                content = it.content ?: this.content,
                 location = if (it.longitude != null && it.latitude != null)
                     GeoUtils.geoJsonPoint(it.longitude, it.latitude) else this.location,
                 anonymous = it.anonymous ?: this.anonymous

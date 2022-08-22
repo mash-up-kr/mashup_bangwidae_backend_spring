@@ -16,7 +16,7 @@ data class CommentWriteRequest(
     @ApiModelProperty(value = "위도", example = "36.4")
     val latitude: Double,
     @ApiModelProperty(value = "익명 여부", example = "true || null || false")
-    val anonymous: Boolean?
+    val anonymous: Boolean
 ) {
     fun toEntity(userId: ObjectId, postId: ObjectId): Comment {
         return Comment(
@@ -24,14 +24,14 @@ data class CommentWriteRequest(
             userId = userId,
             postId = postId,
             location = GeoUtils.geoJsonPoint(longitude, latitude),
-            anonymous = anonymous ?: false
+            anonymous = anonymous
         )
     }
 }
 
 data class CommentEditRequest(
     @ApiModelProperty(value = "댓글 내용", example = "댓글 내용 string")
-    val content: String,
+    val content: String?,
     val longitude: Double?,
     val latitude: Double?,
     val anonymous: Boolean?
