@@ -20,9 +20,8 @@ data class Answer(
     val questionId: ObjectId,
     val content: String,
 
-    // TODO location 기존 데이터 마이그레이션 후 not-null 로 수정
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
-    val location: GeoJsonPoint?,
+    val location: GeoJsonPoint,
     val representativeAddress: String? = null,
     val region: Region? = null,
 

@@ -10,7 +10,7 @@ data class QuestionDomain(
     val id: ObjectId,
     val content: String,
     val representativeAddress: String?,
-    val anonymous: Boolean?,
+    val anonymous: Boolean,
     val fromUser: QuestionUserDomain,
     val toUser: QuestionUserDomain,
     val answer: AnswerDomain?,
@@ -29,7 +29,7 @@ data class QuestionDomain(
             content = question.content,
             representativeAddress = question.representativeAddress,
             anonymous = question.anonymous,
-            fromUser = if (question.anonymous == true) QuestionUserDomain.from(fromUser.getAnonymousUser())
+            fromUser = if (question.anonymous) QuestionUserDomain.from(fromUser.getAnonymousUser())
             else QuestionUserDomain.from(fromUser),
             toUser = QuestionUserDomain.from(toUser),
             answer = answer?.let {
