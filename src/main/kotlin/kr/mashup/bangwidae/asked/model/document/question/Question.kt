@@ -34,9 +34,10 @@ data class Question(
     @CreatedDate var createdAt: LocalDateTime? = null,
     @LastModifiedDate var updatedAt: LocalDateTime? = null,
 ) {
-    fun updateContent(content: String): Question {
+    fun updateContent(content: String?, anonymous: Boolean?): Question {
         return this.copy(
-            content = content,
+            content = content ?: this.content,
+            anonymous = anonymous ?: this.anonymous,
         )
     }
 

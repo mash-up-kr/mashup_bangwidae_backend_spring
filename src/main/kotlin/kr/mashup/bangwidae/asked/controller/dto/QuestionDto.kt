@@ -21,7 +21,8 @@ data class QuestionWriteRequest(
 
 data class QuestionEditRequest(
     @ApiModelProperty(value = "질문 내용", example = "질문 내용 string")
-    val content: String,
+    val content: String?,
+    val anonymous: Boolean?,
 )
 
 data class AnswerWriteRequest(
