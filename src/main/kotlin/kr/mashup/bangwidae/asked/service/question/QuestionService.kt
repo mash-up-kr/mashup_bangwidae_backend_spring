@@ -59,7 +59,12 @@ class QuestionService(
         )
     }
 
-    fun findAnswerCompleteByToUser(authUser: User?, toUserID: ObjectId, lastId: ObjectId?, size: Int): List<QuestionDomain> {
+    fun findAnswerCompleteByToUser(
+        authUser: User?,
+        toUserID: ObjectId,
+        lastId: ObjectId?,
+        size: Int
+    ): List<QuestionDomain> {
         val toUser = userRepository.findByIdOrNull(toUserID)
             ?: throw DoriDoriException.of(
                 type = DoriDoriExceptionType.NOT_EXIST,
@@ -165,7 +170,10 @@ class QuestionService(
             .also { it.validateToUpdate(user) }
 
         return questionRepository.save(
-            question.updateContent(request.content)
+            question.updateContent(
+                content = request.content,
+                anonymous = request.anonymous,
+            )
         )
     }
 
