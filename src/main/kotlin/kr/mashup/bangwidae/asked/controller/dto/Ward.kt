@@ -10,6 +10,7 @@ data class WardDto(
     val name: String,
     val longitude: Double,
     val latitude: Double,
+    val city: String,
     val createdAt: LocalDateTime?,
     val remainDays: String,
     val isRepresentative: Boolean
@@ -23,6 +24,7 @@ data class WardDto(
                 latitude = ward.location.getLatitude(),
                 createdAt = ward.createdAt,
                 remainDays = ward.getDDays(),
+                city = ward.city,
                 isRepresentative = ward.isRepresentative ?: false
             )
         }
