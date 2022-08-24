@@ -11,7 +11,7 @@ data class CommentDomain(
     val content: String,
     val likeCount: Int,
     val userLiked: Boolean,
-    val representativeAddress: String?,
+    val representativeAddress: String,
     val anonymous: Boolean,
     val createdAt: LocalDateTime?,
     val updatedAt: LocalDateTime?
@@ -20,7 +20,7 @@ data class CommentDomain(
         fun from(user: User, comment: Comment, likeCount: Int, userLiked: Boolean) = CommentDomain(
             id = comment.id!!,
             content = comment.content,
-            representativeAddress = comment.region?.representativeAddress,
+            representativeAddress = comment.region?.representativeAddress?: "",
             anonymous = comment.anonymous,
             createdAt = comment.createdAt,
             updatedAt = comment.updatedAt,

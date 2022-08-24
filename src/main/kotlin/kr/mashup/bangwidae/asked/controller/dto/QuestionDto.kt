@@ -41,7 +41,7 @@ data class AnswerEditRequest(
 data class QuestionDetailDto(
     val id: String,
     val content: String,
-    val representativeAddress: String?,
+    val representativeAddress: String,
     val anonymous: Boolean,
     val fromUser: QuestionUserDto,
     val toUser: QuestionUserDto,
@@ -51,7 +51,7 @@ data class QuestionDetailDto(
     data class AnswerDto(
         val id: String,
         val content: String,
-        val representativeAddress: String?,
+        val representativeAddress: String,
         val user: QuestionUserDto,
         val likeCount: Long,
         val userLiked: Boolean,
@@ -62,7 +62,7 @@ data class QuestionDetailDto(
                 return AnswerDto(
                     id = answer.id.toHexString(),
                     content = answer.content,
-                    representativeAddress = answer.representativeAddress,
+                    representativeAddress = answer.representativeAddress?: "",
                     user = QuestionUserDto.from(answer.user),
                     likeCount = answer.likeCount,
                     userLiked = answer.userLiked,
@@ -77,7 +77,7 @@ data class QuestionDetailDto(
             return QuestionDetailDto(
                 id = question.id.toHexString(),
                 content = question.content,
-                representativeAddress = question.representativeAddress,
+                representativeAddress = question.representativeAddress?: "",
                 anonymous = question.anonymous,
                 fromUser = QuestionUserDto.from(question.fromUser),
                 toUser = QuestionUserDto.from(question.toUser),
@@ -95,7 +95,7 @@ data class AnsweredQuestionsDto(
     data class QuestionDto(
         val id: String,
         val content: String,
-        val representativeAddress: String?,
+        val representativeAddress: String,
         val anonymous: Boolean,
         val fromUser: QuestionUserDto,
         val toUser: QuestionUserDto,
@@ -107,7 +107,7 @@ data class AnsweredQuestionsDto(
                 return QuestionDto(
                     id = question.id.toHexString(),
                     content = question.content,
-                    representativeAddress = question.representativeAddress,
+                    representativeAddress = question.representativeAddress?: "",
                     anonymous = question.anonymous,
                     fromUser = QuestionUserDto.from(question.fromUser),
                     toUser = QuestionUserDto.from(question.toUser),
@@ -121,7 +121,7 @@ data class AnsweredQuestionsDto(
     data class AnswerDto(
         val id: String,
         val content: String,
-        val representativeAddress: String?,
+        val representativeAddress: String,
         val user: QuestionUserDto,
         val likeCount: Long,
         val userLiked: Boolean,
@@ -132,7 +132,7 @@ data class AnsweredQuestionsDto(
                 return AnswerDto(
                     id = answer.id.toHexString(),
                     content = answer.content,
-                    representativeAddress = answer.representativeAddress,
+                    representativeAddress = answer.representativeAddress?: "",
                     user = QuestionUserDto.from(answer.user),
                     likeCount = answer.likeCount,
                     userLiked = answer.userLiked,
@@ -164,7 +164,7 @@ data class ReceivedQuestionsDto(
     data class QuestionDto(
         val id: String,
         val content: String,
-        val representativeAddress: String?,
+        val representativeAddress: String,
         val anonymous: Boolean,
         val fromUser: QuestionUserDto,
         val toUser: QuestionUserDto,
@@ -175,7 +175,7 @@ data class ReceivedQuestionsDto(
                 return QuestionDto(
                     id = question.id.toHexString(),
                     content = question.content,
-                    representativeAddress = question.representativeAddress,
+                    representativeAddress = question.representativeAddress?: "",
                     anonymous = question.anonymous,
                     fromUser = QuestionUserDto.from(question.fromUser),
                     toUser = QuestionUserDto.from(question.toUser),
@@ -207,7 +207,7 @@ data class AskedQuestionsDto(
     data class QuestionDto(
         val id: String,
         val content: String,
-        val representativeAddress: String?,
+        val representativeAddress: String,
         val anonymous: Boolean,
         val fromUser: QuestionUserDto,
         val toUser: QuestionUserDto,
@@ -218,7 +218,7 @@ data class AskedQuestionsDto(
                 return QuestionDto(
                     id = question.id.toHexString(),
                     content = question.content,
-                    representativeAddress = question.representativeAddress,
+                    representativeAddress = question.representativeAddress?: "",
                     anonymous = question.anonymous,
                     fromUser = QuestionUserDto.from(question.fromUser),
                     toUser = QuestionUserDto.from(question.toUser),
