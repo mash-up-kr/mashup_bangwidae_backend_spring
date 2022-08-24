@@ -154,7 +154,7 @@ class QuestionService(
                     content = request.content,
                     anonymous = request.anonymous,
                     location = GeoUtils.geoJsonPoint(longitude = request.longitude, latitude = request.latitude),
-                    representativeAddress = it?.representativeAddress,
+                    representativeAddress = it?.representativeAddress?: "",
                     region = it,
                 )
             ).also {
