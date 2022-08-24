@@ -16,7 +16,7 @@ data class PostDto(
     val userLiked: Boolean,
     val longitude: Double,
     val latitude: Double,
-    val representativeAddress: String?,
+    val representativeAddress: String,
     val anonymous: Boolean,
     val createdAt: LocalDateTime?,
     val updatedAt: LocalDateTime?
@@ -32,7 +32,7 @@ data class PostDto(
                 commentCount = post.commentCount,
                 longitude = post.longitude,
                 latitude = post.latitude,
-                representativeAddress = post.representativeAddress,
+                representativeAddress = post.representativeAddress?: "",
                 anonymous = post.anonymous,
                 createdAt = post.createdAt,
                 updatedAt = post.updatedAt,

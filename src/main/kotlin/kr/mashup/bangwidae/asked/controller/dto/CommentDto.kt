@@ -43,7 +43,7 @@ data class CommentDto(
     val content: String,
     val likeCount: Int,
     val userLiked: Boolean,
-    val representativeAddress: String?,
+    val representativeAddress: String,
     val anonymous: Boolean,
     val createdAt: LocalDateTime?,
     val updatedAt: LocalDateTime?
@@ -56,7 +56,7 @@ data class CommentDto(
                 content = comment.content,
                 likeCount = comment.likeCount,
                 userLiked = comment.userLiked,
-                representativeAddress = comment.representativeAddress,
+                representativeAddress = comment.representativeAddress?: "",
                 anonymous = comment.anonymous,
                 createdAt = comment.createdAt,
                 updatedAt = comment.updatedAt
