@@ -1,5 +1,8 @@
 package kr.mashup.bangwidae.asked.model.document
 
+import kr.mashup.bangwidae.asked.exception.DoriDoriException
+import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
+import kr.mashup.bangwidae.asked.model.Region
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
@@ -21,11 +24,15 @@ data class Ward(
     val expiredAt: LocalDateTime,
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
     val location: GeoJsonPoint,
+    val region: Region,
     val isRepresentative: Boolean? = false,
     @Version var version: Int? = null,
     @CreatedDate var createdAt: LocalDateTime? = null,
     @LastModifiedDate var updatedAt: LocalDateTime? = null
 ) {
+    val city: String
+        get() = region.도 ?: region.시 ?: throw DoriDoriException.of(DoriDoriExceptionType.CITY_NOT_EXIST)
+
     fun extendPeriod(period: Int): Ward {
         return this.copy(
             expiredAt = expiredAt.plusDays(period.toLong())
@@ -42,12 +49,13 @@ data class Ward(
     }
 
     companion object {
-        fun create(userId: ObjectId, name: String, location: GeoJsonPoint): Ward {
+        fun create(userId: ObjectId, name: String, location: GeoJsonPoint, region: Region): Ward {
             return Ward(
                 userId = userId,
                 name = name,
                 expiredAt = LocalDateTime.now().plusDays(20),
                 location = location,
+                region = region
             )
         }
     }
