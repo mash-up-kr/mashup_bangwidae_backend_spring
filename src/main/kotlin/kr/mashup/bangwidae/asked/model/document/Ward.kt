@@ -29,7 +29,7 @@ data class Ward(
     @LastModifiedDate var updatedAt: LocalDateTime? = null
 ) {
     val city: String
-        get() = region.도 ?: region.시 ?: "제주특별자치도"
+        get() = region.도 ?: region.시!!
 
     fun extendPeriod(period: Int): Ward {
         return this.copy(

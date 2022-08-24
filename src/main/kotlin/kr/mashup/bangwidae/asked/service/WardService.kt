@@ -24,16 +24,17 @@ class WardService(
         val userLevelPolicy = levelPolicyRepository.findByLevel(user.level)
         val userWardCount = wardRepository.countAllByUserId(user.id!!)
 
+        val location = GeoUtils.geoJsonPoint(longitude, latitude)
+        val region = placeService.reverseGeocode(longitude, latitude)
+
         if (userWardCount >= userLevelPolicy!!.maxWardCount) {
             throw DoriDoriException.of(DoriDoriExceptionType.WARD_MAX_COUNT)
         }
+        if (region.도 == null && region.시 == null) {
+            throw DoriDoriException.of(DoriDoriExceptionType.CITY_NOT_EXIST)
+        }
 
-        val ward = Ward.create(
-            userId = user.id,
-            name = name,
-            location = GeoUtils.geoJsonPoint(longitude, latitude),
-            region = placeService.reverseGeocode(longitude, latitude)
-        )
+        val ward = Ward.create(userId = user.id, name = name, location = location, region = region)
         wardRepository.save(ward)
         levelPolicyService.levelUpIfConditionSatisfied(user)
         return true
