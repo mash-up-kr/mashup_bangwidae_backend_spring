@@ -1,5 +1,7 @@
 package kr.mashup.bangwidae.asked.model.document
 
+import kr.mashup.bangwidae.asked.exception.DoriDoriException
+import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.Region
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
@@ -29,7 +31,7 @@ data class Ward(
     @LastModifiedDate var updatedAt: LocalDateTime? = null
 ) {
     val city: String
-        get() = region.도 ?: region.시!!
+        get() = region.도 ?: region.시 ?: throw DoriDoriException.of(DoriDoriExceptionType.CITY_NOT_EXIST)
 
     fun extendPeriod(period: Int): Ward {
         return this.copy(
