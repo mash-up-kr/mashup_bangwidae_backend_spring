@@ -17,4 +17,8 @@ class NoticeService(
             pageRequest = PageRequest.of(0, size),
         )
     }
+
+    fun register(notice: Notice): Notice {
+        return noticeRepository.save(notice)
+    }
 }

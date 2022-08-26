@@ -2,15 +2,11 @@ package kr.mashup.bangwidae.asked.controller
 
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
-import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
-import kr.mashup.bangwidae.asked.controller.dto.CursorResult
-import kr.mashup.bangwidae.asked.controller.dto.NoticeDto
+import kr.mashup.bangwidae.asked.controller.dto.*
+import kr.mashup.bangwidae.asked.model.Notice
 import kr.mashup.bangwidae.asked.service.NoticeService
 import org.bson.types.ObjectId
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @Api(tags = ["공지 컨트롤러"])
 @RestController
@@ -27,5 +23,18 @@ class NoticeController(
         return noticeService.getNoticeList(lastId, size + 1)
             .map { NoticeDto.from(it) }
             .let { ApiResponse.success(CursorResult.from(values = it, requestedSize = size)) }
+    }
+
+    @ApiOperation("공지사항 등록")
+    @PostMapping
+    fun registerNotice(
+        @RequestBody noticeRegisterRequest : NoticeRegisterDto
+    ): ApiResponse<NoticeDto> {
+        return noticeService.register(
+            Notice(
+                title = noticeRegisterRequest.title,
+                content = noticeRegisterRequest.content
+            )
+        ).let { ApiResponse.success(NoticeDto.from(it)) }
     }
 }

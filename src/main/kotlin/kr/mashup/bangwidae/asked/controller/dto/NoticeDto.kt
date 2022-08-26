@@ -20,3 +20,8 @@ data class NoticeDto(
         }
     }
 }
+
+data class NoticeRegisterDto(
+    val title: String,
+    val content: String
+)
