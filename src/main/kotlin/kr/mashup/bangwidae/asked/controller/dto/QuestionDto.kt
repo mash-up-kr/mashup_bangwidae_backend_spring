@@ -3,7 +3,6 @@ package kr.mashup.bangwidae.asked.controller.dto
 import io.swagger.annotations.ApiModelProperty
 import kr.mashup.bangwidae.asked.model.domain.AnswerDomain
 import kr.mashup.bangwidae.asked.model.domain.QuestionDomain
-import kr.mashup.bangwidae.asked.model.domain.QuestionUserDomain
 import org.bson.types.ObjectId
 import java.time.LocalDateTime
 import kotlin.math.min
@@ -43,8 +42,8 @@ data class QuestionDetailDto(
     val content: String,
     val representativeAddress: String,
     val anonymous: Boolean,
-    val fromUser: QuestionUserDto,
-    val toUser: QuestionUserDto,
+    val fromUser: WriterUserDto,
+    val toUser: WriterUserDto,
     val answer: AnswerDto?,
     val createdAt: LocalDateTime,
 ) {
@@ -52,7 +51,7 @@ data class QuestionDetailDto(
         val id: String,
         val content: String,
         val representativeAddress: String,
-        val user: QuestionUserDto,
+        val user: WriterUserDto,
         val likeCount: Long,
         val userLiked: Boolean,
         val createdAt: LocalDateTime,
@@ -62,8 +61,8 @@ data class QuestionDetailDto(
                 return AnswerDto(
                     id = answer.id.toHexString(),
                     content = answer.content,
-                    representativeAddress = answer.representativeAddress?: "",
-                    user = QuestionUserDto.from(answer.user),
+                    representativeAddress = answer.representativeAddress,
+                    user = WriterUserDto.from(answer.user),
                     likeCount = answer.likeCount,
                     userLiked = answer.userLiked,
                     createdAt = answer.createdAt,
@@ -77,10 +76,10 @@ data class QuestionDetailDto(
             return QuestionDetailDto(
                 id = question.id.toHexString(),
                 content = question.content,
-                representativeAddress = question.representativeAddress?: "",
+                representativeAddress = question.representativeAddress,
                 anonymous = question.anonymous,
-                fromUser = QuestionUserDto.from(question.fromUser),
-                toUser = QuestionUserDto.from(question.toUser),
+                fromUser = WriterUserDto.from(question.fromUser),
+                toUser = WriterUserDto.from(question.toUser),
                 answer = question.answer?.let { AnswerDto.from(question.answer) },
                 createdAt = question.createdAt,
             )
@@ -97,8 +96,8 @@ data class AnsweredQuestionsDto(
         val content: String,
         val representativeAddress: String,
         val anonymous: Boolean,
-        val fromUser: QuestionUserDto,
-        val toUser: QuestionUserDto,
+        val fromUser: WriterUserDto,
+        val toUser: WriterUserDto,
         val answer: AnswerDto,
         val createdAt: LocalDateTime,
     ) {
@@ -107,10 +106,10 @@ data class AnsweredQuestionsDto(
                 return QuestionDto(
                     id = question.id.toHexString(),
                     content = question.content,
-                    representativeAddress = question.representativeAddress?: "",
+                    representativeAddress = question.representativeAddress,
                     anonymous = question.anonymous,
-                    fromUser = QuestionUserDto.from(question.fromUser),
-                    toUser = QuestionUserDto.from(question.toUser),
+                    fromUser = WriterUserDto.from(question.fromUser),
+                    toUser = WriterUserDto.from(question.toUser),
                     answer = AnswerDto.from(question.answer!!),
                     createdAt = question.createdAt,
                 )
@@ -122,7 +121,7 @@ data class AnsweredQuestionsDto(
         val id: String,
         val content: String,
         val representativeAddress: String,
-        val user: QuestionUserDto,
+        val user: WriterUserDto,
         val likeCount: Long,
         val userLiked: Boolean,
         val createdAt: LocalDateTime,
@@ -132,8 +131,8 @@ data class AnsweredQuestionsDto(
                 return AnswerDto(
                     id = answer.id.toHexString(),
                     content = answer.content,
-                    representativeAddress = answer.representativeAddress?: "",
-                    user = QuestionUserDto.from(answer.user),
+                    representativeAddress = answer.representativeAddress,
+                    user = WriterUserDto.from(answer.user),
                     likeCount = answer.likeCount,
                     userLiked = answer.userLiked,
                     createdAt = answer.createdAt,
@@ -166,8 +165,8 @@ data class ReceivedQuestionsDto(
         val content: String,
         val representativeAddress: String,
         val anonymous: Boolean,
-        val fromUser: QuestionUserDto,
-        val toUser: QuestionUserDto,
+        val fromUser: WriterUserDto,
+        val toUser: WriterUserDto,
         val createdAt: LocalDateTime,
     ) {
         companion object {
@@ -175,10 +174,10 @@ data class ReceivedQuestionsDto(
                 return QuestionDto(
                     id = question.id.toHexString(),
                     content = question.content,
-                    representativeAddress = question.representativeAddress?: "",
+                    representativeAddress = question.representativeAddress,
                     anonymous = question.anonymous,
-                    fromUser = QuestionUserDto.from(question.fromUser),
-                    toUser = QuestionUserDto.from(question.toUser),
+                    fromUser = WriterUserDto.from(question.fromUser),
+                    toUser = WriterUserDto.from(question.toUser),
                     createdAt = question.createdAt,
                 )
             }
@@ -209,8 +208,8 @@ data class AskedQuestionsDto(
         val content: String,
         val representativeAddress: String,
         val anonymous: Boolean,
-        val fromUser: QuestionUserDto,
-        val toUser: QuestionUserDto,
+        val fromUser: WriterUserDto,
+        val toUser: WriterUserDto,
         val createdAt: LocalDateTime,
     ) {
         companion object {
@@ -218,10 +217,10 @@ data class AskedQuestionsDto(
                 return QuestionDto(
                     id = question.id.toHexString(),
                     content = question.content,
-                    representativeAddress = question.representativeAddress?: "",
+                    representativeAddress = question.representativeAddress,
                     anonymous = question.anonymous,
-                    fromUser = QuestionUserDto.from(question.fromUser),
-                    toUser = QuestionUserDto.from(question.toUser),
+                    fromUser = WriterUserDto.from(question.fromUser),
+                    toUser = WriterUserDto.from(question.toUser),
                     createdAt = question.createdAt,
                 )
             }
@@ -243,22 +242,3 @@ data class AskedQuestionsDto(
     }
 }
 
-data class QuestionUserDto(
-    val id: String,
-    val nickname: String,
-    val tags: List<String>,
-    val profileImageUrl: String?,
-    val level: Int
-) {
-    companion object {
-        fun from(user: QuestionUserDomain): QuestionUserDto {
-            return QuestionUserDto(
-                id = user.id.toHexString(),
-                nickname = user.nickname,
-                tags = user.tags,
-                profileImageUrl = user.profileImageUrl,
-                level = user.level
-            )
-        }
-    }
-}

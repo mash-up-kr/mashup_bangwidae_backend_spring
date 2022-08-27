@@ -3,7 +3,6 @@ package kr.mashup.bangwidae.asked.controller.dto
 import io.swagger.annotations.ApiModelProperty
 import kr.mashup.bangwidae.asked.model.document.post.Comment
 import kr.mashup.bangwidae.asked.model.domain.CommentDomain
-import kr.mashup.bangwidae.asked.model.domain.CommentUserDomain
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
 import java.time.LocalDateTime
@@ -39,7 +38,7 @@ data class CommentEditRequest(
 
 data class CommentDto(
     val id: String,
-    val user: CommentWriter,
+    val user: WriterUserDto,
     val content: String,
     val likeCount: Int,
     val userLiked: Boolean,
@@ -52,34 +51,14 @@ data class CommentDto(
         fun from(comment: CommentDomain): CommentDto {
             return CommentDto(
                 id = comment.id.toHexString(),
-                user = CommentWriter.from(comment.user),
+                user = WriterUserDto.from(comment.user),
                 content = comment.content,
                 likeCount = comment.likeCount,
                 userLiked = comment.userLiked,
-                representativeAddress = comment.representativeAddress?: "",
+                representativeAddress = comment.representativeAddress,
                 anonymous = comment.anonymous,
                 createdAt = comment.createdAt,
                 updatedAt = comment.updatedAt
-            )
-        }
-    }
-}
-
-data class CommentWriter(
-    val id: String,
-    val tags: List<String> = emptyList(),
-    val nickname: String,
-    val profileImageUrl: String?,
-    val level: Int
-) {
-    companion object {
-        fun from(user: CommentUserDomain): CommentWriter {
-            return CommentWriter(
-                id = user.id.toHexString(),
-                tags = user.tags,
-                nickname = user.nickname,
-                profileImageUrl = user.profileImageUrl,
-                level = user.level
             )
         }
     }

@@ -11,8 +11,8 @@ data class QuestionDomain(
     val content: String,
     val representativeAddress: String,
     val anonymous: Boolean,
-    val fromUser: QuestionUserDomain,
-    val toUser: QuestionUserDomain,
+    val fromUser: WriterUserDomain,
+    val toUser: WriterUserDomain,
     val answer: AnswerDomain?,
     val createdAt: LocalDateTime,
 ) {
@@ -29,8 +29,8 @@ data class QuestionDomain(
             content = question.content,
             representativeAddress = question.representativeAddress ?: "",
             anonymous = question.anonymous,
-            fromUser = QuestionUserDomain.of(fromUser, question.anonymous),
-            toUser = QuestionUserDomain.of(toUser, false),
+            fromUser = WriterUserDomain.of(fromUser, question.anonymous),
+            toUser = WriterUserDomain.of(toUser, false),
             answer = answer?.let {
                 AnswerDomain.from(
                     answer = it,
@@ -48,7 +48,7 @@ data class AnswerDomain(
     val id: ObjectId,
     val content: String,
     val representativeAddress: String,
-    val user: QuestionUserDomain,
+    val user: WriterUserDomain,
     val likeCount: Long,
     val userLiked: Boolean,
     val createdAt: LocalDateTime,
@@ -58,7 +58,7 @@ data class AnswerDomain(
             id = answer.id!!,
             content = answer.content,
             representativeAddress = answer.representativeAddress ?: "",
-            user = QuestionUserDomain.of(user, false),
+            user = WriterUserDomain.of(user, false),
             likeCount = likeCount,
             userLiked = userLiked,
             createdAt = answer.createdAt!!,
@@ -66,27 +66,3 @@ data class AnswerDomain(
     }
 }
 
-data class QuestionUserDomain(
-    val id: ObjectId,
-    val nickname: String,
-    val tags: List<String>,
-    val profileImageUrl: String?,
-    val level: Int
-) {
-    companion object {
-        fun from(user: User) = QuestionUserDomain(
-            id = user.id!!,
-            nickname = user.nickname!!,
-            tags = user.tags,
-            profileImageUrl = user.userProfileImageUrl,
-            level = user.level
-        )
-
-        fun of(user: User, anonymous: Boolean) =
-            when {
-                user.deleted -> from(User.deletedUser())
-                anonymous -> from(user.getAnonymousUser())
-                else -> from(user)
-            }
-    }
-}
