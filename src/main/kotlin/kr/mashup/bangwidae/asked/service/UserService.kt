@@ -64,6 +64,8 @@ class UserService(
     fun getUserInfo(userId: ObjectId): UserInfoDto {
         val user = userRepository.findById(userId)
             .orElseThrow { DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND) }
+            .also { if (it.deleted) throw DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND) }
+
         val representativeWard = wardService.getMyRepresentativeWard(user)
         return UserInfoDto.from(user, representativeWard)
     }
@@ -105,7 +107,9 @@ class UserService(
     }
 
     fun findById(id: ObjectId): User {
-        return userRepository.findByIdOrNull(id) ?: throw DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND)
+        return (userRepository.findByIdOrNull(id)
+            ?: throw DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND))
+            .also { if (it.deleted) throw DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND) }
     }
 
     fun findByEmail(email: String): User? {
