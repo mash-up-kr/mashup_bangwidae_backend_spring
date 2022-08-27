@@ -62,6 +62,6 @@ logging:
               MongoTemplate: DEBUG
 
 url-scheme:
-  question-detail: "doridori://questions/{questionId}"
-  post-detail: "doridori://posts/{postId}"
-  user-level-up: "doridori://users/level-up"
+  question-detail: "doridori://main/myquestion?questionId={questionId}"
+  post-detail: "doridori://main/communityQuestion?questionId={postId}"
+  user-level-up: "doridori://main/mylevel"
