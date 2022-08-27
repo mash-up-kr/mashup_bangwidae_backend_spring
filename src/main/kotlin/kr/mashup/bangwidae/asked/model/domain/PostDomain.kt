@@ -16,7 +16,7 @@ data class PostDomain(
     val userLiked: Boolean,
     val longitude: Double,
     val latitude: Double,
-    val representativeAddress: String,
+    val representativeAddress: String?,
     val anonymous: Boolean,
     val createdAt: LocalDateTime?,
     val updatedAt: LocalDateTime?
@@ -25,7 +25,7 @@ data class PostDomain(
         fun from(user: User, post: Post, likeCount: Int, commentCount: Int, userLiked: Boolean) = PostDomain(
             id = post.id!!,
             content = post.content,
-            representativeAddress = post.representativeAddress ?: "",
+            representativeAddress = post.representativeAddress,
             longitude = post.location.getLongitude(),
             latitude = post.location.getLatitude(),
             anonymous = post.anonymous,

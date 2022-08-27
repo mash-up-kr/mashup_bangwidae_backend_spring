@@ -55,7 +55,7 @@ data class CommentDto(
                 content = comment.content,
                 likeCount = comment.likeCount,
                 userLiked = comment.userLiked,
-                representativeAddress = comment.representativeAddress,
+                representativeAddress = comment.representativeAddress ?: "",
                 anonymous = comment.anonymous,
                 createdAt = comment.createdAt,
                 updatedAt = comment.updatedAt

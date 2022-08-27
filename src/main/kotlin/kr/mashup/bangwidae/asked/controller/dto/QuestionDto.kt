@@ -61,7 +61,7 @@ data class QuestionDetailDto(
                 return AnswerDto(
                     id = answer.id.toHexString(),
                     content = answer.content,
-                    representativeAddress = answer.representativeAddress,
+                    representativeAddress = answer.representativeAddress ?: "",
                     user = WriterUserDto.from(answer.user),
                     likeCount = answer.likeCount,
                     userLiked = answer.userLiked,
@@ -76,7 +76,7 @@ data class QuestionDetailDto(
             return QuestionDetailDto(
                 id = question.id.toHexString(),
                 content = question.content,
-                representativeAddress = question.representativeAddress,
+                representativeAddress = question.representativeAddress ?: "",
                 anonymous = question.anonymous,
                 fromUser = WriterUserDto.from(question.fromUser),
                 toUser = WriterUserDto.from(question.toUser),
@@ -106,7 +106,7 @@ data class AnsweredQuestionsDto(
                 return QuestionDto(
                     id = question.id.toHexString(),
                     content = question.content,
-                    representativeAddress = question.representativeAddress,
+                    representativeAddress = question.representativeAddress ?: "",
                     anonymous = question.anonymous,
                     fromUser = WriterUserDto.from(question.fromUser),
                     toUser = WriterUserDto.from(question.toUser),
@@ -131,7 +131,7 @@ data class AnsweredQuestionsDto(
                 return AnswerDto(
                     id = answer.id.toHexString(),
                     content = answer.content,
-                    representativeAddress = answer.representativeAddress,
+                    representativeAddress = answer.representativeAddress ?: "",
                     user = WriterUserDto.from(answer.user),
                     likeCount = answer.likeCount,
                     userLiked = answer.userLiked,
@@ -174,7 +174,7 @@ data class ReceivedQuestionsDto(
                 return QuestionDto(
                     id = question.id.toHexString(),
                     content = question.content,
-                    representativeAddress = question.representativeAddress,
+                    representativeAddress = question.representativeAddress ?: "",
                     anonymous = question.anonymous,
                     fromUser = WriterUserDto.from(question.fromUser),
                     toUser = WriterUserDto.from(question.toUser),
@@ -217,7 +217,7 @@ data class AskedQuestionsDto(
                 return QuestionDto(
                     id = question.id.toHexString(),
                     content = question.content,
-                    representativeAddress = question.representativeAddress,
+                    representativeAddress = question.representativeAddress ?: "",
                     anonymous = question.anonymous,
                     fromUser = WriterUserDto.from(question.fromUser),
                     toUser = WriterUserDto.from(question.toUser),

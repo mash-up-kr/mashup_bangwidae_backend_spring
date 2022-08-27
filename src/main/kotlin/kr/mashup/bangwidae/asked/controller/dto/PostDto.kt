@@ -31,7 +31,7 @@ data class PostDto(
                 commentCount = post.commentCount,
                 longitude = post.longitude,
                 latitude = post.latitude,
-                representativeAddress = post.representativeAddress,
+                representativeAddress = post.representativeAddress ?: "",
                 anonymous = post.anonymous,
                 createdAt = post.createdAt,
                 updatedAt = post.updatedAt,

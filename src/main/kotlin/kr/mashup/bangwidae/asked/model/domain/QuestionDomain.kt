@@ -9,7 +9,7 @@ import java.time.LocalDateTime
 data class QuestionDomain(
     val id: ObjectId,
     val content: String,
-    val representativeAddress: String,
+    val representativeAddress: String?,
     val anonymous: Boolean,
     val fromUser: WriterUserDomain,
     val toUser: WriterUserDomain,
@@ -27,7 +27,7 @@ data class QuestionDomain(
         ) = QuestionDomain(
             id = question.id!!,
             content = question.content,
-            representativeAddress = question.representativeAddress ?: "",
+            representativeAddress = question.representativeAddress,
             anonymous = question.anonymous,
             fromUser = WriterUserDomain.of(fromUser, question.anonymous),
             toUser = WriterUserDomain.of(toUser, false),
@@ -47,7 +47,7 @@ data class QuestionDomain(
 data class AnswerDomain(
     val id: ObjectId,
     val content: String,
-    val representativeAddress: String,
+    val representativeAddress: String?,
     val user: WriterUserDomain,
     val likeCount: Long,
     val userLiked: Boolean,
@@ -57,7 +57,7 @@ data class AnswerDomain(
         fun from(answer: Answer, user: User, likeCount: Long, userLiked: Boolean) = AnswerDomain(
             id = answer.id!!,
             content = answer.content,
-            representativeAddress = answer.representativeAddress ?: "",
+            representativeAddress = answer.representativeAddress,
             user = WriterUserDomain.of(user, false),
             likeCount = likeCount,
             userLiked = userLiked,
