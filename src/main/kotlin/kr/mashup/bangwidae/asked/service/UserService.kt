@@ -16,8 +16,8 @@ import kr.mashup.bangwidae.asked.service.question.QuestionService
 import org.bson.types.ObjectId
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class UserService(
@@ -133,6 +133,10 @@ class UserService(
             locationInfo = editUserSettingsRequest.locationInfo,
         )
         return userRepository.save(user.updateSettings(newSettings))
+    }
+
+    fun delete(user: User) {
+        userRepository.save(user.deleteUser())
     }
 }
 

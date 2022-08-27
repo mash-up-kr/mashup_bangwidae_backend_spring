@@ -27,11 +27,10 @@ data class QuestionDomain(
         ) = QuestionDomain(
             id = question.id!!,
             content = question.content,
-            representativeAddress = question.representativeAddress?: "",
+            representativeAddress = question.representativeAddress ?: "",
             anonymous = question.anonymous,
-            fromUser = if (question.anonymous) QuestionUserDomain.from(fromUser.getAnonymousUser())
-            else QuestionUserDomain.from(fromUser),
-            toUser = QuestionUserDomain.from(toUser),
+            fromUser = QuestionUserDomain.of(fromUser, question.anonymous),
+            toUser = QuestionUserDomain.of(toUser, false),
             answer = answer?.let {
                 AnswerDomain.from(
                     answer = it,
@@ -58,8 +57,8 @@ data class AnswerDomain(
         fun from(answer: Answer, user: User, likeCount: Long, userLiked: Boolean) = AnswerDomain(
             id = answer.id!!,
             content = answer.content,
-            representativeAddress = answer.representativeAddress?: "",
-            user = QuestionUserDomain.from(user),
+            representativeAddress = answer.representativeAddress ?: "",
+            user = QuestionUserDomain.of(user, false),
             likeCount = likeCount,
             userLiked = userLiked,
             createdAt = answer.createdAt!!,
@@ -82,5 +81,12 @@ data class QuestionUserDomain(
             profileImageUrl = user.userProfileImageUrl,
             level = user.level
         )
+
+        fun of(user: User, anonymous: Boolean) =
+            when {
+                user.deleted -> from(User.deletedUser())
+                anonymous -> from(user.getAnonymousUser())
+                else -> from(user)
+            }
     }
 }

@@ -20,12 +20,11 @@ data class CommentDomain(
         fun from(user: User, comment: Comment, likeCount: Int, userLiked: Boolean) = CommentDomain(
             id = comment.id!!,
             content = comment.content,
-            representativeAddress = comment.region?.representativeAddress?: "",
+            representativeAddress = comment.region?.representativeAddress ?: "",
             anonymous = comment.anonymous,
             createdAt = comment.createdAt,
             updatedAt = comment.updatedAt,
-            user = if (comment.anonymous) CommentUserDomain.from(user.getAnonymousUser())
-            else CommentUserDomain.from(user),
+            user = CommentUserDomain.of(user, comment.anonymous),
             likeCount = likeCount,
             userLiked = userLiked,
         )
@@ -47,5 +46,12 @@ data class CommentUserDomain(
             profileImageUrl = user.userProfileImageUrl,
             level = user.level
         )
+
+        fun of(user: User, anonymous: Boolean) =
+            when {
+                user.deleted -> from(User.deletedUser())
+                anonymous -> from(user.getAnonymousUser())
+                else -> from(user)
+            }
     }
 }

@@ -25,14 +25,13 @@ data class PostDomain(
         fun from(user: User, post: Post, likeCount: Int, commentCount: Int, userLiked: Boolean) = PostDomain(
             id = post.id!!,
             content = post.content,
-            representativeAddress = post.representativeAddress?: "",
+            representativeAddress = post.representativeAddress ?: "",
             longitude = post.location.getLongitude(),
             latitude = post.location.getLatitude(),
             anonymous = post.anonymous,
             createdAt = post.createdAt,
             updatedAt = post.updatedAt,
-            user = if (post.anonymous) PostUserDomain.from(user.getAnonymousUser())
-            else PostUserDomain.from(user),
+            user = PostUserDomain.of(user, post.anonymous),
             likeCount = likeCount,
             commentCount = commentCount,
             userLiked = userLiked,
@@ -55,5 +54,12 @@ data class PostUserDomain(
             profileImageUrl = user.userProfileImageUrl,
             level = user.level
         )
+
+        fun of(user: User, anonymous: Boolean) =
+            when {
+                user.deleted -> from(User.deletedUser())
+                anonymous -> from(user.getAnonymousUser())
+                else -> from(user)
+            }
     }
 }
