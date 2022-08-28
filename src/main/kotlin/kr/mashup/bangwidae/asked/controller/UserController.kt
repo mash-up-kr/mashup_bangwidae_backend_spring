@@ -225,6 +225,7 @@ class UserController(
     fun leaveUser(
         @ApiIgnore @AuthenticationPrincipal user: User
     ): ApiResponse<Boolean> {
-        return ApiResponse.success(true)
+        return userService.delete(user)
+            .let { ApiResponse.success(true) }
     }
 }

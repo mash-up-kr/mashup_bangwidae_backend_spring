@@ -16,8 +16,8 @@ import kr.mashup.bangwidae.asked.service.question.QuestionService
 import org.bson.types.ObjectId
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.multipart.MultipartFile
 
 @Service
 class UserService(
@@ -64,6 +64,8 @@ class UserService(
     fun getUserInfo(userId: ObjectId): UserInfoDto {
         val user = userRepository.findById(userId)
             .orElseThrow { DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND) }
+            .also { if (it.deleted) throw DoriDoriException.of(DoriDoriExceptionType.USER_DELETED) }
+
         val representativeWard = wardService.getMyRepresentativeWard(user)
         return UserInfoDto.from(user, representativeWard)
     }
@@ -105,7 +107,9 @@ class UserService(
     }
 
     fun findById(id: ObjectId): User {
-        return userRepository.findByIdOrNull(id) ?: throw DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND)
+        return (userRepository.findByIdOrNull(id)
+            ?: throw DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND))
+            .also { if (it.deleted) throw DoriDoriException.of(DoriDoriExceptionType.USER_DELETED) }
     }
 
     fun findByEmail(email: String): User? {
@@ -133,6 +137,10 @@ class UserService(
             locationInfo = editUserSettingsRequest.locationInfo,
         )
         return userRepository.save(user.updateSettings(newSettings))
+    }
+
+    fun delete(user: User) {
+        userRepository.save(user.deleteUser())
     }
 }
 

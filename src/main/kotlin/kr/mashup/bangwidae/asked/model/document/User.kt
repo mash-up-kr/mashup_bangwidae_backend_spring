@@ -24,10 +24,11 @@ data class User(
     val profileImageUrl: String? = null,
     val refreshToken: String? = null,
     val settings: UserSettings = UserSettings(),
-
+    val deleted: Boolean = false,
+    val deletedAt: LocalDateTime? = null,
     @Version var version: Int? = null,
     @CreatedDate var createdAt: LocalDateTime? = null,
-    @LastModifiedDate var updatedAt: LocalDateTime? = null
+    @LastModifiedDate var updatedAt: LocalDateTime? = null,
 ) {
     fun updateNickname(nickname: String): User {
         return this.copy(
@@ -58,6 +59,10 @@ data class User(
         )
     }
 
+    fun deleteUser(): User {
+        return this.copy(deleted = true, deletedAt = LocalDateTime.now())
+    }
+
     fun getAnonymousUser(): User {
         return this.copy(nickname = "익명", profileImageUrl = DEFAULT_PROFILE_IMAGE_URL, level = 1)
     }
@@ -83,6 +88,14 @@ data class User(
                 loginType = LoginType.BASIC
             )
         }
+
+        fun deletedUser(): User = User(
+            id = ObjectId(),
+            email = "",
+            loginType = LoginType.BASIC,
+            nickname = "탈퇴한 사용자",
+            profileImageUrl = DEFAULT_PROFILE_IMAGE_URL
+        )
     }
 }
 
