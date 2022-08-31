@@ -16,7 +16,6 @@ import kr.mashup.bangwidae.asked.service.question.QuestionService
 import org.bson.types.ObjectId
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 
 @Service
@@ -88,7 +87,6 @@ class UserService(
         return true
     }
 
-    @Transactional
     fun updateProfile(user: User, description: String, tags: List<String>, representativeWardId: ObjectId?): Boolean {
         userRepository.save(user.updateProfile(description, tags))
         wardService.updateRepresentativeWard(user, representativeWardId)
