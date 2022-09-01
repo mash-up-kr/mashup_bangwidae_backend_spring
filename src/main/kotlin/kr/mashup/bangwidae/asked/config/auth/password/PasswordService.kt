@@ -29,7 +29,7 @@ class PasswordService(
             throw DoriDoriException.of(DoriDoriExceptionType.INVALID_PASSWORD_REGEX)
         }
 
-        if (password.length < 8) {
+        if (password.length < 6) {
             throw DoriDoriException.of(DoriDoriExceptionType.INVALID_PASSWORD_LENGTH)
         }
     }

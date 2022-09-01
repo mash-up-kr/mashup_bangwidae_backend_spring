@@ -20,7 +20,7 @@ enum class DoriDoriExceptionType(
     LOGIN_FAILED("로그인에 실패했어요"),
     INVALID_PASSWORD("비밀번호가 틀렸어요"),
     INVALID_PASSWORD_REGEX("비밀번호는 숫자, 영어, 특수문자로 이루어져야 해요"),
-    INVALID_PASSWORD_LENGTH("비밀번호는 8자리 이상이어야 해요"),
+    INVALID_PASSWORD_LENGTH("비밀번호는 6자리 이상이어야 해요"),
 
     // USER
     DUPLICATED_NICKNAME("이미 존재하는 닉네임이에요"),
