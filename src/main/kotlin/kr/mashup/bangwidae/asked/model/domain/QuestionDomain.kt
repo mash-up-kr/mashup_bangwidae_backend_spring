@@ -9,10 +9,10 @@ import java.time.LocalDateTime
 data class QuestionDomain(
     val id: ObjectId,
     val content: String,
-    val representativeAddress: String,
+    val representativeAddress: String?,
     val anonymous: Boolean,
-    val fromUser: QuestionUserDomain,
-    val toUser: QuestionUserDomain,
+    val fromUser: WriterUserDomain,
+    val toUser: WriterUserDomain,
     val answer: AnswerDomain?,
     val createdAt: LocalDateTime,
 ) {
@@ -27,11 +27,10 @@ data class QuestionDomain(
         ) = QuestionDomain(
             id = question.id!!,
             content = question.content,
-            representativeAddress = question.representativeAddress?: "",
+            representativeAddress = question.representativeAddress,
             anonymous = question.anonymous,
-            fromUser = if (question.anonymous) QuestionUserDomain.from(fromUser.getAnonymousUser())
-            else QuestionUserDomain.from(fromUser),
-            toUser = QuestionUserDomain.from(toUser),
+            fromUser = WriterUserDomain.of(fromUser, question.anonymous),
+            toUser = WriterUserDomain.of(toUser, false),
             answer = answer?.let {
                 AnswerDomain.from(
                     answer = it,
@@ -48,8 +47,8 @@ data class QuestionDomain(
 data class AnswerDomain(
     val id: ObjectId,
     val content: String,
-    val representativeAddress: String,
-    val user: QuestionUserDomain,
+    val representativeAddress: String?,
+    val user: WriterUserDomain,
     val likeCount: Long,
     val userLiked: Boolean,
     val createdAt: LocalDateTime,
@@ -58,8 +57,8 @@ data class AnswerDomain(
         fun from(answer: Answer, user: User, likeCount: Long, userLiked: Boolean) = AnswerDomain(
             id = answer.id!!,
             content = answer.content,
-            representativeAddress = answer.representativeAddress?: "",
-            user = QuestionUserDomain.from(user),
+            representativeAddress = answer.representativeAddress,
+            user = WriterUserDomain.of(user, false),
             likeCount = likeCount,
             userLiked = userLiked,
             createdAt = answer.createdAt!!,
@@ -67,20 +66,3 @@ data class AnswerDomain(
     }
 }
 
-data class QuestionUserDomain(
-    val id: ObjectId,
-    val nickname: String,
-    val tags: List<String>,
-    val profileImageUrl: String?,
-    val level: Int
-) {
-    companion object {
-        fun from(user: User) = QuestionUserDomain(
-            id = user.id!!,
-            nickname = user.nickname!!,
-            tags = user.tags,
-            profileImageUrl = user.userProfileImageUrl,
-            level = user.level
-        )
-    }
-}

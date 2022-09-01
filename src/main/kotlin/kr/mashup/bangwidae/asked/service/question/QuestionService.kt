@@ -1,6 +1,7 @@
 package kr.mashup.bangwidae.asked.service.question
 
-import kr.mashup.bangwidae.asked.controller.dto.*
+import kr.mashup.bangwidae.asked.controller.dto.QuestionEditRequest
+import kr.mashup.bangwidae.asked.controller.dto.QuestionWriteRequest
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.document.User
@@ -17,9 +18,7 @@ import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
-@Transactional
 @Service
 class QuestionService(
     private val placeService: PlaceService,
