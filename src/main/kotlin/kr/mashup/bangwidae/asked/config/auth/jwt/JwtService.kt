@@ -49,7 +49,7 @@ class JwtService(
     private fun accessTokenExpired(): Date {
         val cal = Calendar.getInstance()
         cal.time = Date()
-        cal.add(Calendar.HOUR, 1)
+        cal.add(Calendar.HOUR, 24 * 30)
         return cal.time
     }
 
