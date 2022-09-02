@@ -36,7 +36,11 @@ class QuestionService(
     }
 
     fun findDetailById(authUser: User?, questionId: ObjectId): QuestionDomain {
-        val question = findById(questionId)
+        // TODO 심사만 올리면 지워버리기..
+        val question = questionRepository.findByIdAndDeletedFalse(questionId)
+            ?:questionRepository.findByIdAndDeletedFalse(
+                answerRepository.findByIdAndDeletedFalse(questionId)?.questionId!!
+            )?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
 
         return question.toDomain(authUser)
     }
