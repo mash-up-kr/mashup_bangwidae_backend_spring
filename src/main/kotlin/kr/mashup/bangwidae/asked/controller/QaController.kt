@@ -6,10 +6,8 @@ import kr.mashup.bangwidae.asked.controller.dto.ApiResponse
 import kr.mashup.bangwidae.asked.controller.dto.JoinUserResponse
 import kr.mashup.bangwidae.asked.controller.dto.QaJoinUserRequest
 import kr.mashup.bangwidae.asked.service.QaService
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.bson.types.ObjectId
+import org.springframework.web.bind.annotation.*
 
 @Api(tags = ["QA 컨트롤러"])
 @RestController
@@ -23,5 +21,13 @@ class QaController(
         @RequestBody qaJoinUserRequest: QaJoinUserRequest
     ): ApiResponse<JoinUserResponse> {
         return ApiResponse.success(qaService.joinUser(qaJoinUserRequest))
+    }
+
+    @ApiOperation("임시용 타입 판별기")
+    @GetMapping("/type/{id}")
+    fun joinUser(
+        @PathVariable id : String
+    ): ApiResponse<String> {
+        return ApiResponse.success(qaService.findType(ObjectId(id)))
     }
 }

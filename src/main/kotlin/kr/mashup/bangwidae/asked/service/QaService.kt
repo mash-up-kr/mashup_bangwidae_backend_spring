@@ -7,7 +7,10 @@ import kr.mashup.bangwidae.asked.controller.dto.QaJoinUserRequest
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.repository.PostRepository
+import kr.mashup.bangwidae.asked.repository.QuestionRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
+import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 
 @Service
@@ -15,7 +18,9 @@ class QaService(
     private val passwordService: PasswordService,
     private val termsService: TermsService,
     private val userRepository: UserRepository,
-    private val jwtService: JwtService
+    private val jwtService: JwtService,
+    private val postRepository: PostRepository,
+    private val questionRepository: QuestionRepository
 ) {
     fun joinUser(joinUserRequest: QaJoinUserRequest): JoinUserResponse {
         if (userRepository.findByEmail(joinUserRequest.email) != null) {
@@ -44,5 +49,11 @@ class QaService(
             refreshToken = refreshToken,
             userId = user.id.toHexString()
         )
+    }
+
+    fun findType(id: ObjectId): String{
+        return if (postRepository.existsById(id)) "POST"
+        else if(questionRepository.existsById(id)) "QUESTION"
+        else throw DoriDoriException.of(DoriDoriExceptionType.UNKNOWN_TYPE)
     }
 }

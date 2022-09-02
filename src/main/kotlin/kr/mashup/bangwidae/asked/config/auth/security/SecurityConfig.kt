@@ -55,6 +55,7 @@ class SecurityConfig {
                 "/api/v1/posts/{postId}/comment",
                 "/api/v1/terms",
                 "/api/v1/qa/user/join",
+                "/api/v1/qa/type/{id}"
             ).permitAll()
             .antMatchers("/api/**").hasAuthority("ROLE")
         http.csrf().disable()
