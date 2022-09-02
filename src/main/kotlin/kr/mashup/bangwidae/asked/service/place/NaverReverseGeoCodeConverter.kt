@@ -27,12 +27,9 @@ class NaverReverseGeocodeConverter(
                     읍면동 = it.읍면동?.name,
                     리 = it.리?.name
                 )
-            } ?: throw DoriDoriException.of(
-            type = DoriDoriExceptionType.PLACE_FETCH_FAIL,
-            message = "위치 정보가 없어요"
-        )
+            }
 
-        return naverRegion.toRegion()
+        return naverRegion?.toRegion() ?: Region()
     }
 
     private fun NaverRegion.toRegion(): Region {
