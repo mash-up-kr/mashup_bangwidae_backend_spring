@@ -1,9 +1,7 @@
-package kr.mashup.bangwidae.asked.model.post
+package kr.mashup.bangwidae.asked.model.document.post
 
 import kr.mashup.bangwidae.asked.controller.dto.CommentEditRequest
-import kr.mashup.bangwidae.asked.controller.dto.CommentWriter
 import kr.mashup.bangwidae.asked.model.Region
-import kr.mashup.bangwidae.asked.model.User
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
@@ -23,7 +21,7 @@ data class Comment(
     val content: String,
     val location: GeoJsonPoint,
     val region: Region? = null,
-    val anonymous: Boolean? = false,
+    val anonymous: Boolean,
 
     val deleted: Boolean = false,
     @Version
@@ -34,7 +32,7 @@ data class Comment(
     fun update(commentEditRequest: CommentEditRequest): Comment {
         return commentEditRequest.let {
             this.copy(
-                content = it.content,
+                content = it.content ?: this.content,
                 location = if (it.longitude != null && it.latitude != null)
                     GeoUtils.geoJsonPoint(it.longitude, it.latitude) else this.location,
                 anonymous = it.anonymous ?: this.anonymous
@@ -46,10 +44,5 @@ data class Comment(
         return this.copy(
             deleted = true,
         )
-    }
-
-    fun getWriter(user: User): CommentWriter {
-        return if (this.anonymous == true) CommentWriter.from(user.getAnonymousUser())
-        else CommentWriter.from(user)
     }
 }

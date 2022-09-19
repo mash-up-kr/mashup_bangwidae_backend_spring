@@ -4,21 +4,21 @@ import kr.mashup.bangwidae.asked.controller.dto.AnswerEditRequest
 import kr.mashup.bangwidae.asked.controller.dto.AnswerWriteRequest
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.question.Answer
-import kr.mashup.bangwidae.asked.model.question.AnswerLike
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.question.Answer
+import kr.mashup.bangwidae.asked.model.document.question.AnswerLike
 import kr.mashup.bangwidae.asked.repository.AnswerLikeRepository
 import kr.mashup.bangwidae.asked.repository.AnswerRepository
 import kr.mashup.bangwidae.asked.repository.QuestionRepository
-import kr.mashup.bangwidae.asked.service.LevelPolicyService
+import kr.mashup.bangwidae.asked.service.event.AnswerWriteEvent
+import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
-@Transactional
 @Service
 class AnswerService(
     private val placeService: PlaceService,
@@ -26,6 +26,7 @@ class AnswerService(
     private val answerRepository: AnswerRepository,
     private val answerLikeRepository: AnswerLikeRepository,
     private val questionRepository: QuestionRepository,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) : WithQuestionAuthorityValidator, WithAnswerAuthorityValidator {
     fun findById(answerId: ObjectId): Answer {
         return answerRepository.findByIdAndDeletedFalse(answerId)
@@ -58,6 +59,8 @@ class AnswerService(
                 )
             ).also {
                 levelPolicyService.levelUpIfConditionSatisfied(user)
+            }.also {
+                applicationEventPublisher.publishEvent(AnswerWriteEvent(it.id!!))
             }
         }
     }

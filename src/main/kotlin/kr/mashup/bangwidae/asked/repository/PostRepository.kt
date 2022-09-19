@@ -1,6 +1,6 @@
 package kr.mashup.bangwidae.asked.repository
 
-import kr.mashup.bangwidae.asked.model.post.Post
+import kr.mashup.bangwidae.asked.model.document.post.Post
 import org.bson.types.ObjectId
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.geo.Distance
@@ -21,4 +21,9 @@ interface PostRepository : MongoRepository<Post, ObjectId> {
     fun existsByIdAndDeletedFalse(id: ObjectId): Boolean
     fun findByIdAndDeletedFalse(id: ObjectId): Post?
     fun findByLocationNear(location: GeoJsonPoint, distance: Distance): List<Post>
+    fun findByUserIdAndIdBeforeAndDeletedFalseOrderByIdDesc(
+        userId: ObjectId,
+        lastId: ObjectId,
+        pageRequest: PageRequest,
+    ): List<Post>
 }

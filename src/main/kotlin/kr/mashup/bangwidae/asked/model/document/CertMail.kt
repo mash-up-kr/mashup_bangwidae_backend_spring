@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.model
+package kr.mashup.bangwidae.asked.model.document
 
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
@@ -18,6 +18,10 @@ data class CertMail(
 ) {
     fun isCertifiedBy(number: String): Boolean {
         return this.certificationNumber == number
+    }
+
+    fun isExpired(): Boolean {
+        return LocalDateTime.now().isAfter(expiredTs)
     }
 
     companion object{

@@ -1,22 +1,24 @@
 package kr.mashup.bangwidae.asked.service.question
 
-import kr.mashup.bangwidae.asked.controller.dto.*
+import kr.mashup.bangwidae.asked.controller.dto.QuestionEditRequest
+import kr.mashup.bangwidae.asked.controller.dto.QuestionWriteRequest
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.question.Question
-import kr.mashup.bangwidae.asked.model.question.QuestionStatus
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.question.Question
+import kr.mashup.bangwidae.asked.model.document.question.QuestionStatus
+import kr.mashup.bangwidae.asked.model.domain.QuestionDomain
 import kr.mashup.bangwidae.asked.repository.*
-import kr.mashup.bangwidae.asked.service.LevelPolicyService
+import kr.mashup.bangwidae.asked.service.event.QuestionWriteEvent
+import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 
-@Transactional
 @Service
 class QuestionService(
     private val placeService: PlaceService,
@@ -26,6 +28,7 @@ class QuestionService(
     private val answerLikeRepository: AnswerLikeRepository,
     private val answerLikeAggregator: AnswerLikeAggregator,
     private val userRepository: UserRepository,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) : WithQuestionAuthorityValidator {
     private fun findById(questionId: ObjectId): Question {
         return questionRepository.findByIdAndDeletedFalse(questionId)
@@ -33,7 +36,11 @@ class QuestionService(
     }
 
     fun findDetailById(authUser: User?, questionId: ObjectId): QuestionDomain {
-        val question = findById(questionId)
+        // TODO 심사만 올리면 지워버리기..
+        val question = questionRepository.findByIdAndDeletedFalse(questionId)
+            ?:questionRepository.findByIdAndDeletedFalse(
+                answerRepository.findByIdAndDeletedFalse(questionId)?.questionId!!
+            )?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
 
         return question.toDomain(authUser)
     }
@@ -55,7 +62,12 @@ class QuestionService(
         )
     }
 
-    fun findAnswerCompleteByToUser(authUser: User?, toUserID: ObjectId, lastId: ObjectId?, size: Int): List<QuestionDomain> {
+    fun findAnswerCompleteByToUser(
+        authUser: User?,
+        toUserID: ObjectId,
+        lastId: ObjectId?,
+        size: Int
+    ): List<QuestionDomain> {
         val toUser = userRepository.findByIdOrNull(toUserID)
             ?: throw DoriDoriException.of(
                 type = DoriDoriExceptionType.NOT_EXIST,
@@ -145,11 +157,13 @@ class QuestionService(
                     content = request.content,
                     anonymous = request.anonymous,
                     location = GeoUtils.geoJsonPoint(longitude = request.longitude, latitude = request.latitude),
-                    representativeAddress = it?.representativeAddress,
+                    representativeAddress = it?.representativeAddress?: "",
                     region = it,
                 )
             ).also {
                 levelPolicyService.levelUpIfConditionSatisfied(user)
+            }.also {
+                applicationEventPublisher.publishEvent(QuestionWriteEvent(it.id!!))
             }
         }
     }
@@ -159,7 +173,10 @@ class QuestionService(
             .also { it.validateToUpdate(user) }
 
         return questionRepository.save(
-            question.updateContent(request.content)
+            question.updateContent(
+                content = request.content,
+                anonymous = request.anonymous,
+            )
         )
     }
 

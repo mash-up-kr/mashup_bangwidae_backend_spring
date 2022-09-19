@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.model
+package kr.mashup.bangwidae.asked.model.document
 
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.Id
@@ -12,7 +12,8 @@ data class LevelPolicy (
     val wardCountCondition: Int,
     val answerCountCondition: Int,
     val questionCountCondition: Int,
-    val wardCount: Int,
+    val maxWardCount: Int,
+    val imageUrl: String
 ) {
     fun isSatisfiedLevelUp(userWardCount: Int, userAnswerCount: Int, userQuestionCount: Int): Boolean {
         return userWardCount >= wardCountCondition &&

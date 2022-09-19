@@ -1,24 +1,28 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.service.question.QuestionDomain
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.Ward
+import kr.mashup.bangwidae.asked.model.domain.QuestionDomain
+import org.bson.types.ObjectId
 
 data class UserInfoDto(
     val userId: String,
     val nickname: String?,
     val profileDescription: String?,
     val tags: List<String>,
+    val representativeWard: WardDto?,
     val level: Int,
     val profileImageUrl: String?
 ) {
     companion object {
-        fun from(user: User): UserInfoDto {
+        fun from(user: User, representativeWard: Ward?): UserInfoDto {
             return UserInfoDto(
                 userId = user.id!!.toHexString(),
                 nickname = user.nickname,
                 profileDescription = user.description,
                 tags = user.tags,
-                profileImageUrl = user.getUserProfileImageUrl(),
+                representativeWard = representativeWard?.let { WardDto.from(it) },
+                profileImageUrl = user.userProfileImageUrl,
                 level = user.level
             )
         }
@@ -27,7 +31,7 @@ data class UserInfoDto(
 
 data class UserLinkShareInfoDto(
     val user: UserInfoDto,
-    val representativeWardName: String,
+    val representativeWard: WardDto?,
     val questions: List<QuestionAndAnswerDto>,
 ) {
     data class UserInfoDto(
@@ -44,7 +48,7 @@ data class UserLinkShareInfoDto(
                 nickname = user.nickname!!,
                 profileDescription = user.description ?: "",
                 tags = user.tags,
-                profileImageUrl = user.getUserProfileImageUrl(),
+                profileImageUrl = user.userProfileImageUrl,
                 level = user.level,
             )
         }
@@ -57,7 +61,7 @@ data class UserLinkShareInfoDto(
     ) {
         companion object {
             fun from(question: QuestionDomain) = QuestionAndAnswerDto(
-                questionId = question.id,
+                questionId = question.id.toHexString(),
                 questionContent = question.content,
                 answerContent = question.answer!!.content,
             )
@@ -65,9 +69,9 @@ data class UserLinkShareInfoDto(
     }
 
     companion object {
-        fun from(user: User, questions: List<QuestionDomain>) = UserLinkShareInfoDto(
+        fun from(user: User, questions: List<QuestionDomain>, representativeWard: Ward?) = UserLinkShareInfoDto(
             user = UserInfoDto.from(user),
-            representativeWardName = "todo - 우리집",
+            representativeWard = representativeWard?.let { WardDto.from(it) },
             questions = questions.map { QuestionAndAnswerDto.from(it) },
         )
     }
@@ -75,12 +79,14 @@ data class UserLinkShareInfoDto(
 
 data class JoinUserRequest(
     val email: String,
-    val password: String
+    val password: String,
+    val termsIds: List<ObjectId>,
 )
 
 data class JoinUserResponse(
     val accessToken: String,
-    val refreshToken: String
+    val refreshToken: String,
+    val userId: String
 )
 
 data class UpdateNicknameRequest(
@@ -90,6 +96,7 @@ data class UpdateNicknameRequest(
 data class UpdateProfileRequest(
     val description: String,
     val tags: List<String>,
+    val representativeWardId: ObjectId?
 )
 
 data class UserSettingsDto(

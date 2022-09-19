@@ -1,20 +1,21 @@
 package kr.mashup.bangwidae.asked.service.post
 
-import kr.mashup.bangwidae.asked.controller.dto.CommentDto
 import kr.mashup.bangwidae.asked.controller.dto.CommentEditRequest
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.post.Comment
-import kr.mashup.bangwidae.asked.model.post.Post
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.post.Comment
+import kr.mashup.bangwidae.asked.model.document.post.Post
+import kr.mashup.bangwidae.asked.model.domain.CommentDomain
 import kr.mashup.bangwidae.asked.repository.CommentRepository
-import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
-import kr.mashup.bangwidae.asked.service.LevelPolicyService
+import kr.mashup.bangwidae.asked.service.event.CommentWriteEvent
+import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.getLatitude
 import kr.mashup.bangwidae.asked.utils.getLongitude
 import org.bson.types.ObjectId
+import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
 
@@ -22,36 +23,24 @@ import org.springframework.stereotype.Service
 @Service
 class CommentService(
     private val commentRepository: CommentRepository,
-    private val postRepository: PostRepository,
     private val userRepository: UserRepository,
     private val placeService: PlaceService,
     private val commentLikeService: CommentLikeService,
-    private val levelPolicyService: LevelPolicyService
+    private val levelPolicyService: LevelPolicyService,
+    private val applicationEventPublisher: ApplicationEventPublisher,
 ) : WithPostAuthorityValidator, WithCommentAuthorityValidator {
     fun findById(commentId: ObjectId): Comment {
         return commentRepository.findByIdAndDeletedFalse(commentId)
             ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
     }
 
-    fun getCommentsByPostId(
-        userId: ObjectId, postId: ObjectId, lastId: ObjectId?, size: Int
-    ): List<CommentDto> {
+    fun getCommentsByPostId(user: User?, postId: ObjectId, lastId: ObjectId?, size: Int): List<CommentDomain> {
         val commentList = commentRepository.findByPostIdAndIdBeforeAndDeletedFalseOrderByIdDesc(
             postId,
             lastId ?: ObjectId(),
             PageRequest.of(0, size)
         )
-        val userIdList = commentList.map { it.userId }.distinct()
-        val userMap = userRepository.findAllByIdIn(userIdList).associateBy { it.id }
-        val likeMap = commentLikeService.getLikeMap(commentList)
-        return commentList.map {
-            CommentDto.from(
-                user = userMap[it.userId]!!,
-                comment = it,
-                likeCount = likeMap[it.id]?.size ?: 0,
-                userLiked = likeMap[it.id]?.map { like -> like.userId }?.contains(userId) ?: false
-            )
-        }
+        return commentList.toDomain(user)
     }
 
     fun getCommentCountMap(postList: List<Post>): Map<ObjectId, Int> {
@@ -59,23 +48,24 @@ class CommentService(
         return commentList.groupingBy { it.postId }.eachCount()
     }
 
-    fun write(user: User, postId: ObjectId, comment: Comment): Comment {
-        postRepository.findByIdAndDeletedFalse(postId)
-            ?.also { it.validateToComment(user) }
-            ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
-        return commentRepository.save(updatePlaceInfo(comment)).also {
-            levelPolicyService.levelUpIfConditionSatisfied(user)
-        }
+    fun write(user: User, comment: Comment): CommentDomain {
+        return commentRepository.save(updatePlaceInfo(comment)).toDomain(user)
+            .also {
+                levelPolicyService.levelUpIfConditionSatisfied(user)
+            }.also {
+                applicationEventPublisher.publishEvent(CommentWriteEvent(it.id!!))
+            }
+
     }
 
-    fun edit(user: User, commentId: ObjectId, request: CommentEditRequest): Comment {
+    fun edit(user: User, commentId: ObjectId, request: CommentEditRequest): CommentDomain {
         val comment = findById(commentId).also { it.validateToUpdate(user) }
-        return commentRepository.save(updatePlaceInfo(comment.update(request)))
+        return commentRepository.save(updatePlaceInfo(comment.update(request))).toDomain(user)
     }
 
-    fun delete(user: User, commentId: ObjectId): Comment {
+    fun delete(user: User, commentId: ObjectId) {
         val comment = findById(commentId).also { it.validateToDelete(user) }
-        return commentRepository.save(comment.delete())
+        commentRepository.save(comment.delete())
     }
 
     private fun updatePlaceInfo(comment: Comment): Comment {
@@ -83,5 +73,23 @@ class CommentService(
         val latitude = comment.location.getLatitude()
         val region = placeService.reverseGeocode(longitude, latitude)
         return comment.copy(region = region)
+    }
+
+    private fun Comment.toDomain(user: User?): CommentDomain {
+        return listOf(this).toDomain(user).first()
+    }
+
+    private fun List<Comment>.toDomain(user: User?): List<CommentDomain> {
+        val userMap = userRepository.findAllByIdIn(this.map { it.userId }.toSet()).associateBy { it.id!! }
+        val likeMap = commentLikeService.getLikeMap(this)
+        return this.map { comment ->
+            CommentDomain.from(
+                user = userMap[comment.userId]!!,
+                comment = comment,
+                likeCount = likeMap[comment.id]?.size ?: 0,
+                userLiked = if (user == null) false
+                else likeMap[comment.id]?.map { like -> like.userId }?.contains(user.id) ?: false
+            )
+        }
     }
 }

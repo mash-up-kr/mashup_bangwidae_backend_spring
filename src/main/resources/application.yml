@@ -18,6 +18,10 @@ spring:
           auth: true
           starttls:
             enable: true
+  servlet:
+    multipart:
+      max-file-size: 15MB
+      max-request-size: 15MB
 
 server:
   error:
@@ -56,3 +60,8 @@ logging:
           mongodb:
             core:
               MongoTemplate: DEBUG
+
+url-scheme:
+  question-detail: "doridori://main/myquestion?questionId={questionId}"
+  post-detail: "doridori://main/communityQuestion?questionId={postId}"
+  user-level-up: "doridori://main/mylevel"

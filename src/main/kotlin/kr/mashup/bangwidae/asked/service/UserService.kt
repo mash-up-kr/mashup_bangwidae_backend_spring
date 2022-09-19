@@ -5,11 +5,12 @@ import kr.mashup.bangwidae.asked.config.auth.password.PasswordService
 import kr.mashup.bangwidae.asked.controller.dto.EditUserSettingsRequest
 import kr.mashup.bangwidae.asked.controller.dto.JoinUserRequest
 import kr.mashup.bangwidae.asked.controller.dto.JoinUserResponse
+import kr.mashup.bangwidae.asked.controller.dto.UserInfoDto
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.external.aws.S3ImageUploader
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.UserSettings
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.UserSettings
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.question.QuestionService
 import org.bson.types.ObjectId
@@ -19,15 +20,18 @@ import org.springframework.web.multipart.MultipartFile
 
 @Service
 class UserService(
-    private val jwtService: JwtService,
     private val userRepository: UserRepository,
+    private val jwtService: JwtService,
+    private val wardService: WardService,
+    private val termsService: TermsService,
     private val certMailService: CertMailService,
     private val passwordService: PasswordService,
     private val questionService: QuestionService,
-    private val s3ImageUploader: S3ImageUploader
+    private val s3ImageUploader: S3ImageUploader,
 ) {
 
     fun joinUser(joinUserRequest: JoinUserRequest): JoinUserResponse {
+        checkDuplicatedUserByEmail(joinUserRequest.email)
         val cert = certMailService.findByEmail(joinUserRequest.email)
         if (!cert.isCertificated) {
             throw DoriDoriException.of(DoriDoriExceptionType.NOT_CERTIFICATED_EMAIL)
@@ -43,6 +47,8 @@ class UserService(
             )
         )
 
+        termsService.agreeTerms(user, joinUserRequest.termsIds)
+
         val refreshToken = jwtService.createRefreshToken(user.id!!.toHexString())
         userRepository.save(
             user.updateRefreshToken(refreshToken)
@@ -50,12 +56,17 @@ class UserService(
         return JoinUserResponse(
             accessToken = jwtService.createAccessToken(user.id.toHexString()),
             refreshToken = refreshToken,
+            userId = user.id.toHexString()
         )
     }
 
-    fun getUserInfo(userId: ObjectId): User {
-        return userRepository.findById(userId)
+    fun getUserInfo(userId: ObjectId): UserInfoDto {
+        val user = userRepository.findById(userId)
             .orElseThrow { DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND) }
+            .also { if (it.deleted) throw DoriDoriException.of(DoriDoriExceptionType.USER_DELETED) }
+
+        val representativeWard = wardService.getMyRepresentativeWard(user)
+        return UserInfoDto.from(user, representativeWard)
     }
 
     fun getUserHeaderText(user: User, type: HeaderTextType): String {
@@ -76,10 +87,9 @@ class UserService(
         return true
     }
 
-    fun updateProfile(user: User, description: String, tags: List<String>): Boolean {
-        userRepository.save(
-            user.updateProfile(description, tags)
-        )
+    fun updateProfile(user: User, description: String, tags: List<String>, representativeWardId: ObjectId?): Boolean {
+        userRepository.save(user.updateProfile(description, tags))
+        wardService.updateRepresentativeWard(user, representativeWardId)
         return true
     }
 
@@ -95,7 +105,9 @@ class UserService(
     }
 
     fun findById(id: ObjectId): User {
-        return userRepository.findByIdOrNull(id) ?: throw RuntimeException("User {id: $id} Not Found")
+        return (userRepository.findByIdOrNull(id)
+            ?: throw DoriDoriException.of(DoriDoriExceptionType.USER_NOT_FOUND))
+            .also { if (it.deleted) throw DoriDoriException.of(DoriDoriExceptionType.USER_DELETED) }
     }
 
     fun findByEmail(email: String): User? {
@@ -123,6 +135,10 @@ class UserService(
             locationInfo = editUserSettingsRequest.locationInfo,
         )
         return userRepository.save(user.updateSettings(newSettings))
+    }
+
+    fun delete(user: User) {
+        userRepository.save(user.deleteUser())
     }
 }
 

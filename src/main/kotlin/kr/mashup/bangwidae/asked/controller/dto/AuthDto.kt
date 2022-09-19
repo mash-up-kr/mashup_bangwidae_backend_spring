@@ -1,7 +1,7 @@
 package kr.mashup.bangwidae.asked.controller.dto
 
 import io.swagger.annotations.ApiModelProperty
-import kr.mashup.bangwidae.asked.model.LoginType
+import kr.mashup.bangwidae.asked.model.document.LoginType
 
 // TODO: 하나의 login api로 BASIC, OAUTH 다 커버할지 나눌지?
 data class LoginRequest(
@@ -18,6 +18,8 @@ data class LoginResponse(
     val accessToken: String,
     @ApiModelProperty(value = "리프레시 토큰", example = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.~~~")
     val refreshToken: String,
+    @ApiModelProperty(value = "유저 Id", example = "62c7d4518b57fb5432bfb0d9")
+    val userId: String
 )
 
 data class CertMailSendRequest(

@@ -3,7 +3,7 @@ package kr.mashup.bangwidae.asked.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.*
-import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.document.User
 import kr.mashup.bangwidae.asked.service.post.CommentService
 import kr.mashup.bangwidae.asked.service.post.PostLikeService
 import kr.mashup.bangwidae.asked.service.post.PostService
@@ -24,11 +24,11 @@ class PostController(
     @PostMapping
     fun writePost(
         @ApiIgnore @AuthenticationPrincipal user: User, @RequestBody postWriteRequest: PostWriteRequest
-    ): ApiResponse<PostResultDto> {
+    ): ApiResponse<PostDto> {
         val post = postWriteRequest.toEntity(user.id!!)
         return postService.write(user, post)
             .let {
-                ApiResponse.success(PostResultDto.from(user, it))
+                ApiResponse.success(PostDto.from(it))
             }
     }
 
@@ -38,13 +38,13 @@ class PostController(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @RequestBody postEditRequest: PostEditRequest,
         @PathVariable id: ObjectId
-    ): ApiResponse<PostResultDto> {
+    ): ApiResponse<PostDto> {
         return postService.edit(
             postId = id,
             user = user,
             request = postEditRequest
         ).let {
-            ApiResponse.success(PostResultDto.from(user, it))
+            ApiResponse.success(PostDto.from(it))
         }
     }
 
@@ -78,28 +78,33 @@ class PostController(
     @ApiOperation("거리 반경 포스트 글 페이징")
     @GetMapping("/near")
     fun getNearPosts(
-        @ApiIgnore @AuthenticationPrincipal user: User,
+        @ApiIgnore @AuthenticationPrincipal user: User?,
         @RequestParam longitude: Double,
         @RequestParam latitude: Double,
         @RequestParam meterDistance: Double,
         @RequestParam size: Int,
         @RequestParam(required = false) lastId: ObjectId?
     ): ApiResponse<CursorResult<PostDto>> {
-        return postService.getNearPost(user.id!!, longitude, latitude, meterDistance, lastId, size + 1)
-            .let {
-                ApiResponse.success(CursorResult.from(values = it, requestedSize = size))
+        return postService.getNearPost(user, longitude, latitude, meterDistance, lastId, size + 1)
+            .let { postList ->
+                ApiResponse.success(
+                    CursorResult.from(
+                        values = postList.map { PostDto.from(it) },
+                        requestedSize = size
+                    )
+                )
             }
     }
 
     @ApiOperation("포스트 글 조회")
-    @GetMapping("/{id}")
+    @GetMapping("/{postId}")
     fun getPostById(
-        @ApiIgnore @AuthenticationPrincipal user: User,
-        @PathVariable id: ObjectId
+        @ApiIgnore @AuthenticationPrincipal user: User?,
+        @PathVariable postId: ObjectId
     ): ApiResponse<PostDto> {
-        return postService.getPostById(user.id!!, id)
+        return postService.getPostById(user, postId)
             .let {
-                ApiResponse.success(it)
+                ApiResponse.success(PostDto.from(it))
             }
     }
 
@@ -109,27 +114,28 @@ class PostController(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable postId: ObjectId,
         @RequestBody commentWriteRequest: CommentWriteRequest,
-    ): ApiResponse<CommentResultDto> {
-        return commentService.write(
-            user = user,
-            postId = postId,
-            comment = commentWriteRequest.toEntity(user.id!!, postId)
-        ).let {
-            ApiResponse.success(CommentResultDto.from(user, it))
+    ): ApiResponse<CommentDto> {
+        return commentService.write(user = user, comment = commentWriteRequest.toEntity(user.id!!, postId)).let {
+            ApiResponse.success(CommentDto.from(it))
         }
     }
 
-    @ApiOperation("댓글 조희 페이징")
+    @ApiOperation("댓글 조회 페이징")
     @GetMapping("/{postId}/comment")
     fun getComments(
-        @ApiIgnore @AuthenticationPrincipal user: User,
+        @ApiIgnore @AuthenticationPrincipal user: User?,
         @PathVariable postId: ObjectId,
         @RequestParam size: Int,
         @RequestParam(required = false) lastId: ObjectId?
     ): ApiResponse<CursorResult<CommentDto>> {
-        return commentService.getCommentsByPostId(user.id!!, postId, lastId, size + 1)
-            .let {
-                ApiResponse.success(CursorResult.from(values = it, requestedSize = size))
+        return commentService.getCommentsByPostId(user, postId, lastId, size + 1)
+            .let { commentList ->
+                ApiResponse.success(
+                    CursorResult.from(
+                        values = commentList.map { CommentDto.from(it) },
+                        requestedSize = size
+                    )
+                )
             }
     }
 }

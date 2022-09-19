@@ -1,4 +1,4 @@
-package kr.mashup.bangwidae.asked.model.question
+package kr.mashup.bangwidae.asked.model.document.question
 
 import kr.mashup.bangwidae.asked.model.Region
 import org.bson.types.ObjectId
@@ -21,22 +21,21 @@ data class Question(
     val content: String,
     val status: QuestionStatus = QuestionStatus.ANSWER_WAITING,
 
-    // TODO location 기존 데이터 마이그레이션 후 not-null 로 수정
     @GeoSpatialIndexed(type = GeoSpatialIndexType.GEO_2DSPHERE)
-    val location: GeoJsonPoint?,
+    val location: GeoJsonPoint,
     val representativeAddress: String? = null,
     val region: Region? = null,
 
-    // TODO anonymous 기존 데이터 마이그레이션 후 not-null 로 수정
-    val anonymous: Boolean? = false,
+    val anonymous: Boolean = false,
     val deleted: Boolean = false,
     @Version var version: Int? = null,
     @CreatedDate var createdAt: LocalDateTime? = null,
     @LastModifiedDate var updatedAt: LocalDateTime? = null,
 ) {
-    fun updateContent(content: String): Question {
+    fun updateContent(content: String?, anonymous: Boolean?): Question {
         return this.copy(
-            content = content,
+            content = content ?: this.content,
+            anonymous = anonymous ?: this.anonymous,
         )
     }
 

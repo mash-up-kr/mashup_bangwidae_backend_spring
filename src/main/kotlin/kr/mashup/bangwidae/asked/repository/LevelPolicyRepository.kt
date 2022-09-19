@@ -1,6 +1,6 @@
 package kr.mashup.bangwidae.asked.repository
 
-import kr.mashup.bangwidae.asked.model.LevelPolicy
+import kr.mashup.bangwidae.asked.model.document.LevelPolicy
 import org.bson.types.ObjectId
 import org.springframework.data.mongodb.repository.MongoRepository
 

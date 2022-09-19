@@ -11,8 +11,8 @@ import kr.mashup.bangwidae.asked.controller.dto.LoginRequest
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.external.mail.GmailSender
-import kr.mashup.bangwidae.asked.model.LoginType
-import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.document.LoginType
+import kr.mashup.bangwidae.asked.model.document.User
 import kr.mashup.bangwidae.asked.service.CertMailService
 import kr.mashup.bangwidae.asked.service.UserService
 import org.bson.types.ObjectId

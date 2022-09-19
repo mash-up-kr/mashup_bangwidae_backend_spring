@@ -6,9 +6,9 @@ import kr.mashup.bangwidae.asked.controller.dto.*
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.external.mail.GmailSender
-import kr.mashup.bangwidae.asked.model.LoginType
+import kr.mashup.bangwidae.asked.model.document.LoginType
 import kr.mashup.bangwidae.asked.model.MailTemplate
-import kr.mashup.bangwidae.asked.model.User
+import kr.mashup.bangwidae.asked.model.document.User
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.CertMailService
 import kr.mashup.bangwidae.asked.service.UserService
@@ -50,7 +50,8 @@ class AuthService(
 
         return LoginResponse(
             accessToken = jwtService.createAccessToken(user.id.toHexString()),
-            refreshToken = refreshToken
+            refreshToken = refreshToken,
+            userId = user.id.toHexString()
         )
     }
 

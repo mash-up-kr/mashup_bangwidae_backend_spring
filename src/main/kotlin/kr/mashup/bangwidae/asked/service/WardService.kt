@@ -2,10 +2,12 @@ package kr.mashup.bangwidae.asked.service
 
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
-import kr.mashup.bangwidae.asked.model.User
-import kr.mashup.bangwidae.asked.model.Ward
+import kr.mashup.bangwidae.asked.model.document.User
+import kr.mashup.bangwidae.asked.model.document.Ward
 import kr.mashup.bangwidae.asked.repository.LevelPolicyRepository
 import kr.mashup.bangwidae.asked.repository.WardRepository
+import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
+import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
@@ -15,21 +17,24 @@ import java.time.LocalDateTime
 class WardService(
     private val wardRepository: WardRepository,
     private val levelPolicyRepository: LevelPolicyRepository,
-    private val levelPolicyService: LevelPolicyService
+    private val levelPolicyService: LevelPolicyService,
+    private val placeService: PlaceService
 ) {
     fun createWard(user: User, name: String, longitude: Double, latitude: Double): Boolean {
         val userLevelPolicy = levelPolicyRepository.findByLevel(user.level)
         val userWardCount = wardRepository.countAllByUserId(user.id!!)
 
-        if (userWardCount >= userLevelPolicy!!.wardCount) {
+        val location = GeoUtils.geoJsonPoint(longitude, latitude)
+        val region = placeService.reverseGeocode(longitude, latitude)
+
+        if (userWardCount >= userLevelPolicy!!.maxWardCount) {
             throw DoriDoriException.of(DoriDoriExceptionType.WARD_MAX_COUNT)
         }
+        if (region.도 == null && region.시 == null) {
+            throw DoriDoriException.of(DoriDoriExceptionType.CITY_NOT_EXIST)
+        }
 
-        val ward = Ward.create(
-            userId = user.id,
-            name = name,
-            location = GeoUtils.geoJsonPoint(longitude, latitude)
-        )
+        val ward = Ward.create(userId = user.id, name = name, location = location, region = region)
         wardRepository.save(ward)
         levelPolicyService.levelUpIfConditionSatisfied(user)
         return true
@@ -46,7 +51,7 @@ class WardService(
         if (ward.userId != user.id!!) {
             throw DoriDoriException.of(DoriDoriExceptionType.NOT_ALLOWED_TO_ACCESS)
         }
-        
+
         wardRepository.delete(ward)
     }
 
@@ -59,6 +64,19 @@ class WardService(
         }
         return ward.extendPeriod(period).let {
             wardRepository.save(it)
+        }
+    }
+
+    fun getMyRepresentativeWard(user: User): Ward? {
+        return wardRepository.findWardByUserIdAndExpiredAtAfterAndIsRepresentativeTrue(user.id!!, LocalDateTime.now())
+    }
+
+    fun updateRepresentativeWard(user: User, representativeWardId: ObjectId?) {
+        getMyRepresentativeWard(user)?.let { wardRepository.save(it.copy(isRepresentative = false)) }
+        if (representativeWardId != null) {
+            wardRepository.findWardByIdAndExpiredAtAfter(representativeWardId, LocalDateTime.now())?.let {
+                wardRepository.save(it.copy(isRepresentative = true))
+            }
         }
     }
 }
