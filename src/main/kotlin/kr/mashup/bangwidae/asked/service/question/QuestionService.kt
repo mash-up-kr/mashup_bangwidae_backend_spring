@@ -9,6 +9,7 @@ import kr.mashup.bangwidae.asked.model.document.question.Question
 import kr.mashup.bangwidae.asked.model.document.question.QuestionStatus
 import kr.mashup.bangwidae.asked.model.domain.QuestionDomain
 import kr.mashup.bangwidae.asked.repository.*
+import kr.mashup.bangwidae.asked.service.BlackListComponent
 import kr.mashup.bangwidae.asked.service.event.QuestionWriteEvent
 import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
@@ -29,6 +30,7 @@ class QuestionService(
     private val answerLikeAggregator: AnswerLikeAggregator,
     private val userRepository: UserRepository,
     private val applicationEventPublisher: ApplicationEventPublisher,
+    private val blackListComponent: BlackListComponent,
 ) : WithQuestionAuthorityValidator {
     private fun findById(questionId: ObjectId): Question {
         return questionRepository.findByIdAndDeletedFalse(questionId)
@@ -38,9 +40,9 @@ class QuestionService(
     fun findDetailById(authUser: User?, questionId: ObjectId): QuestionDomain {
         // TODO 심사만 올리면 지워버리기..
         val question = questionRepository.findByIdAndDeletedFalse(questionId)
-            ?:questionRepository.findByIdAndDeletedFalse(
+            ?: questionRepository.findByIdAndDeletedFalse(
                 answerRepository.findByIdAndDeletedFalse(questionId)?.questionId!!
-            )?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
+            ) ?: throw DoriDoriException.of(DoriDoriExceptionType.NOT_EXIST)
 
         return question.toDomain(authUser)
     }
@@ -124,16 +126,29 @@ class QuestionService(
                 .associateBy { it.answerId }
         } ?: emptyMap()
 
+        val blackListMap = blackListComponent.getBlackListMap().get()
+
         return this.map {
             val answer = answersMapByQuestionId[it.id]?.firstOrNull()
-            QuestionDomain.from(
-                question = it,
-                fromUser = userMapByUserId[it.fromUserId]!!,
-                toUser = userMapByUserId[it.toUserId]!!,
-                answer = answer,
-                answerLikeCount = answer?.let { answerLikeCountMapByAnswerId[answer.id!!] ?: 0 },
-                answerUserLiked = answer?.let { myAnswerLikeMapByAnswerId[answer.id] != null },
-            )
+            if (blackListMap[authUser!!.id]?.contains(it.toUserId) == true) {
+                QuestionDomain.from(
+                    question = it.toBlockedQuestion(),
+                    fromUser = userMapByUserId[it.fromUserId]!!.getAnonymousUser(),
+                    toUser = userMapByUserId[it.toUserId]!!,
+                    answer = answer,
+                    answerLikeCount = 0,
+                    answerUserLiked = false,
+                )
+            } else {
+                QuestionDomain.from(
+                    question = it,
+                    fromUser = userMapByUserId[it.fromUserId]!!,
+                    toUser = userMapByUserId[it.toUserId]!!,
+                    answer = answer,
+                    answerLikeCount = answer?.let { answerLikeCountMapByAnswerId[answer.id!!] ?: 0 },
+                    answerUserLiked = answer?.let { myAnswerLikeMapByAnswerId[answer.id] != null },
+                )
+            }
         }
     }
 
@@ -157,7 +172,7 @@ class QuestionService(
                     content = request.content,
                     anonymous = request.anonymous,
                     location = GeoUtils.geoJsonPoint(longitude = request.longitude, latitude = request.latitude),
-                    representativeAddress = it?.representativeAddress?: "",
+                    representativeAddress = it?.representativeAddress ?: "",
                     region = it,
                 )
             ).also {

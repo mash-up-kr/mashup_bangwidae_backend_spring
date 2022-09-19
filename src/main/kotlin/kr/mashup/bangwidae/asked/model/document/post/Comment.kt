@@ -45,4 +45,8 @@ data class Comment(
             deleted = true,
         )
     }
+
+    fun toBlockedComment() = this.copy(
+        content = "차단된 사용자의 댓글입니다"
+    )
 }

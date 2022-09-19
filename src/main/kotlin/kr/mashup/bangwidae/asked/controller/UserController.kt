@@ -228,4 +228,14 @@ class UserController(
         return userService.delete(user)
             .let { ApiResponse.success(true) }
     }
+
+    @ApiOperation("유저 차단")
+    @PostMapping("/{toUserId}")
+    fun blockUser(
+        @ApiIgnore @AuthenticationPrincipal user: User,
+        @PathVariable toUserId: String
+    ): ApiResponse<Boolean> {
+        return userService.blockUser(user, ObjectId(toUserId))
+            .let { ApiResponse.success(true) }
+    }
 }
