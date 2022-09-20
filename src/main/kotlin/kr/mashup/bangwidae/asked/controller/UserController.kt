@@ -3,6 +3,8 @@ package kr.mashup.bangwidae.asked.controller
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 import kr.mashup.bangwidae.asked.controller.dto.*
+import kr.mashup.bangwidae.asked.exception.DoriDoriException
+import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.model.document.User
 import kr.mashup.bangwidae.asked.service.HeaderTextType
 import kr.mashup.bangwidae.asked.service.UserService
@@ -235,6 +237,9 @@ class UserController(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable toUserId: String
     ): ApiResponse<Boolean> {
+        if (user.id!! == ObjectId(toUserId)) {
+            throw DoriDoriException.of(DoriDoriExceptionType.USER_CANNOT_BLOCK_ME)
+        }
         return userService.blockUser(user, ObjectId(toUserId))
             .let { ApiResponse.success(true) }
     }

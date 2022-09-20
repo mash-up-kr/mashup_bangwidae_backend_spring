@@ -27,6 +27,7 @@ enum class DoriDoriExceptionType(
     DUPLICATED_NICKNAME("이미 존재하는 닉네임이에요"),
     USER_NOT_FOUND("유저를 찾을 수 없어요"),
     USER_DELETED("탈퇴한 유저예요"),
+    USER_CANNOT_BLOCK_ME("자기 자신을 차단할 수 없어요"),
 
     // PLACE
     INVALID_COUNTRY("한국에서만 위치 기능을 사용할 수 있어요"),
