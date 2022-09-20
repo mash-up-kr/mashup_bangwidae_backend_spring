@@ -8,6 +8,7 @@ import kr.mashup.bangwidae.asked.model.document.post.Post
 import kr.mashup.bangwidae.asked.model.domain.PostDomain
 import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
+import kr.mashup.bangwidae.asked.service.BlackListComponent
 import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
@@ -26,7 +27,8 @@ class PostService(
     private val userRepository: UserRepository,
     private val postLikeService: PostLikeService,
     private val commentService: CommentService,
-    private val levelPolicyService: LevelPolicyService
+    private val levelPolicyService: LevelPolicyService,
+    private val blackListComponent: BlackListComponent
 ) : WithPostAuthorityValidator {
     fun findById(id: ObjectId): Post {
         return postRepository.findByIdAndDeletedFalse(id)
@@ -95,15 +97,25 @@ class PostService(
         val userMap = userRepository.findAllByIdIn(this.map { it.userId }.toSet()).associateBy { it.id!! }
         val likeMap = postLikeService.getLikeMap(this)
         val commentCountMap = commentService.getCommentCountMap(this)
+        val blackListMap = blackListComponent.getBlackListMap().get()
         return this.map { post ->
-            PostDomain.from(
-                user = userMap[post.userId]!!,
-                post = post,
-                likeCount = likeMap[post.id]?.size ?: 0,
-                commentCount = commentCountMap[post.id] ?: 0,
-                userLiked = if (user == null) false
-                else likeMap[post.id]?.map { like -> like.userId }?.contains(user.id) ?: false
-            )
+            if (blackListMap[user!!.id]?.contains(post.userId) == true) {
+                PostDomain.from(
+                    user = userMap[post.userId]!!.getAnonymousUser(),
+                    post = post.toBlockedPost(),
+                    likeCount = 0,
+                    commentCount = 0,
+                    userLiked = false
+                )
+            } else {
+                PostDomain.from(
+                    user = userMap[post.userId]!!,
+                    post = post,
+                    likeCount = likeMap[post.id]?.size ?: 0,
+                    commentCount = commentCountMap[post.id] ?: 0,
+                    userLiked = likeMap[post.id]?.map { like -> like.userId }?.contains(user.id) ?: false
+                )
+            }
         }
     }
 }

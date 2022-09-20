@@ -9,6 +9,7 @@ import kr.mashup.bangwidae.asked.model.document.post.Post
 import kr.mashup.bangwidae.asked.model.domain.CommentDomain
 import kr.mashup.bangwidae.asked.repository.CommentRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
+import kr.mashup.bangwidae.asked.service.BlackListComponent
 import kr.mashup.bangwidae.asked.service.event.CommentWriteEvent
 import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
@@ -28,6 +29,7 @@ class CommentService(
     private val commentLikeService: CommentLikeService,
     private val levelPolicyService: LevelPolicyService,
     private val applicationEventPublisher: ApplicationEventPublisher,
+    private val blackListComponent: BlackListComponent
 ) : WithPostAuthorityValidator, WithCommentAuthorityValidator {
     fun findById(commentId: ObjectId): Comment {
         return commentRepository.findByIdAndDeletedFalse(commentId)
@@ -53,7 +55,7 @@ class CommentService(
             .also {
                 levelPolicyService.levelUpIfConditionSatisfied(user)
             }.also {
-                applicationEventPublisher.publishEvent(CommentWriteEvent(it.id!!))
+                applicationEventPublisher.publishEvent(CommentWriteEvent(it.id))
             }
 
     }
@@ -82,14 +84,23 @@ class CommentService(
     private fun List<Comment>.toDomain(user: User?): List<CommentDomain> {
         val userMap = userRepository.findAllByIdIn(this.map { it.userId }.toSet()).associateBy { it.id!! }
         val likeMap = commentLikeService.getLikeMap(this)
+        val blackListMap = blackListComponent.getBlackListMap().get()
         return this.map { comment ->
-            CommentDomain.from(
-                user = userMap[comment.userId]!!,
-                comment = comment,
-                likeCount = likeMap[comment.id]?.size ?: 0,
-                userLiked = if (user == null) false
-                else likeMap[comment.id]?.map { like -> like.userId }?.contains(user.id) ?: false
-            )
+            if (blackListMap[user!!.id]?.contains(comment.userId) == true) {
+                CommentDomain.from(
+                    user = userMap[comment.userId]!!,
+                    comment = comment.toBlockedComment(),
+                    likeCount = 0,
+                    userLiked = false
+                )
+            } else {
+                CommentDomain.from(
+                    user = userMap[comment.userId]!!.getAnonymousUser(),
+                    comment = comment,
+                    likeCount = likeMap[comment.id]?.size ?: 0,
+                    userLiked = likeMap[comment.id]?.map { like -> like.userId }?.contains(user.id) ?: false
+                )
+            }
         }
     }
 }

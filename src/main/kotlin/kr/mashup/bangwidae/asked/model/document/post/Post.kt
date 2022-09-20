@@ -47,4 +47,8 @@ data class Post(
             deleted = true,
         )
     }
+
+    fun toBlockedPost() = this.copy(
+        content = "차단된 사용자의 글입니다"
+    )
 }

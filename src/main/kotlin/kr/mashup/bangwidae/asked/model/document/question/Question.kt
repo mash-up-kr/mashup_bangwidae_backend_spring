@@ -62,6 +62,10 @@ data class Question(
             status = QuestionStatus.ANSWER_WAITING,
         )
     }
+
+    fun toBlockedQuestion() = this.copy(
+        content = "차단된 사용자의 질문입니다"
+    )
 }
 
 enum class QuestionStatus {

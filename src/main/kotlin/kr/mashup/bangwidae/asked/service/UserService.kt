@@ -9,8 +9,10 @@ import kr.mashup.bangwidae.asked.controller.dto.UserInfoDto
 import kr.mashup.bangwidae.asked.exception.DoriDoriException
 import kr.mashup.bangwidae.asked.exception.DoriDoriExceptionType
 import kr.mashup.bangwidae.asked.external.aws.S3ImageUploader
+import kr.mashup.bangwidae.asked.model.BlackList
 import kr.mashup.bangwidae.asked.model.document.User
 import kr.mashup.bangwidae.asked.model.document.UserSettings
+import kr.mashup.bangwidae.asked.repository.BlackListRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.question.QuestionService
 import org.bson.types.ObjectId
@@ -28,6 +30,8 @@ class UserService(
     private val passwordService: PasswordService,
     private val questionService: QuestionService,
     private val s3ImageUploader: S3ImageUploader,
+    private val blackListRepository: BlackListRepository,
+    private val blackListComponent: BlackListComponent
 ) {
 
     fun joinUser(joinUserRequest: JoinUserRequest): JoinUserResponse {
@@ -139,6 +143,11 @@ class UserService(
 
     fun delete(user: User) {
         userRepository.save(user.deleteUser())
+    }
+
+    fun blockUser(user: User, toUserId: ObjectId) {
+        blackListRepository.save(BlackList(fromUserId = user.id!!, toUserId = toUserId))
+            .let { blackListComponent.setBlackListMap() }
     }
 }
 
