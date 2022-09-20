@@ -88,17 +88,17 @@ class CommentService(
         return this.map { comment ->
             if (blackListMap[user!!.id]?.contains(comment.userId) == true) {
                 CommentDomain.from(
-                    user = userMap[comment.userId]!!.getAnonymousUser(),
-                    comment = comment,
-                    likeCount = likeMap[comment.id]?.size ?: 0,
-                    userLiked = likeMap[comment.id]?.map { like -> like.userId }?.contains(user.id) ?: false
-                )
-            } else {
-                CommentDomain.from(
                     user = userMap[comment.userId]!!,
                     comment = comment.toBlockedComment(),
                     likeCount = 0,
                     userLiked = false
+                )
+            } else {
+                CommentDomain.from(
+                    user = userMap[comment.userId]!!.getAnonymousUser(),
+                    comment = comment,
+                    likeCount = likeMap[comment.id]?.size ?: 0,
+                    userLiked = likeMap[comment.id]?.map { like -> like.userId }?.contains(user.id) ?: false
                 )
             }
         }

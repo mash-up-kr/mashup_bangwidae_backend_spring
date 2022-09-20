@@ -230,7 +230,7 @@ class UserController(
     }
 
     @ApiOperation("유저 차단")
-    @PostMapping("/{toUserId}")
+    @PostMapping("block/{toUserId}")
     fun blockUser(
         @ApiIgnore @AuthenticationPrincipal user: User,
         @PathVariable toUserId: String

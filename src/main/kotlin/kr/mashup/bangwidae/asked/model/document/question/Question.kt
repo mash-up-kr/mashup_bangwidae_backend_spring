@@ -64,7 +64,7 @@ data class Question(
     }
 
     fun toBlockedQuestion() = this.copy(
-        content = "차단된 사용자의 질문입니다."
+        content = "차단된 사용자의 질문입니다"
     )
 }
 

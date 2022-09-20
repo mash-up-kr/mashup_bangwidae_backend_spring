@@ -19,16 +19,10 @@ class BlackListComponent(
         setBlackListMap()
     }
 
-    @Scheduled(cron = "0 0/1 * * * *")
-    fun cron() {
-        setBlackListMap()
-    }
-
     fun setBlackListMap() {
-        blackListMap.set(
-            blackListRepository.findAll()
-                .groupBy({ it.fromUserId }, { it.toUserId }) as ConcurrentHashMap<ObjectId, List<ObjectId>>?
-        )
+        ConcurrentHashMap<ObjectId, List<ObjectId>>().apply {
+            putAll(blackListRepository.findAll().groupBy({ it.fromUserId }, { it.toUserId }))
+        }.let { blackListMap.set(it) }
     }
 
     fun getBlackListMap() = blackListMap
