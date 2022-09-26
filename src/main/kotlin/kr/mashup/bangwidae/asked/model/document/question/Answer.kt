@@ -42,4 +42,8 @@ data class Answer(
             deleted = true,
         )
     }
+
+    fun toReportedAnswer() = this.copy(
+        content = "신고된 답변입니다"
+    )
 }

@@ -9,6 +9,7 @@ import kr.mashup.bangwidae.asked.model.domain.PostDomain
 import kr.mashup.bangwidae.asked.repository.PostRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.BlackListComponent
+import kr.mashup.bangwidae.asked.service.ReportService
 import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
 import kr.mashup.bangwidae.asked.utils.GeoUtils
@@ -28,7 +29,8 @@ class PostService(
     private val postLikeService: PostLikeService,
     private val commentService: CommentService,
     private val levelPolicyService: LevelPolicyService,
-    private val blackListComponent: BlackListComponent
+    private val blackListComponent: BlackListComponent,
+    private val reportService: ReportService
 ) : WithPostAuthorityValidator {
     fun findById(id: ObjectId): Post {
         return postRepository.findByIdAndDeletedFalse(id)
@@ -98,11 +100,14 @@ class PostService(
         val likeMap = postLikeService.getLikeMap(this)
         val commentCountMap = commentService.getCommentCountMap(this)
         val blackListMap = blackListComponent.getBlackListMap().get()
+        val reportMap = reportService.getReportMap().get()
         return this.map { post ->
-            if (blackListMap[user!!.id]?.contains(post.userId) == true) {
+            val blocked = blackListMap[user!!.id]?.contains(post.userId) == true
+            val reported = reportMap[user.id]?.map { it.targetId }?.contains(post.id!!) == true
+            if (blocked || reported) {
                 PostDomain.from(
                     user = userMap[post.userId]!!.getAnonymousUser(),
-                    post = post.toBlockedPost(),
+                    post = if (reported) post.toReportedPost() else post.toBlockedPost(),
                     likeCount = 0,
                     commentCount = 0,
                     userLiked = false

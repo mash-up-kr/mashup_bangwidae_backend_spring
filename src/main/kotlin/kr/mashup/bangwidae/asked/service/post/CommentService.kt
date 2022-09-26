@@ -10,6 +10,7 @@ import kr.mashup.bangwidae.asked.model.domain.CommentDomain
 import kr.mashup.bangwidae.asked.repository.CommentRepository
 import kr.mashup.bangwidae.asked.repository.UserRepository
 import kr.mashup.bangwidae.asked.service.BlackListComponent
+import kr.mashup.bangwidae.asked.service.ReportService
 import kr.mashup.bangwidae.asked.service.event.CommentWriteEvent
 import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
@@ -29,7 +30,8 @@ class CommentService(
     private val commentLikeService: CommentLikeService,
     private val levelPolicyService: LevelPolicyService,
     private val applicationEventPublisher: ApplicationEventPublisher,
-    private val blackListComponent: BlackListComponent
+    private val blackListComponent: BlackListComponent,
+    private val reportService: ReportService
 ) : WithPostAuthorityValidator, WithCommentAuthorityValidator {
     fun findById(commentId: ObjectId): Comment {
         return commentRepository.findByIdAndDeletedFalse(commentId)
@@ -85,11 +87,14 @@ class CommentService(
         val userMap = userRepository.findAllByIdIn(this.map { it.userId }.toSet()).associateBy { it.id!! }
         val likeMap = commentLikeService.getLikeMap(this)
         val blackListMap = blackListComponent.getBlackListMap().get()
+        val reportMap = reportService.getReportMap().get()
         return this.map { comment ->
-            if (blackListMap[user!!.id]?.contains(comment.userId) == true) {
+            val blocked = blackListMap[user!!.id]?.contains(comment.userId) == true
+            val reported = reportMap[user.id]?.map { it.targetId }?.contains(comment.id!!) == true
+            if (blocked || reported) {
                 CommentDomain.from(
                     user = userMap[comment.userId]!!,
-                    comment = comment.toBlockedComment(),
+                    comment = if (reported) comment.toReportedComment() else comment.toBlockedComment(),
                     likeCount = 0,
                     userLiked = false
                 )

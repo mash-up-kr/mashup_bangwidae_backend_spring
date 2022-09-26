@@ -66,6 +66,10 @@ data class Question(
     fun toBlockedQuestion() = this.copy(
         content = "차단된 사용자의 질문입니다"
     )
+
+    fun toReportedQuestion() = this.copy(
+        content = "신고된 질문입니다"
+    )
 }
 
 enum class QuestionStatus {

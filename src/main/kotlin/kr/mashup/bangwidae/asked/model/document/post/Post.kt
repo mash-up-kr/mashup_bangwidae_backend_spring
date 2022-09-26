@@ -51,4 +51,8 @@ data class Post(
     fun toBlockedPost() = this.copy(
         content = "차단된 사용자의 글입니다"
     )
+
+    fun toReportedPost() = this.copy(
+        content = "신고된 글입니다"
+    )
 }

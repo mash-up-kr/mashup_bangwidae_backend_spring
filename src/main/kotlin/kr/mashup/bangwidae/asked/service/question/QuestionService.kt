@@ -10,6 +10,7 @@ import kr.mashup.bangwidae.asked.model.document.question.QuestionStatus
 import kr.mashup.bangwidae.asked.model.domain.QuestionDomain
 import kr.mashup.bangwidae.asked.repository.*
 import kr.mashup.bangwidae.asked.service.BlackListComponent
+import kr.mashup.bangwidae.asked.service.ReportService
 import kr.mashup.bangwidae.asked.service.event.QuestionWriteEvent
 import kr.mashup.bangwidae.asked.service.levelpolicy.LevelPolicyService
 import kr.mashup.bangwidae.asked.service.place.PlaceService
@@ -31,6 +32,7 @@ class QuestionService(
     private val userRepository: UserRepository,
     private val applicationEventPublisher: ApplicationEventPublisher,
     private val blackListComponent: BlackListComponent,
+    private val reportService: ReportService
 ) : WithQuestionAuthorityValidator {
     private fun findById(questionId: ObjectId): Question {
         return questionRepository.findByIdAndDeletedFalse(questionId)
@@ -127,23 +129,32 @@ class QuestionService(
         } ?: emptyMap()
 
         val blackListMap = blackListComponent.getBlackListMap().get()
+        val reportMap = reportService.getReportMap().get()
 
-        return this.map {
-            val answer = answersMapByQuestionId[it.id]?.firstOrNull()
-            if (blackListMap[authUser!!.id]?.contains(it.toUserId) == true) {
+        return this.map { question ->
+            val answer = answersMapByQuestionId[question.id]?.firstOrNull()?.apply {
+                val answerReported = reportMap[authUser!!.id]?.map { report -> report.targetId }?.contains(id!!) == true
+                if (answerReported) {
+                    this.toReportedAnswer()
+                }
+            }
+            val blocked = blackListMap[authUser!!.id]?.contains(question.toUserId) == true
+            val reported = reportMap[authUser.id]?.map { it.targetId }?.contains(question.id!!) == true
+
+            if (blocked || reported) {
                 QuestionDomain.from(
-                    question = it.toBlockedQuestion(),
-                    fromUser = userMapByUserId[it.fromUserId]!!.getAnonymousUser(),
-                    toUser = userMapByUserId[it.toUserId]!!,
+                    question = if (reported) question.toReportedQuestion() else question.toBlockedQuestion(),
+                    fromUser = userMapByUserId[question.fromUserId]!!.getAnonymousUser(),
+                    toUser = userMapByUserId[question.toUserId]!!,
                     answer = answer,
                     answerLikeCount = 0,
                     answerUserLiked = false,
                 )
             } else {
                 QuestionDomain.from(
-                    question = it,
-                    fromUser = userMapByUserId[it.fromUserId]!!,
-                    toUser = userMapByUserId[it.toUserId]!!,
+                    question = question,
+                    fromUser = userMapByUserId[question.fromUserId]!!,
+                    toUser = userMapByUserId[question.toUserId]!!,
                     answer = answer,
                     answerLikeCount = answer?.let { answerLikeCountMapByAnswerId[answer.id!!] ?: 0 },
                     answerUserLiked = answer?.let { myAnswerLikeMapByAnswerId[answer.id] != null },

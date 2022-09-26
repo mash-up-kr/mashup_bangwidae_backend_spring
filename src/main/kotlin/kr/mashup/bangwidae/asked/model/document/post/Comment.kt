@@ -49,4 +49,8 @@ data class Comment(
     fun toBlockedComment() = this.copy(
         content = "차단된 사용자의 댓글입니다"
     )
+
+    fun toReportedComment() = this.copy(
+        content = "신고된 댓글입니다"
+    )
 }
