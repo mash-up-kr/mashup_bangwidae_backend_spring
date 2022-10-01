@@ -19,6 +19,9 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.web.AuthenticationEntryPoint
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.preauth.AbstractPreAuthenticatedProcessingFilter
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 
 @EnableWebSecurity
@@ -58,6 +61,7 @@ class SecurityConfig {
                 "/api/v1/qa/type/{id}"
             ).permitAll()
             .antMatchers("/api/**").hasAuthority("ROLE")
+        http.cors().configurationSource(corsConfigurationSource())
         http.csrf().disable()
             .logout().disable()
             .formLogin().disable()
@@ -100,5 +104,17 @@ class SecurityConfig {
     @Bean
     fun authenticationEntryPoint(): AuthenticationEntryPoint {
         return AuthenticationExceptionHandler(objectMapper)
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource? {
+        val configuration = CorsConfiguration()
+        configuration.addAllowedOriginPattern("*")
+        configuration.addAllowedHeader("*")
+        configuration.addAllowedMethod("*")
+        configuration.allowCredentials = true
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
     }
 }
